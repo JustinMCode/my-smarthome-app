@@ -11,6 +11,7 @@
 // Core filter components
 import { CalendarFilter } from './calendar-filter.js';
 import { hashString } from '../../../utils/core/hash.js';
+import { CacheFactory } from '../../../utils/core/cache/index.js';
 
 export { CalendarFilter };
 
@@ -34,7 +35,6 @@ export function createFilterManager(core, options = {}) {
     // Create filter manager with optimized settings
     const filterManager = new FilterManager(core, {
         enableCaching: true,
-        maxCacheSize: 100,
         enableResponsive: true,
         updateDebounce: 100,
         ...managerConfig
@@ -97,13 +97,12 @@ class FilterManager {
         this.core = core;
         this.options = {
             enableCaching: true,
-            maxCacheSize: 100,
             enableResponsive: true,
             updateDebounce: 100,
             ...options
         };
         
-        this.filterCache = new Map();
+        this.filterCache = CacheFactory.createCache('filters');
         this.activeFilters = new Map();
         this.stats = {
             cacheHits: 0,
@@ -158,12 +157,16 @@ class FilterManager {
      */
     getFilteredEvents(events) {
         const startTime = performance.now();
-        const cacheKey = this.generateCacheKey(events);
         
         // Check cache first
-        if (this.options.enableCaching && this.filterCache.has(cacheKey)) {
-            this.stats.cacheHits++;
-            return this.filterCache.get(cacheKey);
+        if (this.options.enableCaching) {
+            const cached = this.filterCache.get(events, {
+                keyOptions: { strategy: 'hash' }
+            });
+            if (cached) {
+                this.stats.cacheHits++;
+                return cached;
+            }
         }
         
         this.stats.cacheMisses++;
@@ -173,12 +176,9 @@ class FilterManager {
         
         // Cache the result
         if (this.options.enableCaching) {
-            this.filterCache.set(cacheKey, filteredEvents);
-            
-            // Cleanup if cache is too large
-            if (this.filterCache.size > this.options.maxCacheSize) {
-                this.cleanupCache();
-            }
+            this.filterCache.set(events, filteredEvents, {
+                keyOptions: { strategy: 'hash' }
+            });
         }
         
         // Update stats
@@ -244,29 +244,10 @@ class FilterManager {
     }
 
     /**
-     * Generate cache key for events
-     * @param {Array} events - Array of events
-     * @returns {string} Cache key
-     */
-    generateCacheKey(events) {
-        const eventIds = events.map(e => e.id || e.title).sort().join(',');
-        const visibleCalendars = this.activeFilters.get('calendars') || [];
-        const filterHash = hashString(JSON.stringify(visibleCalendars));
-        return `${eventIds}_${filterHash}`;
-    }
-
-    /**
      * Cleanup cache by removing oldest entries
      */
     cleanupCache() {
-        const entries = Array.from(this.filterCache.entries());
-        entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
-        
-        // Remove oldest 20% of entries
-        const toRemove = Math.floor(this.filterCache.size * 0.2);
-        for (let i = 0; i < toRemove; i++) {
-            this.filterCache.delete(entries[i][0]);
-        }
+        this.filterCache.clearExpired();
     }
 
     /**
@@ -318,11 +299,11 @@ class FilterManager {
      * @returns {Object} Filter manager statistics
      */
     getStats() {
+        const cacheStats = this.filterCache.getStats();
         return {
             ...this.stats,
-            cacheSize: this.filterCache.size,
-            cacheHitRate: this.stats.totalFilters > 0 ? 
-                (this.stats.cacheHits / this.stats.totalFilters * 100).toFixed(2) + '%' : '0%'
+            cacheSize: cacheStats.size,
+            cacheHitRate: cacheStats.hitRate + '%'
         };
     }
 
@@ -330,7 +311,7 @@ class FilterManager {
      * Destroy the manager
      */
     destroy() {
-        this.clearCache();
+        this.filterCache.destroy();
         if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
         }

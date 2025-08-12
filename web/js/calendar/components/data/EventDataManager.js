@@ -3,12 +3,13 @@
  * Centralized event data handling and filtering for calendar views
  */
 
+import { CacheFactory } from '../../utils/core/cache/index.js';
+
 export class EventDataManager {
     constructor(core) {
         this.core = core;
         this.filters = new Map();
-        this.cache = new Map();
-        this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+        this.cache = CacheFactory.createEventCache();
     }
 
     /**
@@ -22,12 +23,11 @@ export class EventDataManager {
             useCache = true
         } = options;
 
-        const cacheKey = this.getCacheKey(date, options);
-        
-        if (useCache && this.cache.has(cacheKey)) {
-            const cached = this.cache.get(cacheKey);
-            if (Date.now() - cached.timestamp < this.cacheTimeout) {
-                return cached.events;
+        // Check cache first
+        if (useCache) {
+            const cached = this.cache.getEvents(date, options);
+            if (cached) {
+                return cached;
             }
         }
 
@@ -52,10 +52,7 @@ export class EventDataManager {
 
         // Cache the result
         if (useCache) {
-            this.cache.set(cacheKey, {
-                events,
-                timestamp: Date.now()
-            });
+            this.cache.cacheEvents(date, options, events);
         }
 
         return events;
@@ -295,15 +292,6 @@ export class EventDataManager {
     }
 
     /**
-     * Get cache key for date and options
-     */
-    getCacheKey(date, options) {
-        const dateStr = date.toDateString();
-        const optionsStr = JSON.stringify(options);
-        return `${dateStr}-${optionsStr}`;
-    }
-
-    /**
      * Clear cache
      */
     clearCache() {
@@ -314,37 +302,28 @@ export class EventDataManager {
      * Clear expired cache entries
      */
     clearExpiredCache() {
-        const now = Date.now();
-        for (const [key, value] of this.cache.entries()) {
-            if (now - value.timestamp > this.cacheTimeout) {
-                this.cache.delete(key);
-            }
-        }
+        this.cache.clearExpired();
     }
 
     /**
      * Get cache statistics
      */
     getCacheStats() {
-        this.clearExpiredCache();
-        return {
-            size: this.cache.size,
-            timeout: this.cacheTimeout
-        };
+        return this.cache.getEventStats();
     }
 
     /**
      * Set cache timeout
      */
     setCacheTimeout(timeout) {
-        this.cacheTimeout = timeout;
+        this.cache.updateConfig({ timeout });
     }
 
     /**
      * Destroy the manager
      */
     destroy() {
-        this.clearCache();
+        this.cache.destroy();
         this.filters.clear();
     }
 }

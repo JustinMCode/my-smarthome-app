@@ -9,11 +9,10 @@
  */
 
 // Core data management components
-import { EventCache } from './EventCache.js';
 import { EventDataManager } from './EventDataManager.js';
-import { hashString } from '../../utils/core/hash.js';
+import { CacheFactory, KeyGenerators } from '../../utils/core/cache/index.js';
 
-export { EventCache, EventDataManager };
+export { EventDataManager };
 
 /**
  * Calendar Data Manager Factory
@@ -30,10 +29,9 @@ export function createDataManager(core, options = {}) {
     } = options;
 
     // Create cache with optimized settings
-    const eventCache = new EventCache({
-        defaultTTL: 5 * 60 * 1000, // 5 minutes
-        maxCacheSize: 1000,        // Max 1000 entries
-        enableCompression: true,   // Enable compression for memory efficiency
+    const eventCache = CacheFactory.createEventCache({
+        timeout: 5 * 60 * 1000, // 5 minutes
+        maxSize: 1000,          // Max 1000 entries
         ...cacheConfig
     });
 
@@ -51,36 +49,36 @@ export function createDataManager(core, options = {}) {
         
         // Convenience methods for common operations
         getEventsForDate: (date, options) => {
-            const cacheKey = eventCache.generateKey(date, options);
-            let events = eventCache.get(cacheKey);
+            let events = eventCache.getEvents(date, options);
             
             if (!events) {
                 events = eventDataManager.getEventsForDate(date, options);
-                eventCache.set(cacheKey, events);
+                eventCache.cacheEvents(date, options, events);
             }
             
             return events;
         },
         
         getEventsForWeek: (startOfWeek, options) => {
-            const cacheKey = eventCache.generateKey(startOfWeek, { type: 'week', ...options });
-            let events = eventCache.get(cacheKey);
+            const weekOptions = { type: 'week', ...options };
+            let events = eventCache.getEvents(startOfWeek, weekOptions);
             
             if (!events) {
                 events = eventDataManager.getEventsForWeek(startOfWeek, options);
-                eventCache.set(cacheKey, events);
+                eventCache.cacheEvents(startOfWeek, weekOptions, events);
             }
             
             return events;
         },
         
         getEventsForMonth: (year, month, options) => {
-            const cacheKey = eventCache.generateKey(new Date(year, month, 1), { type: 'month', ...options });
-            let events = eventCache.get(cacheKey);
+            const monthDate = new Date(year, month, 1);
+            const monthOptions = { type: 'month', ...options };
+            let events = eventCache.getEvents(monthDate, monthOptions);
             
             if (!events) {
                 events = eventDataManager.getEventsForMonth(year, month, options);
-                eventCache.set(cacheKey, events);
+                eventCache.cacheEvents(monthDate, monthOptions, events);
             }
             
             return events;
@@ -88,7 +86,7 @@ export function createDataManager(core, options = {}) {
         
         // Cache management
         clearCache: () => eventCache.clear(),
-        getCacheStats: () => eventCache.getStats(),
+        getCacheStats: () => eventCache.getEventStats(),
         
         // Data manager operations
         findOverlappingEvents: (events) => eventDataManager.findOverlappingEvents(events),
@@ -175,46 +173,43 @@ export const Filters = {
 
 /**
  * Predefined cache configurations for different use cases
+ * @deprecated Use CACHE_PRESETS from cache system instead
  */
 export const CacheConfigs = {
     /**
      * Configuration for high-performance month view
      */
     monthView: {
-        defaultTTL: 10 * 60 * 1000, // 10 minutes
-        maxCacheSize: 500,          // Smaller cache for month view
-        enableCompression: true,    // Enable compression
-        cleanupInterval: 300000     // Cleanup every 5 minutes
+        timeout: 10 * 60 * 1000, // 10 minutes
+        maxSize: 500,            // Smaller cache for month view
+        evictionPolicy: 'lru'
     },
     
     /**
      * Configuration for responsive week view
      */
     weekView: {
-        defaultTTL: 5 * 60 * 1000,  // 5 minutes
-        maxCacheSize: 200,          // Larger cache for week view
-        enableCompression: false,   // Disable compression for faster access
-        cleanupInterval: 60000      // Cleanup every minute
+        timeout: 5 * 60 * 1000,  // 5 minutes
+        maxSize: 200,            // Larger cache for week view
+        evictionPolicy: 'lru'
     },
     
     /**
      * Configuration for mobile devices
      */
     mobile: {
-        defaultTTL: 3 * 60 * 1000,  // 3 minutes
-        maxCacheSize: 100,          // Smaller cache for memory constraints
-        enableCompression: true,    // Enable compression
-        cleanupInterval: 120000     // Cleanup every 2 minutes
+        timeout: 3 * 60 * 1000,  // 3 minutes
+        maxSize: 100,            // Smaller cache for memory constraints
+        evictionPolicy: 'lru'
     },
     
     /**
      * Configuration for desktop with high memory
      */
     desktop: {
-        defaultTTL: 15 * 60 * 1000, // 15 minutes
-        maxCacheSize: 2000,         // Large cache for desktop
-        enableCompression: false,   // Disable compression
-        cleanupInterval: 600000     // Cleanup every 10 minutes
+        timeout: 15 * 60 * 1000, // 15 minutes
+        maxSize: 2000,           // Large cache for desktop
+        evictionPolicy: 'lru'
     }
 };
 
@@ -227,11 +222,10 @@ export const Utils = {
      * @param {Date} date - Date for the query
      * @param {Object} options - Query options
      * @returns {string} Cache key
+     * @deprecated Use KeyGenerators.event from cache system instead
      */
     generateCacheKey: (date, options = {}) => {
-        const dateStr = date.toISOString().split('T')[0];
-        const optionsStr = JSON.stringify(options);
-        return `events_${dateStr}_${hashString(optionsStr)}`;
+        return KeyGenerators.event(date, options);
     },
     
     /**
@@ -268,7 +262,6 @@ export const Utils = {
 
 // Default export for convenience
 export default {
-    EventCache,
     EventDataManager,
     createDataManager,
     Filters,

@@ -11,6 +11,7 @@
 // Core navigation components
 import { DateNavigation } from './DateNavigation.js';
 import { CalendarHeader } from './calendar-header.js';
+import { CacheFactory } from '../../../utils/core/cache/index.js';
 
 export { DateNavigation, CalendarHeader };
 
@@ -38,7 +39,6 @@ export function createNavigationManager(core, options = {}) {
     // Create navigation manager with optimized settings
     const navigationManager = new NavigationManager(core, {
         enableCaching: true,
-        maxCacheSize: 100,
         enableHistory: true,
         maxHistorySize: 50,
         enableResponsive: true,
@@ -107,7 +107,6 @@ class NavigationManager {
         this.core = core;
         this.options = {
             enableCaching: true,
-            maxCacheSize: 100,
             enableHistory: true,
             maxHistorySize: 50,
             enableResponsive: true,
@@ -118,7 +117,7 @@ class NavigationManager {
         this.dateNavigation = new DateNavigation(core);
         this.calendarHeader = new CalendarHeader(core);
         this.navigationHistory = [];
-        this.navigationCache = new Map();
+        this.navigationCache = CacheFactory.createCache('navigation');
         this.stats = {
             navigations: 0,
             cacheHits: 0,
@@ -282,29 +281,22 @@ class NavigationManager {
             return this.calculateNavigationState(date, viewType);
         }
         
-        const cacheKey = this.generateCacheKey(date, viewType);
+        const cached = this.navigationCache.get([date, viewType], {
+            keyOptions: { strategy: 'simple' }
+        });
         
-        if (this.navigationCache.has(cacheKey)) {
-            const cached = this.navigationCache.get(cacheKey);
-            if (this.isCacheValid(cached)) {
-                this.stats.cacheHits++;
-                return cached.result;
-            }
+        if (cached) {
+            this.stats.cacheHits++;
+            return cached;
         }
         
         this.stats.cacheMisses++;
         
         const navigationState = this.calculateNavigationState(date, viewType);
         
-        this.navigationCache.set(cacheKey, {
-            result: navigationState,
-            timestamp: Date.now()
+        this.navigationCache.set([date, viewType], navigationState, {
+            keyOptions: { strategy: 'simple' }
         });
-        
-        // Cleanup if cache is too large
-        if (this.navigationCache.size > this.options.maxCacheSize) {
-            this.cleanupCache();
-        }
         
         return navigationState;
     }
@@ -363,37 +355,10 @@ class NavigationManager {
     }
 
     /**
-     * Generate cache key
-     * @param {Date} date - Date for cache key
-     * @param {string} viewType - View type for cache key
-     * @returns {string} Cache key
-     */
-    generateCacheKey(date, viewType) {
-        const dateStr = date.toDateString();
-        return `${viewType}_${dateStr}`;
-    }
-
-    /**
-     * Check if cache is valid
-     * @param {Object} cached - Cached data
-     * @returns {boolean} True if cache is valid
-     */
-    isCacheValid(cached) {
-        return Date.now() - cached.timestamp < 300000; // 5 minutes
-    }
-
-    /**
      * Cleanup cache
      */
     cleanupCache() {
-        const entries = Array.from(this.navigationCache.entries());
-        entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
-        
-        // Remove oldest entries
-        const toRemove = Math.floor(this.navigationCache.size * 0.2); // Remove 20%
-        for (let i = 0; i < toRemove; i++) {
-            this.navigationCache.delete(entries[i][0]);
-        }
+        this.navigationCache.clearExpired();
     }
 
     /**

@@ -28,7 +28,7 @@ export { CalendarSettings, createSettingsManager, SettingsConfigs, SettingsStrat
 export { GridLayoutEngine, OverlapDetector, ResponsiveLayout, createLayoutManager, LayoutConfigs, LayoutStrategies, LayoutUtils, PerformanceUtils } from './layout/index.js';
 
 // Data Components
-export { EventDataManager, EventCache, createDataManager, Filters, CacheConfigs, Utils } from './data/index.js';
+export { EventDataManager, createDataManager, Filters, CacheConfigs, Utils } from './data/index.js';
 
 // Legacy exports for backward compatibility
 // These will be removed once refactoring is complete

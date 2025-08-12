@@ -3,6 +3,8 @@
  * Handles time slot positioning, overlap detection, and layout calculations
  */
 
+import { CacheFactory } from '../../utils/core/cache/index.js';
+
 export class GridLayoutEngine {
     constructor(options = {}) {
         this.options = {
@@ -13,7 +15,8 @@ export class GridLayoutEngine {
             ...options
         };
         
-        this.layoutCache = new Map();
+        this.layoutCache = CacheFactory.createCache('layout');
+        this.layoutVersion = 0; // Track layout changes
     }
 
     /**
@@ -300,10 +303,12 @@ export class GridLayoutEngine {
      * Cache layout calculations
      */
     cacheLayout(key, layout) {
-        this.layoutCache.set(key, {
-            layout,
+        const enhancedLayout = {
+            ...layout,
+            layoutVersion: this.layoutVersion,
             timestamp: Date.now()
-        });
+        };
+        this.layoutCache.set(key, enhancedLayout);
     }
 
     /**
@@ -311,8 +316,8 @@ export class GridLayoutEngine {
      */
     getCachedLayout(key, maxAge = 60000) { // 1 minute default
         const cached = this.layoutCache.get(key);
-        if (cached && Date.now() - cached.timestamp < maxAge) {
-            return cached.layout;
+        if (cached && cached.layoutVersion === this.layoutVersion) {
+            return cached;
         }
         return null;
     }
@@ -329,6 +334,7 @@ export class GridLayoutEngine {
      */
     updateOptions(newOptions) {
         this.options = { ...this.options, ...newOptions };
+        this.layoutVersion++; // Increment version to invalidate cache
         this.clearLayoutCache(); // Clear cache when options change
     }
 
@@ -336,8 +342,10 @@ export class GridLayoutEngine {
      * Get layout statistics
      */
     getLayoutStats() {
+        const cacheStats = this.layoutCache.getStats();
         return {
-            cacheSize: this.layoutCache.size,
+            ...cacheStats,
+            layoutVersion: this.layoutVersion,
             options: this.options
         };
     }
@@ -346,6 +354,6 @@ export class GridLayoutEngine {
      * Destroy the layout engine
      */
     destroy() {
-        this.clearLayoutCache();
+        this.layoutCache.destroy();
     }
 }

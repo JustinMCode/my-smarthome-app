@@ -12,6 +12,7 @@
 import { EventRenderer } from './EventRenderer.js';
 import { EventPill } from './event-pill.js';
 import { hashString } from '../../../utils/core/hash.js';
+import { CacheFactory } from '../../../utils/core/cache/index.js';
 
 export { EventRenderer, EventPill };
 
@@ -38,7 +39,6 @@ export function createEventManager(core, options = {}) {
         enablePooling: true,
         maxPoolSize: 200,
         enableCaching: true,
-        cacheTimeout: 5 * 60 * 1000, // 5 minutes
         ...managerConfig
     });
 
@@ -105,12 +105,11 @@ class EventManager {
             enablePooling: true,
             maxPoolSize: 200,
             enableCaching: true,
-            cacheTimeout: 5 * 60 * 1000,
             ...options
         };
         
         this.eventPills = new Map();
-        this.eventCache = new Map();
+        this.eventCache = CacheFactory.createEventCache();
         this.eventPool = [];
         this.stats = {
             created: 0,
@@ -127,12 +126,10 @@ class EventManager {
      * @returns {EventPill} Event pill instance
      */
     createEventPill(event, options = {}) {
-        const cacheKey = this.generateEventKey(event, options);
-        
         // Check cache first
-        if (this.options.enableCaching && this.eventCache.has(cacheKey)) {
-            const cached = this.eventCache.get(cacheKey);
-            if (this.isCacheValid(cached)) {
+        if (this.options.enableCaching) {
+            const cached = this.eventCache.getEvents(new Date(event.start), options);
+            if (cached) {
                 this.stats.reused++;
                 return cached.pill;
             }
@@ -151,16 +148,12 @@ class EventManager {
         
         // Cache the pill
         if (this.options.enableCaching) {
-            this.eventCache.set(cacheKey, {
-                pill,
-                timestamp: Date.now(),
-                options
-            });
+            this.eventCache.cacheEvents(new Date(event.start), options, { pill, options });
             this.stats.cached++;
         }
         
         // Store reference
-        this.eventPills.set(event.id || cacheKey, pill);
+        this.eventPills.set(event.id || event.title, pill);
         
         return pill;
     }
@@ -232,41 +225,24 @@ class EventManager {
      * @returns {Object} Event manager statistics
      */
     getStats() {
+        const cacheStats = this.eventCache.getEventStats();
         return {
             ...this.stats,
             activePills: this.eventPills.size,
-            cachedPills: this.eventCache.size,
-            pooledPills: this.eventPool.length
+            cachedPills: cacheStats.size,
+            pooledPills: this.eventPool.length,
+            cacheHitRate: cacheStats.hitRate
         };
     }
 
-    /**
-     * Generate cache key
-     * @param {Object} event - Event data
-     * @param {Object} options - Event options
-     * @returns {string} Cache key
-     */
-    generateEventKey(event, options) {
-        const eventStr = JSON.stringify(event);
-        const optionsStr = JSON.stringify(options);
-        return `${event.id || hashString(eventStr)}_${hashString(optionsStr)}`;
-    }
 
-    /**
-     * Check if cache entry is valid
-     * @param {Object} cached - Cached entry
-     * @returns {boolean} True if valid
-     */
-    isCacheValid(cached) {
-        return Date.now() - cached.timestamp < this.options.cacheTimeout;
-    }
 
     /**
      * Destroy the manager
      */
     destroy() {
         this.clearEventPills();
-        this.clearCache();
+        this.eventCache.destroy();
         
         // Clear pool
         this.eventPool.forEach(pill => pill.destroy());

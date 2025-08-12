@@ -10,6 +10,7 @@
 
 // Core settings components
 import { CalendarSettings } from './calendar-settings.js';
+import { CacheFactory } from '../../../utils/core/cache/index.js';
 
 export { CalendarSettings };
 
@@ -33,7 +34,6 @@ export function createSettingsManager(core, options = {}) {
     // Create settings manager with optimized settings
     const settingsManager = new SettingsManager(core, {
         enableCaching: true,
-        maxCacheSize: 50,
         enableAutoSave: true,
         autoSaveDelay: 1000,
         enableValidation: true,
@@ -106,7 +106,6 @@ class SettingsManager {
         this.core = core;
         this.options = {
             enableCaching: true,
-            maxCacheSize: 50,
             enableAutoSave: true,
             autoSaveDelay: 1000,
             enableValidation: true,
@@ -116,7 +115,7 @@ class SettingsManager {
         };
         
         this.userPreferences = new Map();
-        this.settingsCache = new Map();
+        this.settingsCache = CacheFactory.createCache('settings');
         this.stats = {
             settingsLoaded: 0,
             settingsSaved: 0,
@@ -174,29 +173,22 @@ class SettingsManager {
             return this.loadSettings(key);
         }
         
-        const cacheKey = this.generateCacheKey(key);
+        const cached = this.settingsCache.get(key, {
+            keyOptions: { strategy: 'simple' }
+        });
         
-        if (this.settingsCache.has(cacheKey)) {
-            const cached = this.settingsCache.get(cacheKey);
-            if (this.isCacheValid(cached)) {
-                this.stats.cacheHits++;
-                return cached.result;
-            }
+        if (cached) {
+            this.stats.cacheHits++;
+            return cached;
         }
         
         this.stats.cacheMisses++;
         
         const settings = this.loadSettings(key);
         
-        this.settingsCache.set(cacheKey, {
-            result: settings,
-            timestamp: Date.now()
+        this.settingsCache.set(key, settings, {
+            keyOptions: { strategy: 'simple' }
         });
-        
-        // Cleanup if cache is too large
-        if (this.settingsCache.size > this.options.maxCacheSize) {
-            this.cleanupCache();
-        }
         
         return settings;
     }
@@ -386,35 +378,10 @@ class SettingsManager {
     }
 
     /**
-     * Generate cache key
-     * @param {string} key - Settings key
-     * @returns {string} Cache key
-     */
-    generateCacheKey(key) {
-        return `settings_${key}`;
-    }
-
-    /**
-     * Check if cache is valid
-     * @param {Object} cached - Cached data
-     * @returns {boolean} True if cache is valid
-     */
-    isCacheValid(cached) {
-        return Date.now() - cached.timestamp < 600000; // 10 minutes
-    }
-
-    /**
      * Cleanup cache
      */
     cleanupCache() {
-        const entries = Array.from(this.settingsCache.entries());
-        entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
-        
-        // Remove oldest entries
-        const toRemove = Math.floor(this.settingsCache.size * 0.2); // Remove 20%
-        for (let i = 0; i < toRemove; i++) {
-            this.settingsCache.delete(entries[i][0]);
-        }
+        this.settingsCache.clearExpired();
     }
 
     /**

@@ -11,6 +11,7 @@
 // Core cell rendering components
 import { DayCell } from './day-cell.js';
 import { hashString } from '../../../utils/core/hash.js';
+import { CacheFactory } from '../../../utils/core/cache/index.js';
 
 export { DayCell };
 
@@ -33,7 +34,6 @@ export function createCellManager(core, options = {}) {
         enablePooling: true,
         maxPoolSize: 100,
         enableCaching: true,
-        cacheTimeout: 5 * 60 * 1000, // 5 minutes
         ...managerConfig
     });
 
@@ -94,12 +94,11 @@ class CellManager {
             enablePooling: true,
             maxPoolSize: 100,
             enableCaching: true,
-            cacheTimeout: 5 * 60 * 1000,
             ...options
         };
         
         this.cells = new Map();
-        this.cellCache = new Map();
+        this.cellCache = CacheFactory.createCellCache();
         this.cellPool = [];
         this.stats = {
             created: 0,
@@ -116,12 +115,10 @@ class CellManager {
      * @returns {DayCell} Cell instance
      */
     createCell(date, options = {}) {
-        const cacheKey = this.generateCacheKey(date, options);
-        
         // Check cache first
-        if (this.options.enableCaching && this.cellCache.has(cacheKey)) {
-            const cached = this.cellCache.get(cacheKey);
-            if (this.isCacheValid(cached)) {
+        if (this.options.enableCaching) {
+            const cached = this.cellCache.getCell(date, options);
+            if (cached) {
                 this.stats.reused++;
                 return cached.cell;
             }
@@ -140,11 +137,7 @@ class CellManager {
         
         // Cache the cell
         if (this.options.enableCaching) {
-            this.cellCache.set(cacheKey, {
-                cell,
-                timestamp: Date.now(),
-                options
-            });
+            this.cellCache.cacheCell(date, options, { cell, options });
             this.stats.cached++;
         }
         
@@ -221,33 +214,14 @@ class CellManager {
      * @returns {Object} Cell manager statistics
      */
     getStats() {
+        const cacheStats = this.cellCache.getCellStats();
         return {
             ...this.stats,
             activeCells: this.cells.size,
-            cachedCells: this.cellCache.size,
-            pooledCells: this.cellPool.length
+            cachedCells: cacheStats.size,
+            pooledCells: this.cellPool.length,
+            cacheHitRate: cacheStats.hitRate
         };
-    }
-
-    /**
-     * Generate cache key
-     * @param {Date} date - Date for the cell
-     * @param {Object} options - Cell options
-     * @returns {string} Cache key
-     */
-    generateCacheKey(date, options) {
-        const dateStr = date.toDateString();
-        const optionsStr = JSON.stringify(options);
-        return `${dateStr}_${CellUtils.hashString(optionsStr)}`;
-    }
-
-    /**
-     * Check if cache entry is valid
-     * @param {Object} cached - Cached entry
-     * @returns {boolean} True if valid
-     */
-    isCacheValid(cached) {
-        return Date.now() - cached.timestamp < this.options.cacheTimeout;
     }
 
     /**
@@ -255,7 +229,7 @@ class CellManager {
      */
     destroy() {
         this.clearCells();
-        this.clearCache();
+        this.cellCache.destroy();
         
         // Clear pool
         this.cellPool.forEach(cell => cell.destroy());
