@@ -11,6 +11,7 @@
 // Core event rendering components
 import { EventRenderer } from './EventRenderer.js';
 import { EventPill } from './event-pill.js';
+import { hashString } from '../../../utils/core/hash.js';
 
 export { EventRenderer, EventPill };
 
@@ -248,7 +249,7 @@ class EventManager {
     generateEventKey(event, options) {
         const eventStr = JSON.stringify(event);
         const optionsStr = JSON.stringify(options);
-        return `${event.id || EventUtils.hashString(eventStr)}_${EventUtils.hashString(optionsStr)}`;
+        return `${event.id || hashString(eventStr)}_${hashString(optionsStr)}`;
     }
 
     /**
@@ -437,22 +438,7 @@ export const EventUtils = {
     generateEventKey: (event, options = {}) => {
         const eventStr = JSON.stringify(event);
         const optionsStr = JSON.stringify(options);
-        return `event_${event.id || EventUtils.hashString(eventStr)}_${EventUtils.hashString(optionsStr)}`;
-    },
-    
-    /**
-     * Simple string hash function
-     * @param {string} str - String to hash
-     * @returns {string} Hash value
-     */
-    hashString: (str) => {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
-        }
-        return Math.abs(hash).toString(36);
+        return `event_${event.id || hashString(eventStr)}_${hashString(optionsStr)}`;
     },
     
     /**

@@ -11,10 +11,12 @@
 // Import utility modules
 import * as Constants from './calendar-constants.js';
 import * as DateUtils from './calendar-date-utils.js';
+import * as HashUtils from './core/hash.js';
 
 // Utility modules
 export * from './calendar-constants.js';
 export * from './calendar-date-utils.js';
+export * from './core/hash.js';
 
 // Named exports for better organization
 export { 
@@ -47,6 +49,19 @@ export {
     getCalendarGridDates
 } from './calendar-date-utils.js';
 
+export {
+    hashString,
+    hashStringLegacy,
+    hashStrings,
+    hashObject,
+    getHashPerformanceMetrics,
+    resetHashPerformanceMetrics,
+    compareHashes,
+    isValidHash,
+    HASH_ALGORITHMS,
+    DEFAULT_ALGORITHM
+} from './core/hash.js';
+
 // Legacy exports for backward compatibility
 export { CALENDAR_CONFIG as LegacyCalendarConfig } from './calendar-constants.js';
 export { CSS_CLASSES as LegacyCSSClasses } from './calendar-constants.js';
@@ -59,6 +74,7 @@ export { SUCCESS_MESSAGES as LegacySuccessMessages } from './calendar-constants.
 export default {
     ...Constants,
     ...DateUtils,
+    ...HashUtils,
     
     // Legacy exports
     LegacyCalendarConfig: Constants.CALENDAR_CONFIG,

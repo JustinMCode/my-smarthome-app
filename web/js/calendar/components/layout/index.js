@@ -12,6 +12,7 @@
 import { GridLayoutEngine } from './GridLayoutEngine.js';
 import { OverlapDetector } from './OverlapDetector.js';
 import { ResponsiveLayout } from './ResponsiveLayout.js';
+import { hashString } from '../../utils/core/hash.js';
 
 export { GridLayoutEngine, OverlapDetector, ResponsiveLayout };
 
@@ -316,22 +317,7 @@ export const LayoutUtils = {
     generateLayoutKey: (viewType, date, options = {}) => {
         const dateStr = date.toISOString().split('T')[0];
         const optionsStr = JSON.stringify(options);
-        return `layout_${viewType}_${dateStr}_${LayoutUtils.hashString(optionsStr)}`;
-    },
-    
-    /**
-     * Simple string hash function
-     * @param {string} str - String to hash
-     * @returns {string} Hash value
-     */
-    hashString: (str) => {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
-        }
-        return Math.abs(hash).toString(36);
+        return `layout_${viewType}_${dateStr}_${hashString(optionsStr)}`;
     },
     
     /**

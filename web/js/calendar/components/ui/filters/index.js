@@ -10,6 +10,7 @@
 
 // Core filter components
 import { CalendarFilter } from './calendar-filter.js';
+import { hashString } from '../../../utils/core/hash.js';
 
 export { CalendarFilter };
 
@@ -250,7 +251,7 @@ class FilterManager {
     generateCacheKey(events) {
         const eventIds = events.map(e => e.id || e.title).sort().join(',');
         const visibleCalendars = this.activeFilters.get('calendars') || [];
-        const filterHash = FilterUtils.hashString(JSON.stringify(visibleCalendars));
+        const filterHash = hashString(JSON.stringify(visibleCalendars));
         return `${eventIds}_${filterHash}`;
     }
 
@@ -501,23 +502,8 @@ export const FilterUtils = {
      */
     generateFilterKey: (events, filterConfig = {}) => {
         const eventIds = events.map(e => e.id || e.title).sort().join(',');
-        const configHash = FilterUtils.hashString(JSON.stringify(filterConfig));
+        const configHash = hashString(JSON.stringify(filterConfig));
         return `filter_${eventIds}_${configHash}`;
-    },
-    
-    /**
-     * Simple string hash function
-     * @param {string} str - String to hash
-     * @returns {string} Hash value
-     */
-    hashString: (str) => {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
-        }
-        return Math.abs(hash).toString(36);
     },
     
     /**
