@@ -1,0 +1,26 @@
+/**
+ * Calendar Touch UI - Main Entry Point
+ * Optimized for 15-inch Touchscreen
+ * 
+ * This file imports all calendar components:
+ * - Variables and theming
+ * - Header and navigation
+ * - View-specific styles (month, week, agenda)
+ * - Shared events and interactions
+ */
+
+/* Import theme variables */
+@import url('../theme/_calendar-variables.css');
+
+/* Import header component */
+@import url('../components/calendar/_calendar-header.css');
+
+/* Import view-specific components */
+@import url('../components/calendar/_calendar-month.css');
+@import url('../components/calendar/_calendar-week.css');
+@import url('../components/calendar/_calendar-agenda.css');
+
+/* Import shared components */
+@import url('../components/calendar/_calendar-events.css');
+@import url('../components/calendar/_calendar-filter.css');
+@import url('../components/calendar/_calendar-interactions.css');

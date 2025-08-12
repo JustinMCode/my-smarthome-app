@@ -1,0 +1,282 @@
+/**
+ * Calendar Events Component
+ * Shared event styling and categories across all views - Sleek Design
+ */
+
+/* Base Event Pill Styling */
+.event-pill {
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-full);
+    font-size: var(--font-xs);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all var(--transition-base);
+    cursor: default;
+}
+
+.event-pill:hover {
+    transform: translateX(2px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Event Category Colors - Work */
+.event-pill.work,
+.event-work {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563EB;
+    border-left-color: #3B82F6;
+}
+
+.event-pill.work:hover,
+.event-work:hover {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.week-event.work {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+}
+
+.agenda-item.work {
+    border-left-color: #3B82F6;
+}
+
+/* Event Category Colors - Personal */
+.event-pill.personal,
+.event-personal {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border-left-color: #10B981;
+}
+
+.event-pill.personal:hover,
+.event-personal:hover {
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.week-event.personal {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.agenda-item.personal {
+    border-left-color: #10B981;
+}
+
+/* Event Category Colors - Family */
+.event-pill.family,
+.event-family {
+    background: rgba(245, 158, 11, 0.1);
+    color: #D97706;
+    border-left-color: #F59E0B;
+}
+
+.event-pill.family:hover,
+.event-family:hover {
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.week-event.family {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+}
+
+.agenda-item.family {
+    border-left-color: #F59E0B;
+}
+
+/* Event Category Colors - Health */
+.event-pill.health,
+.event-health {
+    background: rgba(239, 68, 68, 0.1);
+    color: #DC2626;
+    border-left-color: #EF4444;
+}
+
+.event-pill.health:hover,
+.event-health:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.week-event.health {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+}
+
+.agenda-item.health {
+    border-left-color: #EF4444;
+}
+
+/* Event Category Colors - Meeting */
+.event-pill.meeting,
+.event-meeting {
+    background: rgba(168, 85, 247, 0.1);
+    color: #7C3AED;
+    border-left-color: #A855F7;
+}
+
+.event-pill.meeting:hover,
+.event-meeting:hover {
+    background: rgba(168, 85, 247, 0.15);
+}
+
+.week-event.meeting {
+    background: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%);
+}
+
+.agenda-item.meeting {
+    border-left-color: #A855F7;
+}
+
+/* Special Event States */
+.day-cell.today .event-pill {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+.day-cell.today .event-pill:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Week View Event Styling */
+.week-event {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    color: white;
+    border-radius: var(--radius-md);
+    padding: var(--space-sm);
+    font-size: var(--font-xs);
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    overflow: hidden;
+}
+
+.week-event:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-lg);
+    z-index: 10;
+}
+
+.week-event:active {
+    transform: scale(0.98);
+}
+
+.week-event .event-time {
+    font-weight: 700;
+    opacity: 0.9;
+}
+
+.week-event .event-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* All-Day Events */
+.all-day-event {
+    /* Background and color will be set dynamically via JavaScript */
+    border-radius: var(--radius-lg);
+    padding: var(--space-sm) var(--space-md);
+    margin: var(--space-xs);
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+}
+
+/* Multi-Day Events */
+.multi-day-event {
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.multi-day-event.continues {
+    border-radius: 0;
+}
+
+.multi-day-event.ends {
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+/* Event Badges */
+.event-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.2);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Event Icons */
+.event-icon {
+    width: 14px;
+    height: 14px;
+    margin-right: var(--space-xs);
+    opacity: 0.8;
+}
+
+/* More Events Indicator */
+.more-events {
+    font-size: var(--font-xs);
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+    padding: var(--space-xs);
+    background: transparent;
+    border-radius: var(--radius-md);
+    cursor: default;
+    transition: all var(--transition-base);
+}
+
+/* .more-events:hover - removed hover effects */
+
+/* Event Tooltip */
+.event-tooltip {
+    position: absolute;
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-xl);
+    z-index: 1000;
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+}
+
+.event-tooltip.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.event-tooltip-title {
+    font-weight: 700;
+    margin-bottom: var(--space-xs);
+}
+
+.event-tooltip-time {
+    color: var(--text-secondary);
+    font-size: var(--font-sm);
+}
+
+/* Override hover effects for day events modal */
+.day-events-modal .event-item {
+    transition: none !important;
+}
+
+.day-events-modal .event-item:hover {
+    background: transparent !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.day-events-modal .event-item:hover::before {
+    display: none !important;
+}

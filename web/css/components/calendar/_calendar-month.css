@@ -1,0 +1,421 @@
+/**
+ * Calendar Month View Component
+ * Month grid layout, day cells, and weekday headers - Sleek Design
+ */
+
+/* Month View Container */
+.month-view-container {
+    background: var(--bg-primary);
+    margin: var(--space-sm);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-xl);
+    position: relative;
+    z-index: 1;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Month Navigation Header */
+.month-nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.month-title {
+    font-size: var(--font-lg);
+    font-weight: 800;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.month-year {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Weekday Headers */
+.weekday-headers {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--bg-secondary);
+}
+
+.weekday-header {
+    text-align: center;
+    font-size: calc(11px + 0.1rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    padding: var(--space-sm);
+}
+
+.weekday-header.weekend {
+    color: var(--accent);
+}
+
+/* Month Grid */
+.month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    min-height: 400px;
+    grid-auto-rows: minmax(80px, 1fr);
+}
+
+/* Day Cell */
+.day-cell {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm);
+    height: 80px;
+    min-height: 80px;
+    max-height: 80px;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.day-cell::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent, rgba(91, 33, 182, 0.03));
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    pointer-events: none;
+}
+
+.day-cell:hover {
+    background: var(--bg-primary);
+    border-color: rgba(91, 33, 182, 0.2);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.day-cell:hover::before {
+    opacity: 1;
+}
+
+.day-cell:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Day Cell States */
+.day-cell.today {
+    /* Keep today cell visually consistent with others; highlight only the number */
+    background: var(--bg-secondary);
+    color: inherit;
+    box-shadow: none;
+    border: 1px solid transparent;
+}
+
+.day-cell.today:hover {
+    /* Same hover as default day cell */
+    background: var(--bg-primary);
+    border-color: rgba(91, 33, 182, 0.2);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.day-cell.selected {
+    border-color: var(--primary);
+    background: var(--bg-primary);
+    box-shadow: var(--shadow-md);
+}
+
+.day-cell.other-month {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.day-cell.weekend {
+    background: rgba(236, 72, 153, 0.03);
+}
+
+.day-cell.has-events {
+    border-color: rgba(91, 33, 182, 0.1);
+}
+
+/* Day Number */
+.day-number {
+    font-size: calc(var(--font-md) + 0.1rem);
+    font-weight: 700;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.day-cell.today .day-number {
+    color: var(--primary);
+    font-size: inherit;
+}
+
+.day-cell.weekend .day-number {
+    color: var(--accent);
+}
+
+/* Day Badge */
+.day-badge {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    margin-left: auto;
+}
+
+.day-cell.today .day-badge {
+    background: var(--primary);
+}
+
+/* Day Events Container */
+.day-events {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    overflow: hidden;
+    max-height: calc(100% - 18px); /* Reduced space for day number */
+    white-space: nowrap;
+    margin-top: -3px; /* Move events up more */
+}
+
+/* Event Pills in Month View */
+.day-cell .event-pill {
+    padding: 1px 6px;
+    font-size: calc(10px + 0.1rem);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    min-height: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.day-cell.today .event-pill {
+    /* Do not alter event pill styling for today */
+    background: transparent;
+    color: inherit;
+    backdrop-filter: none;
+}
+
+/* More Events */
+.more-events {
+    font-size: calc(9px + 0.1rem);
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+    padding: 1px 4px;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    margin-top: auto;
+    cursor: default;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 1.2;
+}
+
+/* .more-events:hover - removed hover effects */
+
+.day-cell.today .more-events {
+    background: transparent;
+    color: var(--primary);
+}
+
+/* Mini Calendar (for date picker) */
+.mini-calendar {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-lg);
+}
+
+.mini-calendar .month-grid {
+    gap: 2px;
+    min-height: auto;
+}
+
+.mini-calendar .day-cell {
+    min-height: 36px;
+    padding: var(--space-xs);
+    border-radius: var(--radius-md);
+}
+
+.mini-calendar .day-number {
+    font-size: var(--font-sm);
+    margin: 0;
+    justify-content: center;
+}
+
+.mini-calendar .day-events {
+    display: none;
+}
+
+/* Month View Animations */
+@keyframes monthSlideLeft {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes monthSlideRight {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.month-transition-left {
+    animation: monthSlideLeft 0.3s ease-out;
+}
+
+.month-transition-right {
+    animation: monthSlideRight 0.3s ease-out;
+}
+
+/* Month Selector */
+.month-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+}
+
+.month-option {
+    padding: var(--space-md);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-weight: 600;
+}
+
+.month-option:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+.month-option.current {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+}
+
+/* Responsive Month View */
+@media (max-width: 1024px) {
+    .month-grid {
+        gap: 4px;
+    }
+    
+    .day-cell {
+        height: 75px;
+        min-height: 75px;
+        max-height: 75px;
+        padding: var(--space-sm);
+    }
+}
+
+@media (max-width: 768px) {
+    .month-view-container {
+        margin: var(--space-md);
+        padding: var(--space-md);
+    }
+    
+    .month-grid {
+        gap: 3px;
+        grid-auto-rows: minmax(70px, 1fr);
+    }
+    
+    .day-cell {
+        height: 70px;
+        min-height: 70px;
+        max-height: 70px;
+        padding: var(--space-xs);
+        border-radius: var(--radius-md);
+    }
+    
+    .day-number {
+        font-size: calc(var(--font-sm) + 0.1rem);
+    }
+    
+    .day-cell .event-pill {
+        font-size: calc(9px + 0.1rem);
+        padding: 1px 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .weekday-header {
+        font-size: calc(10px + 0.1rem);
+        padding: var(--space-xs);
+    }
+}
+
+/* Large screen optimizations for 15-inch displays */
+@media (min-width: 1200px) and (max-width: 1600px) {
+    .month-view-container {
+        margin: var(--space-sm);
+        padding: var(--space-md);
+    }
+    
+    .month-grid {
+        gap: 3px;
+        min-height: 450px;
+    }
+    
+    .day-cell {
+        height: 85px;
+        min-height: 85px;
+        max-height: 85px;
+        padding: var(--space-sm);
+    }
+    
+    .day-number {
+        font-size: calc(var(--font-md) + 0.1rem);
+        margin-bottom: 3px;
+    }
+    
+    .day-cell .event-pill {
+        font-size: calc(10px + 0.1rem);
+        padding: 2px 6px;
+        min-height: 18px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .more-events {
+        font-size: calc(9px + 0.1rem);
+        padding: 2px 4px;
+    }
+}

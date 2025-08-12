@@ -1,0 +1,977 @@
+/**
+ * Calendar Interactions Component
+ * Touch feedback, animations, and interactive elements - Sleek Design
+ */
+
+/* Floating Action Button */
+.add-event-btn {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white;
+    border: none;
+    font-size: 32px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(91, 33, 182, 0.4);
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.add-event-btn:hover {
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 12px 32px rgba(91, 33, 182, 0.5);
+}
+
+.add-event-btn:active {
+    transform: scale(0.95);
+}
+
+/* Create Event Modal base styles */
+.modal-overlay {
+    backdrop-filter: blur(2px);
+}
+
+.modal.create-event-modal {
+    width: 720px;
+    max-width: 95vw;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.create-modal-header {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.create-modal-header .mode-btn {
+    flex: 1;
+    padding: 14px 16px;
+    background: white;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #5f6368;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.create-modal-header .mode-btn.active {
+    color: #1a73e8;
+    border-bottom-color: #1a73e8;
+}
+
+.create-modal-content {
+    padding: 20px;
+}
+
+/* Forms */
+.event-form, .calendar-form, .import-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.row {
+    display: block;
+}
+
+.row.two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 8px;
+    color: #3c4043;
+    font-size: 14px;
+}
+
+.field input[type="text"],
+.field input[type="datetime-local"],
+.field input[type="url"],
+.field input[type="file"],
+.field select,
+.field textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.field textarea {
+    resize: vertical;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.actions .primary {
+    padding: 12px 24px;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.actions .cancel-btn {
+    padding: 12px 24px;
+    border: 1px solid #dadce0;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Touch-Optimized DateTime Picker Button */
+.datetime-picker-btn {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #dadce0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    min-height: 64px; /* Touch-friendly height */
+    text-align: left;
+}
+
+.datetime-picker-btn:hover {
+    border-color: #1a73e8;
+    background: #f8f9ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.1);
+}
+
+.datetime-picker-btn:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+}
+
+.datetime-picker-btn svg {
+    color: #5f6368;
+    transition: color 0.2s ease;
+}
+
+.datetime-picker-btn:hover svg {
+    color: #1a73e8;
+}
+
+.datetime-display {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.date-part {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.time-part {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* Touch-specific optimizations for datetime buttons */
+@media (hover: none) and (pointer: coarse) {
+    .datetime-picker-btn {
+        min-height: 72px;
+        padding: 20px;
+        border-width: 3px;
+    }
+    
+    .date-part {
+        font-size: 18px;
+    }
+    
+    .time-part {
+        font-size: 16px;
+    }
+}
+
+/* Recurring Event Checkbox */
+.recurring-option {
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    font-size: 16px;
+    font-weight: 500;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.checkbox-container input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 2px solid #d1d5db;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.checkbox-container:hover .checkmark {
+    border-color: #1a73e8;
+    background: #f8f9ff;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark {
+    background: #1a73e8;
+    border-color: #1a73e8;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 7px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-label {
+    color: #374151;
+    font-weight: 500;
+}
+
+.recurring-details {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.recurring-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+}
+
+.recurring-select:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+}
+
+/* Touch-specific optimizations for checkbox */
+@media (hover: none) and (pointer: coarse) {
+    .checkmark {
+        width: 28px;
+        height: 28px;
+        border-width: 3px;
+    }
+    
+    .checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+        top: 3px;
+        left: 8px;
+        width: 7px;
+        height: 14px;
+        border-width: 0 3px 3px 0;
+    }
+    
+    .checkbox-container {
+        font-size: 18px;
+        gap: 16px;
+    }
+    
+    .recurring-select {
+        padding: 16px;
+        font-size: 16px;
+    }
+}
+
+/* Enhanced Recurring Event UI */
+.recurring-section {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.recurring-header {
+    margin-bottom: 16px;
+}
+
+.recurring-config {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.recurring-frequency-section,
+.recurring-end-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.recurring-frequency-section label,
+.recurring-end-section label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.frequency-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.frequency-details {
+    margin-top: 12px;
+}
+
+.frequency-option-details {
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.frequency-option-details label {
+    display: block;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+/* Day Selector for Weekly Recurrence */
+.day-selector {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.day-btn {
+    padding: 8px 12px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    text-align: center;
+}
+
+.day-btn:hover {
+    border-color: #1a73e8;
+    color: #1a73e8;
+    background: #f8f9ff;
+}
+
+.day-btn.selected {
+    background: #1a73e8;
+    border-color: #1a73e8;
+    color: white;
+}
+
+/* Monthly and Yearly Options */
+.monthly-option,
+.yearly-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.monthly-option:last-child,
+.yearly-option:last-child {
+    margin-bottom: 0;
+}
+
+.monthly-option input[type="radio"],
+.yearly-option input[type="radio"] {
+    margin: 0;
+}
+
+.monthly-option label,
+.yearly-option label {
+    margin: 0;
+    font-weight: 400;
+    color: #374151;
+    cursor: pointer;
+}
+
+/* End Options */
+.end-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.end-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.end-option input[type="radio"] {
+    margin: 0;
+}
+
+.end-option label {
+    margin: 0;
+    font-weight: 400;
+    color: #374151;
+    cursor: pointer;
+    flex: 1;
+}
+
+.end-option input[type="number"],
+.end-option input[type="date"] {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100px;
+}
+
+.end-option input[type="number"]:focus,
+.end-option input[type="date"]:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+}
+
+/* End date button styling within recurring options */
+.end-option .datetime-picker-btn {
+  width: auto;
+  min-width: 120px;
+  padding: 8px 12px;
+  margin-left: 8px;
+  min-height: 36px;
+  font-size: 14px;
+}
+
+.end-option .datetime-picker-btn .datetime-display {
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}
+
+.end-option .datetime-picker-btn .date-part {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.end-option .datetime-picker-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+#occurrences-text {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* Touch optimizations for new recurring UI */
+@media (hover: none) and (pointer: coarse) {
+    .day-btn {
+        padding: 12px 16px;
+        font-size: 14px;
+        min-width: 50px;
+    }
+    
+    .end-option {
+        padding: 16px;
+    }
+    
+    .end-option input[type="number"],
+    .end-option input[type="date"] {
+        padding: 12px;
+        font-size: 16px;
+        width: 120px;
+    }
+    
+    .frequency-option-details {
+        padding: 20px;
+    }
+    
+    .recurring-section {
+        padding: 24px;
+    }
+}
+
+/* Color picker */
+.color-picker {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.color-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    background: var(--swatch);
+}
+
+.color-swatch.selected {
+    border-color: #1a73e8;
+}
+
+/* Ripple Effect */
+@keyframes ripple {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(4);
+        opacity: 0;
+    }
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(91, 33, 182, 0.3);
+    pointer-events: none;
+    animation: ripple 0.6s ease-out;
+}
+
+/* Touch Feedback */
+.touchable {
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.touchable::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(91, 33, 182, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+}
+
+.touchable:active::after {
+    width: 200%;
+    height: 200%;
+}
+
+/* Loading States */
+.calendar-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    gap: var(--space-lg);
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--bg-secondary);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: var(--font-md);
+    color: var(--text-secondary);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Skeleton Loading */
+.skeleton {
+    background: linear-gradient(90deg, 
+        var(--bg-secondary) 25%, 
+        rgba(91, 33, 182, 0.05) 50%, 
+        var(--bg-secondary) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-md);
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Empty States */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: var(--space-xl);
+}
+
+.empty-state-icon {
+    font-size: 64px;
+    margin-bottom: var(--space-lg);
+    opacity: 0.3;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.empty-state-text {
+    font-size: var(--font-lg);
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+    color: var(--text-secondary);
+}
+
+.empty-state-subtext {
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+}
+
+.empty-state-action {
+    margin-top: var(--space-lg);
+    padding: var(--space-sm) var(--space-xl);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.empty-state-action:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--primary), var(--primary-light));
+    border-radius: var(--radius-full);
+    transition: opacity var(--transition-base);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
+
+/* Tooltips */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-content {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    background: var(--text-primary);
+    color: white;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-md);
+    font-size: var(--font-xs);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.tooltip:hover .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tooltip-content::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--text-primary);
+}
+
+/* Modal Backdrop */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+}
+
+.modal-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Dropdown Menus */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: var(--space-xs);
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    padding: var(--space-sm);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all var(--transition-base);
+    z-index: 100;
+}
+
+.dropdown.active .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+}
+
+.dropdown-item:hover {
+    background: var(--bg-secondary);
+    color: var(--primary);
+}
+
+/* Notifications */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md) var(--space-lg);
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    transform: translateX(400px);
+    transition: transform var(--transition-base);
+    z-index: 1001;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+}
+
+.notification-message {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+}
+
+/* Swipe Actions */
+.swipeable {
+    position: relative;
+    overflow: hidden;
+}
+
+.swipe-action {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+}
+
+.swipe-action.left {
+    left: -80px;
+    background: var(--success);
+}
+
+.swipe-action.right {
+    right: -80px;
+    background: var(--danger);
+}
+
+.swipeable.swiped-left .swipe-action.left {
+    left: 0;
+}
+
+.swipeable.swiped-right .swipe-action.right {
+    right: 0;
+}
+
+/* Page Transitions */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+.scale-in {
+    animation: scaleIn 0.3s ease-out;
+}
+
+/* Interactive Button States */
+button, .btn {
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+button:disabled, .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Focus States */
+:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+    background: rgba(91, 33, 182, 0.2);
+    color: var(--primary-dark);
+}

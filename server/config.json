@@ -1,0 +1,13 @@
+{
+  "port": 4000,
+  "refreshMinutes": 15,
+  "timezone": "America/Chicago",
+  "windowDaysFuture": 60,
+  "windowDaysPast": 0,
+  "webhookBaseUrl": "http://localhost:4000",
+  "calendars": [],
+  "defaultCalendarSharees": [
+    { "email": "justincodeemail@gmail.com", "role": "writer" },
+    { "email": "bookiewookie1313@gmail.com", "role": "writer" }
+  ]
+}

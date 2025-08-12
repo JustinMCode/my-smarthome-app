@@ -1,0 +1,544 @@
+/**
+ * Calendar Header Component
+ * Navigation, view switcher, and header layout - Sleek Design
+ */
+
+/* CSS Variables - Modern Color Palette */
+:root {
+    /* Modern Colors */
+    --primary: #5B21B6;
+    --primary-light: #7C3AED;
+    --primary-dark: #4C1D95;
+    
+    --secondary: #F3F4F6;
+    --secondary-dark: #E5E7EB;
+    
+    --accent: #EC4899;
+    --accent-light: #F472B6;
+    
+    --success: #10B981;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --info: #3B82F6;
+    
+    /* Text Colors */
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --text-light: #F9FAFB;
+    
+    /* Backgrounds */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F9FAFB;
+    --bg-tertiary: #F3F4F6;
+    
+    /* Shadows - Softer */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    
+    /* Typography */
+    --font-xs: 0.75rem;
+    --font-sm: 0.875rem;
+    --font-md: 1rem;
+    --font-lg: 1.125rem;
+    --font-xl: 1.25rem;
+    --font-2xl: 1.5rem;
+    --font-3xl: 1.875rem;
+    
+    /* Spacing */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --radius-full: 9999px;
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Global Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Calendar Container */
+.calendar-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+}
+
+.calendar-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 300px;
+    background: linear-gradient(135deg, rgba(91, 33, 182, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+    pointer-events: none;
+}
+
+/**
+ * FIXED HEADER COMPONENT
+ */
+.calendar-header {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: var(--space-md) var(--space-lg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    height: 60px;
+    box-shadow: var(--shadow-md);
+}
+
+/* Header Title Section */
+.header-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+/* Remove old header title styles since it's now in navigation */
+/* .calendar-header h2 styles moved to .calendar-nav h2 */
+
+/* Navigation Controls - Left Aligned with Month Title */
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    justify-content: flex-start;
+}
+
+.calendar-nav h2 {
+    font-size: var(--font-xl);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.025em;
+    margin: 0;
+    text-align: left;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+}
+
+.nav-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--secondary);
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-size: var(--font-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.nav-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.nav-btn:active {
+    transform: translateY(0);
+}
+
+.nav-btn svg {
+    width: 16px;
+    height: 16px;
+    transition: transform var(--transition-base);
+}
+
+.nav-btn:hover svg {
+    transform: scale(1.1);
+}
+
+/* Remove Today button styles since it's no longer used */
+.today-btn {
+    display: none;
+}
+
+/* View Switcher - Right Side */
+.view-switcher {
+    display: flex;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    gap: 0;
+    box-shadow: none;
+    position: relative;
+    backdrop-filter: none;
+}
+
+.view-btn {
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: var(--font-sm);
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: capitalize;
+    position: relative;
+    min-width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    flex-direction: column;
+    user-select: none;
+    outline: none;
+    margin: 0 var(--space-xs);
+}
+
+.view-btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.view-btn svg {
+    width: 16px;
+    height: 16px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    stroke-width: 2;
+}
+
+.view-btn span {
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+}
+
+.view-btn:hover {
+    background: rgba(91, 33, 182, 0.06);
+    color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(91, 33, 182, 0.1);
+}
+
+.view-btn:hover svg {
+    transform: scale(1.1);
+    stroke-width: 2.5;
+}
+
+.view-btn:active {
+    transform: translateY(0);
+    transition: all 0.1s ease;
+}
+
+.view-btn.active {
+    background: var(--primary) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(91, 33, 182, 0.2) !important;
+    font-weight: 600 !important;
+    transform: translateY(-1px) !important;
+    position: relative;
+}
+
+.view-btn.active::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    z-index: -1;
+    opacity: 0.2;
+    filter: blur(2px);
+}
+
+.view-btn.active:hover {
+    background: var(--primary-dark) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 10px rgba(91, 33, 182, 0.3) !important;
+}
+
+.view-btn.active:hover svg {
+    transform: scale(1.1);
+}
+
+/* Loading state for buttons */
+.view-btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.view-btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Tooltip styles */
+.view-btn[data-tooltip] {
+    position: relative;
+}
+
+.view-btn[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-xs);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    z-index: 1000;
+}
+
+.view-btn[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-2px);
+}
+
+/**
+ * RESPONSIVE HEADER
+ */
+@media (max-width: 768px) {
+    .calendar-header {
+        flex-direction: column;
+        gap: var(--space-md);
+        padding: var(--space-md);
+    }
+    
+    .calendar-nav {
+        width: 100%;
+        justify-content: center;
+        gap: var(--space-md);
+    }
+    
+    .calendar-nav h2 {
+        font-size: var(--font-xl);
+        min-width: 150px;
+    }
+    
+    .nav-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .view-switcher {
+        width: 100%;
+        justify-content: center;
+        max-width: 300px;
+        margin: 0 auto;
+        gap: var(--space-xs);
+    }
+    
+    .view-btn {
+        flex: 1;
+        min-width: 0;
+        padding: var(--space-xs) var(--space-sm);
+    }
+    
+    .view-btn span {
+        font-size: 10px;
+    }
+    
+    .view-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .view-switcher {
+        max-width: 280px;
+        gap: var(--space-xs);
+    }
+    
+    .view-btn {
+        padding: var(--space-xs);
+        gap: 2px;
+    }
+    
+    .view-btn span {
+        font-size: 9px;
+    }
+    
+    .view-btn svg {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+/* Focus states */
+.view-btn.focused {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(91, 33, 182, 0.1);
+}
+
+/* Keyboard shortcut feedback */
+.view-btn.keyboard-shortcut {
+    animation: keyboardShortcut 0.3s ease;
+}
+
+@keyframes keyboardShortcut {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Ripple effect */
+.button-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* View switch animation */
+@keyframes viewSwitch {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+/* Enhanced hover states for better touch devices */
+@media (hover: hover) {
+    .view-btn:hover {
+        background: rgba(91, 33, 182, 0.08);
+        color: var(--primary);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(91, 33, 182, 0.15);
+    }
+    
+    .view-btn:hover svg {
+        transform: scale(1.1);
+        stroke-width: 2.5;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .view-btn {
+        min-height: 44px; /* Minimum touch target size */
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .view-btn:active {
+        background: rgba(91, 33, 182, 0.12);
+        transform: scale(0.98);
+        transition: all 0.1s ease;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .view-btn {
+        border: 1px solid transparent;
+    }
+    
+    .view-btn:hover {
+        border-color: var(--text-primary);
+    }
+    
+    .view-btn.active {
+        border-color: var(--text-primary);
+        /* Keep the main active styles */
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .view-btn,
+    .view-btn svg,
+    .button-ripple {
+        transition: none;
+        animation: none;
+    }
+    
+    .view-btn:hover {
+        transform: none;
+    }
+    
+    .view-btn.active {
+        /* Keep the main active styles */
+    }
+}

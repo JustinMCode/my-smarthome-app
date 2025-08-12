@@ -1,0 +1,372 @@
+/**
+ * Idle Screen Styles - 15" Screen Optimized
+ * Enhanced visual design with glassmorphism and dynamic effects
+ * Fixed sizing for 15" displays (typically 1920x1080 or similar)
+ */
+
+ .idle-page,
+ .idle-screen {
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+     z-index: 9999;
+     opacity: 0;
+     pointer-events: none;
+     transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+     cursor: pointer;
+     overflow: hidden;
+     background: #000;
+     isolation: isolate;
+ }
+ 
+ /* Dynamic gradient background with animation */
+ .idle-page::before,
+ .idle-screen::before {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #667eea 100%);
+     background-size: 400% 400%;
+     animation: gradientShift 15s ease infinite;
+     z-index: -2;
+ }
+ 
+ @keyframes gradientShift {
+     0% { background-position: 0% 50%; }
+     50% { background-position: 100% 50%; }
+     100% { background-position: 0% 50%; }
+ }
+ 
+ /* Floating orbs for depth */
+ .idle-page::after,
+ .idle-screen::after {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background-image: 
+         radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+         radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.06) 0%, transparent 40%),
+         radial-gradient(circle at 60% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 40%);
+     animation: floatOrbs 20s ease-in-out infinite;
+     z-index: -1;
+ }
+ 
+ @keyframes floatOrbs {
+     0%, 100% { opacity: 0.5; transform: scale(1); }
+     50% { opacity: 1; transform: scale(1.1); }
+ }
+ 
+ .idle-page.active,
+ .idle-screen.active {
+     opacity: 1;
+     pointer-events: all;
+ }
+ 
+ .idle-container {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     width: 100%;
+     height: 100%;
+     padding: 60px;
+     position: relative;
+     z-index: 1;
+ }
+ 
+ /* Time Section - Fixed sizing for 15" */
+ .time-section {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     gap: 25px;
+     position: absolute;
+     top: 40%;
+     left: 50%;
+     transform: translate(-50%, -50%);
+     animation: fadeInScale 1.2s ease-out;
+ }
+ 
+ @keyframes fadeInScale {
+     from {
+         opacity: 0;
+         transform: translate(-50%, -50%) scale(0.9);
+     }
+     to {
+         opacity: 1;
+         transform: translate(-50%, -50%) scale(1);
+     }
+ }
+ 
+ .large-clock {
+     font-size: 160px;
+     font-weight: 100;
+     color: white;
+     text-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+     letter-spacing: -8px;
+     line-height: 1;
+     position: relative;
+     font-variant-numeric: tabular-nums;
+     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+ }
+ 
+ /* Subtle glow effect on time */
+ .large-clock::after {
+     content: attr(data-time);
+     position: absolute;
+     top: 0;
+     left: 0;
+     font-size: inherit;
+     font-weight: inherit;
+     color: transparent;
+     background: linear-gradient(45deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
+     -webkit-background-clip: text;
+     background-clip: text;
+     filter: blur(10px);
+     opacity: 0.5;
+     z-index: -1;
+ }
+ 
+ .large-date {
+     font-size: 32px;
+     color: rgba(255, 255, 255, 0.95);
+     font-weight: 200;
+     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+     letter-spacing: 2px;
+     text-transform: uppercase;
+     opacity: 0.9;
+ }
+ 
+ /* Next Event Section - Glass cards */
+ .next-event-section {
+     position: absolute;
+     bottom: 140px;
+     left: 50%;
+     transform: translateX(-50%);
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     gap: 20px;
+     animation: slideInUp 1.4s ease-out;
+ }
+ 
+ @keyframes slideInUp {
+     from {
+         opacity: 0;
+         transform: translateX(-50%) translateY(30px);
+     }
+     to {
+         opacity: 1;
+         transform: translateX(-50%) translateY(0);
+     }
+ }
+ 
+ .next-event-label {
+     font-size: 12px;
+     color: rgba(255, 255, 255, 0.5);
+     text-transform: uppercase;
+     letter-spacing: 2px;
+     font-weight: 500;
+ }
+ 
+ .upcoming-events {
+     display: flex;
+     gap: 20px;
+     align-items: center;
+     justify-content: center;
+ }
+ 
+ .event-item {
+     font-size: 18px;
+     color: white;
+     text-align: center;
+     padding: 18px 36px;
+     background: rgba(255, 255, 255, 0.08);
+     border-radius: 20px;
+     backdrop-filter: blur(20px);
+     border: 1px solid rgba(255, 255, 255, 0.15);
+     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+     position: relative;
+     overflow: hidden;
+     white-space: nowrap;
+     max-width: 400px;
+ }
+ 
+ .event-item::before {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: -100%;
+     width: 100%;
+     height: 100%;
+     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+     transition: left 0.6s ease;
+ }
+ 
+ .event-item:hover {
+     background: rgba(255, 255, 255, 0.12);
+     transform: translateY(-4px) scale(1.02);
+     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+ }
+ 
+ .event-item:hover::before {
+     left: 100%;
+ }
+ 
+ .event-item:empty {
+     display: none;
+ }
+ 
+ /* Legacy support for single event */
+ .next-event {
+     font-size: 18px;
+     color: white;
+     text-align: center;
+     padding: 18px 36px;
+     background: rgba(255, 255, 255, 0.08);
+     border-radius: 20px;
+     backdrop-filter: blur(20px);
+     border: 1px solid rgba(255, 255, 255, 0.15);
+     max-width: 400px;
+ }
+ 
+ /* Tap to Wake - Modern minimal design */
+ .tap-to-wake {
+     position: absolute;
+     bottom: 50px;
+     font-size: 15px;
+     color: rgba(255, 255, 255, 0.4);
+     font-weight: 300;
+     letter-spacing: 1px;
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     animation: gentleBounce 3s ease-in-out infinite;
+ }
+ 
+ .tap-to-wake::before {
+     content: '○';
+     font-size: 24px;
+     animation: pulseRing 2s ease-in-out infinite;
+ }
+ 
+ @keyframes gentleBounce {
+     0%, 100% { 
+         transform: translateY(0);
+         opacity: 0.4;
+     }
+     50% { 
+         transform: translateY(-8px);
+         opacity: 0.7;
+     }
+ }
+ 
+ @keyframes pulseRing {
+     0%, 100% { 
+         transform: scale(1);
+         opacity: 0.4;
+     }
+     50% { 
+         transform: scale(1.2);
+         opacity: 0.8;
+     }
+ }
+ 
+ /* Animated particles for extra visual interest */
+ .particles {
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     overflow: hidden;
+     z-index: 0;
+     pointer-events: none;
+ }
+ 
+ .particle {
+     position: absolute;
+     width: 3px;
+     height: 3px;
+     background: rgba(255, 255, 255, 0.2);
+     border-radius: 50%;
+     bottom: -10px;
+     animation: float 20s infinite linear;
+ }
+ 
+ @keyframes float {
+     from {
+         transform: translateY(0) translateX(0);
+         opacity: 0;
+     }
+     10% {
+         opacity: 0.2;
+     }
+     90% {
+         opacity: 0.2;
+     }
+     to {
+         transform: translateY(-110vh) translateX(50px);
+         opacity: 0;
+     }
+ }
+ 
+ /* Theme Variations - Simplified gradients */
+ .idle-page.theme-morning::before,
+ .idle-screen.theme-morning::before {
+     background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 25%, #ff9a9e 50%, #ffecd2 100%);
+     background-size: 400% 400%;
+ }
+ 
+ .idle-page.theme-day::before,
+ .idle-screen.theme-day::before {
+     background: linear-gradient(135deg, #a8edea 0%, #fed6e3 25%, #d299c2 50%, #a8edea 100%);
+     background-size: 400% 400%;
+ }
+ 
+ .idle-page.theme-evening::before,
+ .idle-screen.theme-evening::before {
+     background: linear-gradient(135deg, #fa709a 0%, #fee140 25%, #feada6 50%, #fa709a 100%);
+     background-size: 400% 400%;
+ }
+ 
+ .idle-page.theme-night::before,
+ .idle-screen.theme-night::before {
+     background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #667eea 100%);
+     background-size: 400% 400%;
+ }
+ 
+ /* Idle Screen Transitions */
+ .idle-page.transitioning,
+ .idle-screen.transitioning {
+     animation: idleTransition 0.5s ease-out;
+ }
+ 
+ @keyframes idleTransition {
+     from {
+         opacity: 0;
+     }
+     to {
+         opacity: 1;
+     }
+ }
+ 
+ /* Hide old message section and weather */
+ .message-section,
+ .fun-message,
+ #idleMessage,
+ #fun-message,
+ .weather-section {
+     display: none !important;
+ }

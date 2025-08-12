@@ -1,0 +1,15 @@
+{
+    "name": "skylight-pi-server",
+    "version": "0.1.0",
+    "type": "module",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^4.21.2",
+        "googleapis": "^128.0.0",
+        "node-ical": "^0.20.1"
+    }
+}

@@ -1,0 +1,40 @@
+/**
+ * Calendar Variables - CSS Custom Properties
+ * Optimized for 15-inch Touchscreen
+ */
+
+/* Base Touch-Optimized Variables */
+:root {
+    /* Touch-friendly sizes */
+    --touch-target-min: 60px;
+    --touch-target-ideal: 72px;
+    --touch-spacing: 16px;
+    --touch-padding: 20px;
+    
+    /* Readable font sizes for distance viewing */
+    --font-xl: 32px;
+    --font-lg: 24px;
+    --font-md: 18px;
+    --font-sm: 16px;
+    --font-xs: 14px;
+    
+    /* Enhanced colors for better visibility */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f4f6;
+    --bg-hover: #e5e7eb;
+    --bg-active: #ddd6fe;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+    --accent-primary: #6366f1;
+    --accent-secondary: #10b981;
+    --accent-warm: #f59e0b;
+    --accent-danger: #ef4444;
+    --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --gradient-today: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+    
+    /* Touch feedback */
+    --shadow-touch: 0 8px 24px rgba(0, 0, 0, 0.15);
+    --shadow-hover: 0 12px 32px rgba(99, 102, 241, 0.2);
+    --transition-touch: all 0.15s ease;
+}
