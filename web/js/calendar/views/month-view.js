@@ -15,7 +15,6 @@ import {
 } from '../utils/calendar-date-utils.js';
 import { calendarConfigService } from '../config/calendar-config-service.js';
 import { logger } from '../../utils/logger.js';
-import { createEventManager } from '../components/ui/events/index.js';
 
 // Apply the ViewMixin to create an enhanced base class
 const EnhancedViewBase = ViewMixin(ViewBase);
@@ -25,19 +24,12 @@ export class MonthViewRefactored extends EnhancedViewBase {
         super(core, container);
         this.gridContainer = null;
         this.weekdayHeaders = null;
-        this.eventManager = createEventManager(core, {
-            rendererConfig: {
-                showTime: true,
-                showBullet: true,
-                maxWidth: '100%'
-            }
-        });
     }
-    
+
     /**
      * Initialize the month view
      */
-    init() {
+    async init() {
         this.gridContainer = this.container.querySelector('.month-grid') || 
                            this.container.querySelector('#month-grid');
         
@@ -49,10 +41,12 @@ export class MonthViewRefactored extends EnhancedViewBase {
         this.weekdayHeaders = this.container.querySelector('.weekday-headers');
         
         // Initialize shared functionality
-        this.initShared();
+        await this.initShared();
         
         logger.init('Month View', 'Initialized');
     }
+    
+
     
     /**
      * Render the month view
@@ -165,7 +159,10 @@ export class MonthViewRefactored extends EnhancedViewBase {
         
         // Add only the first event pill
         if (events.length > 0) {
-            const eventEl = this.eventManager.createMonthEvent(events[0], {
+            const eventEl = this.createEventPill(events[0], {
+                showTime: true,
+                showBullet: true,
+                maxWidth: '100%',
                 className: 'event-pill'
             });
             eventsContainer.appendChild(eventEl);

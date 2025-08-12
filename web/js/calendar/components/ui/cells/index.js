@@ -1,48 +1,49 @@
 /**
- * Calendar Cell Components Index
+ * Cell Components Index
  * 
- * This module provides centralized access to all cell rendering components
- * for the calendar system. These components handle individual day cell creation,
- * event display, interactions, and provide sophisticated cell management for all calendar views.
+ * This module provides centralized access to all cell-related components
+ * for the calendar system. These components handle cell rendering, cell states,
+ * and provide sophisticated cell management for all calendar views.
  * 
- * @module CalendarCellComponents
+ * @module CellComponents
  */
 
-// Core cell rendering components
+// Core cell components
 import { DayCell } from './day-cell.js';
-import { hashString } from '../../../utils/core/hash.js';
-import { CacheFactory } from '../../../utils/core/cache/index.js';
 
+// Export core components
 export { DayCell };
 
 /**
- * Calendar Cell Manager Factory
- * Creates and configures cell management components with optimal settings
+ * Cell Component Factory
+ * Creates and configures cell components with optimal settings
  * 
  * @param {Object} core - Calendar core instance
  * @param {Object} options - Configuration options
- * @returns {Object} Configured cell management components
+ * @returns {Object} Configured cell components
  */
-export function createCellManager(core, options = {}) {
+export function createCellComponents(core, options = {}) {
     const {
         cellConfig = {},
-        managerConfig = {}
+        dayConfig = {},
+        componentConfig = {}
     } = options;
 
-    // Create cell manager with optimized settings
-    const cellManager = new CellManager(core, {
-        enablePooling: true,
-        maxPoolSize: 100,
-        enableCaching: true,
-        ...managerConfig
+    // Create day cell with optimized settings
+    const dayCell = new DayCell({
+        enableSelection: true,
+        enableHighlight: true,
+        enableDragDrop: true,
+        maxEvents: 3,
+        ...dayConfig
     });
 
     return {
-        cellManager,
+        dayCell,
         
         // Convenience methods for common operations
-        createCell: (date, options) => {
-            return cellManager.createCell(date, {
+        createDayCell: (date, options) => {
+            return dayCell.create(date, {
                 isOtherMonth: false,
                 isSelected: false,
                 maxEvents: 3,
@@ -52,7 +53,7 @@ export function createCellManager(core, options = {}) {
         },
         
         createMonthCell: (date, options) => {
-            return cellManager.createCell(date, {
+            return dayCell.createMonthCell(date, {
                 isOtherMonth: false,
                 isSelected: false,
                 maxEvents: 3,
@@ -63,7 +64,7 @@ export function createCellManager(core, options = {}) {
         },
         
         createWeekCell: (date, options) => {
-            return cellManager.createCell(date, {
+            return dayCell.createWeekCell(date, {
                 isOtherMonth: false,
                 isSelected: false,
                 maxEvents: 2,
@@ -73,437 +74,159 @@ export function createCellManager(core, options = {}) {
             });
         },
         
-        // Cell management
-        updateCell: (date, newOptions) => cellManager.updateCell(date, newOptions),
-        clearCache: () => cellManager.clearCache(),
-        getCellStats: () => cellManager.getStats(),
+        // Component management
+        updateConfig: (newConfig) => {
+            dayCell.updateConfig(newConfig);
+        },
+        
+        clearCache: () => {
+            dayCell.clearCache();
+        },
+        
+        getStats: () => ({
+            dayCell: dayCell.getStats()
+        }),
         
         // Cleanup
-        destroy: () => cellManager.destroy()
+        destroy: () => {
+            dayCell.destroy();
+        }
     };
 }
 
 /**
- * Cell Manager Class
- * Manages cell creation, caching, and lifecycle
- */
-class CellManager {
-    constructor(core, options = {}) {
-        this.core = core;
-        this.options = {
-            enablePooling: true,
-            maxPoolSize: 100,
-            enableCaching: true,
-            ...options
-        };
-        
-        this.cells = new Map();
-        this.cellCache = CacheFactory.createCellCache();
-        this.cellPool = [];
-        this.stats = {
-            created: 0,
-            cached: 0,
-            reused: 0,
-            destroyed: 0
-        };
-    }
-
-    /**
-     * Create a cell with caching and pooling
-     * @param {Date} date - Date for the cell
-     * @param {Object} options - Cell options
-     * @returns {DayCell} Cell instance
-     */
-    createCell(date, options = {}) {
-        // Check cache first
-        if (this.options.enableCaching) {
-            const cached = this.cellCache.getCell(date, options);
-            if (cached) {
-                this.stats.reused++;
-                return cached.cell;
-            }
-        }
-        
-        // Try to reuse from pool
-        let cell;
-        if (this.options.enablePooling && this.cellPool.length > 0) {
-            cell = this.cellPool.pop();
-            cell.update({ ...options, date });
-            this.stats.reused++;
-        } else {
-            cell = new DayCell(this.core, date, options);
-            this.stats.created++;
-        }
-        
-        // Cache the cell
-        if (this.options.enableCaching) {
-            this.cellCache.cacheCell(date, options, { cell, options });
-            this.stats.cached++;
-        }
-        
-        // Store reference
-        this.cells.set(date.toDateString(), cell);
-        
-        return cell;
-    }
-
-    /**
-     * Update an existing cell
-     * @param {Date} date - Date for the cell
-     * @param {Object} newOptions - New options
-     */
-    updateCell(date, newOptions) {
-        const cell = this.cells.get(date.toDateString());
-        if (cell) {
-            cell.update(newOptions);
-        }
-    }
-
-    /**
-     * Get cell by date
-     * @param {Date} date - Date for the cell
-     * @returns {DayCell|null} Cell instance or null
-     */
-    getCell(date) {
-        return this.cells.get(date.toDateString()) || null;
-    }
-
-    /**
-     * Remove cell from management
-     * @param {Date} date - Date for the cell
-     */
-    removeCell(date) {
-        const cell = this.cells.get(date.toDateString());
-        if (cell) {
-            this.cells.delete(date.toDateString());
-            
-            // Return to pool or destroy
-            if (this.options.enablePooling && this.cellPool.length < this.options.maxPoolSize) {
-                this.cellPool.push(cell);
-            } else {
-                cell.destroy();
-                this.stats.destroyed++;
-            }
-        }
-    }
-
-    /**
-     * Clear all cells
-     */
-    clearCells() {
-        this.cells.forEach(cell => {
-            if (this.options.enablePooling && this.cellPool.length < this.options.maxPoolSize) {
-                this.cellPool.push(cell);
-            } else {
-                cell.destroy();
-                this.stats.destroyed++;
-            }
-        });
-        this.cells.clear();
-    }
-
-    /**
-     * Clear cache
-     */
-    clearCache() {
-        this.cellCache.clear();
-    }
-
-    /**
-     * Get statistics
-     * @returns {Object} Cell manager statistics
-     */
-    getStats() {
-        const cacheStats = this.cellCache.getCellStats();
-        return {
-            ...this.stats,
-            activeCells: this.cells.size,
-            cachedCells: cacheStats.size,
-            pooledCells: this.cellPool.length,
-            cacheHitRate: cacheStats.hitRate
-        };
-    }
-
-    /**
-     * Destroy the manager
-     */
-    destroy() {
-        this.clearCells();
-        this.cellCache.destroy();
-        
-        // Clear pool
-        this.cellPool.forEach(cell => cell.destroy());
-        this.cellPool = [];
-    }
-}
-
-/**
- * Predefined cell configurations for different use cases
+ * Predefined cell component configurations for different use cases
  */
 export const CellConfigs = {
     /**
      * Configuration for month view cells
      */
     monthView: {
-        isOtherMonth: false,
-        isSelected: false,
         maxEvents: 3,
         compactMode: false,
-        showEventTimes: false,
-        enableTouch: true,
-        enableRipple: true
+        enableSelection: true,
+        enableHighlight: true,
+        enableDragDrop: true,
+        showWeekNumber: false
     },
     
     /**
      * Configuration for week view cells
      */
     weekView: {
-        isOtherMonth: false,
-        isSelected: false,
         maxEvents: 2,
         compactMode: true,
-        showEventTimes: true,
-        enableTouch: true,
-        enableRipple: true
+        enableSelection: true,
+        enableHighlight: true,
+        enableDragDrop: true,
+        showWeekNumber: true
     },
     
     /**
      * Configuration for mobile devices
      */
     mobile: {
-        isOtherMonth: false,
-        isSelected: false,
         maxEvents: 2,
         compactMode: true,
-        showEventTimes: false,
-        enableTouch: true,
-        enableRipple: true
+        enableSelection: true,
+        enableHighlight: true,
+        enableDragDrop: false,
+        showWeekNumber: false,
+        touchTargetSize: 44
     },
     
     /**
      * Configuration for desktop with high resolution
      */
     desktop: {
-        isOtherMonth: false,
-        isSelected: false,
         maxEvents: 5,
         compactMode: false,
-        showEventTimes: true,
-        enableTouch: false,
-        enableRipple: false
+        enableSelection: true,
+        enableHighlight: true,
+        enableDragDrop: true,
+        showWeekNumber: true
     }
 };
 
 /**
- * Predefined cell strategies for different scenarios
- */
-export const CellStrategies = {
-    /**
-     * Strategy for high event density
-     */
-    highDensity: {
-        maxEvents: 2,
-        compactMode: true,
-        showOverflowIndicator: true,
-        enableScrolling: true
-    },
-    
-    /**
-     * Strategy for sparse events
-     */
-    sparseEvents: {
-        maxEvents: 5,
-        compactMode: false,
-        showOverflowIndicator: false,
-        enableScrolling: false
-    },
-    
-    /**
-     * Strategy for touch-friendly interactions
-     */
-    touchFriendly: {
-        maxEvents: 3,
-        compactMode: false,
-        enableTouch: true,
-        enableRipple: true,
-        touchTargetSize: 44
-    },
-    
-    /**
-     * Strategy for compact display
-     */
-    compact: {
-        maxEvents: 1,
-        compactMode: true,
-        showEventTimes: false,
-        enableOverflowIndicator: true
-    }
-};
-
-/**
- * Utility functions for cell management
+ * Cell component utilities
  */
 export const CellUtils = {
     /**
-     * Calculate optimal max events for screen size
+     * Format date for cell display
+     * @param {Date} date - Date to format
+     * @returns {string} Formatted date string
+     */
+    formatCellDate: (date) => {
+        return date.getDate().toString();
+    },
+    
+    /**
+     * Calculate optimal cell configuration for screen size
      * @param {number} screenWidth - Screen width
-     * @returns {number} Optimal max events
+     * @returns {Object} Optimal cell configuration
      */
-    calculateOptimalMaxEvents: (screenWidth) => {
-        if (screenWidth < 768) return 2;      // Mobile
-        if (screenWidth < 1024) return 3;     // Tablet
-        if (screenWidth < 1440) return 4;     // Desktop
-        return 5;                             // Large desktop
+    calculateOptimalCellConfig: (screenWidth) => {
+        if (screenWidth < 768) {
+            return CellConfigs.mobile;
+        } else if (screenWidth < 1024) {
+            return {
+                ...CellConfigs.monthView,
+                maxEvents: 4
+            };
+        } else {
+            return CellConfigs.desktop;
+        }
     },
     
     /**
-     * Generate cell cache key
-     * @param {Date} date - Date for the cell
-     * @param {Object} options - Cell options
-     * @returns {string} Cache key
-     */
-    generateCellKey: (date, options = {}) => {
-        const dateStr = date.toDateString();
-        const optionsStr = JSON.stringify(options);
-        return `cell_${dateStr}_${hashString(optionsStr)}`;
-    },
-    
-    /**
-     * Check if cell needs update
-     * @param {Object} cachedCell - Cached cell data
-     * @param {Object} currentOptions - Current cell options
-     * @returns {boolean} True if update is needed
-     */
-    needsUpdate: (cachedCell, currentOptions) => {
-        if (!cachedCell) return true;
-        
-        const age = Date.now() - cachedCell.timestamp;
-        const maxAge = currentOptions.cacheTimeout || 300000; // 5 minutes default
-        
-        return age > maxAge || 
-               cachedCell.options !== JSON.stringify(currentOptions);
-    },
-    
-    /**
-     * Calculate responsive cell configuration
+     * Calculate cell dimensions based on container
      * @param {number} containerWidth - Container width
      * @param {number} containerHeight - Container height
-     * @returns {Object} Responsive cell configuration
-     * @deprecated Use createCellConfig from utils/responsive/index.js instead
+     * @returns {Object} Cell dimensions
      */
-    calculateResponsiveConfig: (containerWidth, containerHeight) => {
-        console.warn('CellUtils.calculateResponsiveConfig is deprecated. Use createCellConfig from utils/responsive/index.js instead.');
+    calculateCellDimensions: (containerWidth, containerHeight) => {
+        const aspectRatio = containerWidth / containerHeight;
         
-        // Import the new responsive system
-        const { createCellConfig } = require('../../../utils/responsive/index.js');
-        return createCellConfig(containerWidth, containerHeight);
+        if (aspectRatio > 2) {
+            return {
+                width: Math.floor(containerWidth / 7),
+                height: Math.floor(containerHeight / 5)
+            };
+        } else if (aspectRatio > 1.5) {
+            return {
+                width: Math.floor(containerWidth / 7),
+                height: Math.floor(containerHeight / 6)
+            };
+        } else {
+            return {
+                width: Math.floor(containerWidth / 7),
+                height: Math.floor(containerHeight / 6)
+            };
+        }
     },
     
     /**
-     * Group events by date for efficient cell updates
-     * @param {Array} events - Array of events
-     * @returns {Map} Events grouped by date
+     * Validate cell configuration
+     * @param {Object} config - Cell configuration
+     * @returns {Object} Validation result
      */
-    groupEventsByDate: (events) => {
-        const grouped = new Map();
+    validateCellConfig: (config) => {
+        const errors = [];
+        const warnings = [];
         
-        events.forEach(event => {
-            const date = new Date(event.start);
-            const dateKey = date.toDateString();
-            
-            if (!grouped.has(dateKey)) {
-                grouped.set(dateKey, []);
-            }
-            grouped.get(dateKey).push(event);
-        });
+        if (config.maxEvents && (config.maxEvents < 1 || config.maxEvents > 10)) {
+            errors.push('maxEvents must be between 1 and 10');
+        }
         
-        return grouped;
-    }
-};
-
-/**
- * Performance monitoring utilities for cells
- */
-export const CellPerformanceUtils = {
-    /**
-     * Measure cell creation performance
-     * @param {Function} cellCreationFunction - Cell creation function
-     * @param {Array} args - Arguments for the function
-     * @returns {Object} Performance metrics
-     */
-    measureCellCreation: (cellCreationFunction, args) => {
-        const startTime = performance.now();
-        const startMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;
-        
-        const result = cellCreationFunction(...args);
-        
-        const endTime = performance.now();
-        const endMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;
+        if (config.touchTargetSize && config.touchTargetSize < 44) {
+            warnings.push('Touch target size may be too small for mobile devices');
+        }
         
         return {
-            result,
-            creationTime: endTime - startTime,
-            memoryUsage: endMemory - startMemory,
-            timestamp: Date.now()
-        };
-    },
-    
-    /**
-     * Create performance monitor for cell operations
-     * @returns {Object} Performance monitor
-     */
-    createCellPerformanceMonitor: () => {
-        const metrics = {
-            totalCreations: 0,
-            totalCreationTime: 0,
-            averageCreationTime: 0,
-            slowestCreation: 0,
-            fastestCreation: Infinity,
-            memoryUsage: []
-        };
-        
-        return {
-            measureCreation: (operationName, operation) => {
-                const startTime = performance.now();
-                const startMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;
-                
-                const result = operation();
-                
-                const endTime = performance.now();
-                const endMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;
-                
-                const creationTime = endTime - startTime;
-                const memoryUsage = endMemory - startMemory;
-                
-                // Update metrics
-                metrics.totalCreations++;
-                metrics.totalCreationTime += creationTime;
-                metrics.averageCreationTime = metrics.totalCreationTime / metrics.totalCreations;
-                metrics.slowestCreation = Math.max(metrics.slowestCreation, creationTime);
-                metrics.fastestCreation = Math.min(metrics.fastestCreation, creationTime);
-                metrics.memoryUsage.push(memoryUsage);
-                
-                return {
-                    result,
-                    creationTime,
-                    memoryUsage,
-                    operationName,
-                    timestamp: Date.now()
-                };
-            },
-            
-            getMetrics: () => ({ ...metrics }),
-            
-            reset: () => {
-                Object.assign(metrics, {
-                    totalCreations: 0,
-                    totalCreationTime: 0,
-                    averageCreationTime: 0,
-                    slowestCreation: 0,
-                    fastestCreation: Infinity,
-                    memoryUsage: []
-                });
-            }
+            isValid: errors.length === 0,
+            errors,
+            warnings
         };
     }
 };
@@ -511,9 +234,7 @@ export const CellPerformanceUtils = {
 // Default export for convenience
 export default {
     DayCell,
-    createCellManager,
+    createCellComponents,
     CellConfigs,
-    CellStrategies,
-    CellUtils,
-    CellPerformanceUtils
+    CellUtils
 };

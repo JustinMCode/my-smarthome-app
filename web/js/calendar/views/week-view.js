@@ -29,7 +29,7 @@ export class WeekViewRefactored extends EnhancedViewBase {
     /**
      * Initialize the week view
      */
-    init() {
+    async init() {
         this.gridContainer = this.container.querySelector('.week-grid') || 
                            this.container.querySelector('#week-grid');
         
@@ -39,7 +39,7 @@ export class WeekViewRefactored extends EnhancedViewBase {
         }
         
         // Initialize shared functionality
-        this.initShared();
+        await this.initShared();
         
         console.log('📅 Week view initialized');
     }

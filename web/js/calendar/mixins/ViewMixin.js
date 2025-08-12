@@ -5,29 +5,68 @@
 
 import { EventRenderer } from '../components/ui/events/index.js';
 import { DateNavigation } from '../components/ui/navigation/index.js';
-import { EventDataManager } from '../components/data/index.js';
-import { GridLayoutEngine } from '../components/layout/index.js';
+import { createDataManager, createLayoutManager } from '../utils/factory/index.js';
 import { EventModal } from '../components/ui/modals/index.js';
 
 export const ViewMixin = (BaseClass) => class extends BaseClass {
     constructor(core, container) {
         super(core, container);
         
-        // Initialize shared components
+        // Initialize synchronous components
         this.eventRenderer = new EventRenderer();
         this.dateNavigation = new DateNavigation(core);
-        this.eventDataManager = new EventDataManager(core);
-        this.gridLayoutEngine = new GridLayoutEngine();
         this.eventModal = new EventModal();
+        
+        // Factory-created components (initialized asynchronously)
+        this.eventDataManager = null;
+        this.layoutManager = null;
+        this._dataManagerInitialized = false;
+        this._layoutManagerInitialized = false;
         
         // Bind event handlers
         this.eventRenderer.onEventSelect = this.onEventSelect.bind(this);
     }
 
     /**
+     * Initialize async components using factory pattern
+     */
+    async initializeFactoryComponents() {
+        // Initialize data manager
+        if (!this._dataManagerInitialized) {
+            this.eventDataManager = await createDataManager(this.core, {
+                enableCaching: true,
+                enableLazyLoading: true,
+                maxConcurrentRequests: 3
+            });
+            this._dataManagerInitialized = true;
+        }
+        
+        // Initialize layout manager
+        if (!this._layoutManagerInitialized) {
+            this.layoutManager = await createLayoutManager(this.core, {
+                layoutConfig: {
+                    columns: 3,
+                    maxEventsPerDay: 5,
+                    compactMode: false,
+                    enableGrid: true
+                },
+                managerConfig: {
+                    enablePooling: true,
+                    maxPoolSize: 50,
+                    enableCaching: true
+                }
+            });
+            this._layoutManagerInitialized = true;
+        }
+    }
+
+    /**
      * Initialize shared functionality
      */
-    initShared() {
+    async initShared() {
+        // Initialize factory components first
+        await this.initializeFactoryComponents();
+        
         // Setup keyboard navigation
         this.dateNavigation.setupKeyboardListeners(true);
         
@@ -62,7 +101,16 @@ export const ViewMixin = (BaseClass) => class extends BaseClass {
      */
     updateResponsiveState() {
         const containerWidth = this.container?.offsetWidth || window.innerWidth;
-        this.responsiveState = this.gridLayoutEngine.calculateResponsiveBreakpoints(containerWidth);
+        const containerHeight = this.container?.offsetHeight || window.innerHeight;
+        
+        if (!this.layoutManager) {
+            console.warn('LayoutManager not initialized. Call initShared() first.');
+            this.responsiveState = { breakpoint: 'unknown', containerWidth, containerHeight };
+            return;
+        }
+        
+        // Use the enhanced layout manager's responsive calculation
+        this.responsiveState = this.layoutManager.calculateLayout([], containerWidth, containerHeight);
     }
 
     /**
@@ -104,6 +152,10 @@ export const ViewMixin = (BaseClass) => class extends BaseClass {
      * Get events for date with caching
      */
     getEventsForDate(date, options = {}) {
+        if (!this.eventDataManager) {
+            console.warn('EventDataManager not initialized. Call initShared() first.');
+            return [];
+        }
         return this.eventDataManager.getEventsForDate(date, options);
     }
 
@@ -111,6 +163,10 @@ export const ViewMixin = (BaseClass) => class extends BaseClass {
      * Get all-day events for date
      */
     getAllDayEvents(date, options = {}) {
+        if (!this.eventDataManager) {
+            console.warn('EventDataManager not initialized. Call initShared() first.');
+            return [];
+        }
         return this.eventDataManager.getAllDayEvents(date, options);
     }
 
@@ -118,6 +174,10 @@ export const ViewMixin = (BaseClass) => class extends BaseClass {
      * Get timed events for date
      */
     getTimedEvents(date, options = {}) {
+        if (!this.eventDataManager) {
+            console.warn('EventDataManager not initialized. Call initShared() first.');
+            return [];
+        }
         return this.eventDataManager.getTimedEvents(date, options);
     }
 
@@ -199,21 +259,61 @@ export const ViewMixin = (BaseClass) => class extends BaseClass {
      * Calculate event layout
      */
     calculateEventLayout(event, containerWidth, options = {}) {
-        return this.gridLayoutEngine.calculateEventLayout(event, containerWidth, options);
+        if (!this.layoutManager) {
+            console.warn('LayoutManager not initialized. Call initShared() first.');
+            return { event, layout: 'fallback' };
+        }
+        
+        const containerHeight = this.container?.offsetHeight || window.innerHeight;
+        return this.layoutManager.calculateLayout([event], containerWidth, containerHeight);
     }
 
     /**
      * Layout events with overlaps
      */
     layoutEventsWithOverlaps(events, containerWidth, options = {}) {
-        return this.gridLayoutEngine.layoutEventsWithOverlaps(events, containerWidth, options);
+        if (!this.layoutManager) {
+            console.warn('LayoutManager not initialized. Call initShared() first.');
+            return events.map(event => ({ ...event, layout: 'fallback' }));
+        }
+        
+        // Use the enhanced overlap detection and layout
+        const overlaps = this.layoutManager.detectOverlaps(events);
+        const containerHeight = this.container?.offsetHeight || window.innerHeight;
+        const layout = this.layoutManager.calculateLayout(events, containerWidth, containerHeight);
+        
+        return {
+            events: layout.events,
+            overlaps,
+            layout: layout.layout
+        };
     }
 
     /**
      * Calculate current time position
      */
     calculateCurrentTimePosition(options = {}) {
-        return this.gridLayoutEngine.calculateCurrentTimePosition(options);
+        if (!this.layoutManager) {
+            console.warn('LayoutManager not initialized. Call initShared() first.');
+            return { top: 0, height: 0 };
+        }
+        
+        // Use layout manager's responsive calculation
+        const containerWidth = this.container?.offsetWidth || window.innerWidth;
+        const containerHeight = this.container?.offsetHeight || window.innerHeight;
+        const layout = this.layoutManager.calculateLayout([], containerWidth, containerHeight);
+        
+        // Calculate current time position based on layout
+        const now = new Date();
+        const minutes = now.getHours() * 60 + now.getMinutes();
+        const totalMinutes = 24 * 60;
+        const percentage = minutes / totalMinutes;
+        
+        return {
+            top: percentage * containerHeight,
+            height: 2, // 2px line height
+            time: now
+        };
     }
 
     /**
@@ -221,6 +321,51 @@ export const ViewMixin = (BaseClass) => class extends BaseClass {
      */
     addTouchFeedback(element) {
         this.eventRenderer.addTouchFeedback(element);
+    }
+
+    /**
+     * Arrange events in grid layout
+     */
+    arrangeEventsInGrid(events, columns = 3) {
+        if (!this.layoutManager) {
+            console.warn('LayoutManager not initialized. Call initShared() first.');
+            return events;
+        }
+        
+        return this.layoutManager.arrangeInGrid(events, columns);
+    }
+
+    /**
+     * Detect overlapping events
+     */
+    detectEventOverlaps(events) {
+        if (!this.layoutManager) {
+            console.warn('LayoutManager not initialized. Call initShared() first.');
+            return [];
+        }
+        
+        return this.layoutManager.detectOverlaps(events);
+    }
+
+    /**
+     * Update layout configuration
+     */
+    updateLayoutConfig(newConfig) {
+        if (!this.layoutManager) {
+            console.warn('LayoutManager not initialized. Call initShared() first.');
+            return;
+        }
+        
+        this.layoutManager.updateLayout(newConfig);
+    }
+
+    /**
+     * Clear layout cache
+     */
+    clearLayoutCache() {
+        if (this.layoutManager) {
+            this.layoutManager.clearCache();
+        }
     }
 
     /**
@@ -282,8 +427,8 @@ export const ViewMixin = (BaseClass) => class extends BaseClass {
         return {
             ...this.performanceMetrics,
             responsiveState: this.responsiveState,
-            cacheStats: this.eventDataManager.getCacheStats(),
-            layoutStats: this.gridLayoutEngine.getLayoutStats(),
+            cacheStats: this.eventDataManager?.getCacheStats() || { initialized: false },
+            layoutStats: this.layoutManager?.getLayoutStats() || { initialized: false },
             activeModals: this.eventModal.getActiveModalsCount()
         };
     }
@@ -324,12 +469,18 @@ export const ViewMixin = (BaseClass) => class extends BaseClass {
         
         // Destroy shared components
         this.dateNavigation.destroy();
-        this.eventDataManager.destroy();
-        this.gridLayoutEngine.destroy();
+        if (this.eventDataManager) {
+            this.eventDataManager.destroy();
+        }
+        if (this.layoutManager) {
+            this.layoutManager.destroy();
+        }
         this.eventModal.destroy();
         
-        // Call parent destroy
-        super.destroy();
+        // Call parent destroy if it exists
+        if (super.destroy) {
+            super.destroy();
+        }
     }
 
     /**

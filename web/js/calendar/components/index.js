@@ -10,25 +10,40 @@
 export { BaseModal, EventModal, createModalManager, ModalConfigs, ModalStrategies, ModalUtils, ModalPerformanceUtils } from './ui/modals/index.js';
 
 // UI Components - Navigation
-export { DateNavigation, CalendarHeader, createNavigationManager, NavigationConfigs, NavigationStrategies, NavigationUtils, NavigationPerformanceUtils } from './ui/navigation/index.js';
+export { DateNavigation, CalendarHeader } from './ui/navigation/index.js';
 
 // UI Components - Filters
-export { CalendarFilter, createFilterManager, FilterConfigs, FilterStrategies, FilterUtils, FilterPerformanceUtils } from './ui/filters/index.js';
+export { CalendarFilter } from './ui/filters/index.js';
 
 // UI Components - Cells
-export { DayCell, createCellManager, CellConfigs, CellStrategies, CellUtils, CellPerformanceUtils } from './ui/cells/index.js';
+export { DayCell } from './ui/cells/index.js';
 
 // UI Components - Events
-export { EventPill, EventRenderer, createEventManager, EventConfigs, EventStrategies, EventUtils, EventPerformanceUtils } from './ui/events/index.js';
+export { EventPill, EventRenderer } from './ui/events/index.js';
 
 // UI Components - Settings
-export { CalendarSettings, createSettingsManager, SettingsConfigs, SettingsStrategies, SettingsUtils, SettingsPerformanceUtils } from './ui/settings/index.js';
+export { CalendarSettings } from './ui/settings/index.js';
 
 // Layout Components
-export { GridLayoutEngine, OverlapDetector, ResponsiveLayout, createLayoutManager, LayoutConfigs, LayoutStrategies, LayoutUtils, PerformanceUtils } from './layout/index.js';
+export { GridLayoutEngine, OverlapDetector, ResponsiveLayout } from './layout/index.js';
 
 // Data Components
-export { EventDataManager, createDataManager, Filters, CacheConfigs, Utils } from './data/index.js';
+export { EventDataManager } from './data/index.js';
+
+// Note: All factory functions have been moved to the centralized factory system
+// Import factory functions from: ../utils/factory/index.js
+
+// Factory Functions - New centralized factory system
+export { 
+    createDataManager,
+    createCellManager,
+    createEventManager,
+    createFilterManager,
+    createLayoutManager,
+    createNavigationManager,
+    createSettingsManager,
+    CalendarFactoryUtils
+} from '../utils/factory/index.js';
 
 // Legacy exports for backward compatibility
 // These will be removed once refactoring is complete

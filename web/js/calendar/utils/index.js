@@ -12,10 +12,13 @@
 import * as Constants from './calendar-constants.js';
 import * as DateUtils from './calendar-date-utils.js';
 import * as HashUtils from './core/hash.js';
+import * as FactoryUtils from './factory/index.js';
+
 // Utility modules
 export * from './calendar-constants.js';
 export * from './calendar-date-utils.js';
 export * from './core/hash.js';
+export * from './factory/index.js';
 
 // Named exports for better organization
 export { 
@@ -76,6 +79,7 @@ export default {
     ...Constants,
     ...DateUtils,
     ...HashUtils,
+    ...FactoryUtils,
     
     // Legacy exports
     LegacyCalendarConfig: Constants.CALENDAR_CONFIG,
