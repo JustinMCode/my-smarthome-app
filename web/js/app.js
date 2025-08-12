@@ -7,6 +7,7 @@ import { CONFIG } from './constants/config.js';
 import { TouchCalendarManager } from './calendar/index.js';
 import { formatTime, formatDate, loadFromStorage, saveToStorage } from './utils/utils.js';
 import { logger } from './utils/logger.js';
+import { createPerformanceDashboard } from './performance/components/PerformanceDashboard.js';
 
 export class FridgeDashboard {
     constructor() {
@@ -24,6 +25,9 @@ export class FridgeDashboard {
         this.managers = {
             calendar: null
         };
+        
+        // Performance monitoring
+        this.performanceDashboard = null;
         
         // Touch gesture tracking
         this.touchStartX = 0;
@@ -621,6 +625,35 @@ export class FridgeDashboard {
         if (viewName === 'calendar' && this.managers.calendar) {
             this.managers.calendar.render();
         }
+        
+        // Special handling for performance view - initialize performance dashboard
+        if (viewName === 'performance') {
+            this.initializePerformanceDashboard();
+        }
+    }
+    
+    /**
+     * Initialize performance dashboard
+     */
+    initializePerformanceDashboard() {
+        const container = document.getElementById('performance-dashboard-container');
+        if (container && !this.performanceDashboard) {
+            try {
+                this.performanceDashboard = createPerformanceDashboard(container, {
+                    updateInterval: 3000, // Update every 3 seconds
+                    showAlerts: true,
+                    showMetrics: true,
+                    showMemory: true
+                });
+                
+                // Show the dashboard
+                this.performanceDashboard.show();
+                
+                console.log('🔍 Performance dashboard initialized successfully');
+            } catch (error) {
+                console.error('❌ Failed to initialize performance dashboard:', error);
+            }
+        }
     }
     
     /**
@@ -682,6 +715,10 @@ export class FridgeDashboard {
         
         if (this.managers.calendar) {
             this.managers.calendar.destroy();
+        }
+        
+        if (this.performanceDashboard) {
+            this.performanceDashboard.destroy();
         }
     }
 }

@@ -13,6 +13,8 @@
  * @since 2024-01-01
  */
 
+import { performanceMonitor } from '../../../performance/utils/PerformanceMonitor.js';
+
 /**
  * Hash algorithm types supported by this module
  * @enum {string}
@@ -211,23 +213,20 @@ export function hashString(str, options = {}) {
             throw new Error(`hashString: Algorithm '${algorithm}' not implemented`);
     }
     
-    // Execute hash function
+    // Execute hash function with performance monitoring
+    const result = performanceMonitor.measure(`hash.${algorithm}`, hashFunction, [str], {
+        algorithm,
+        inputLength: str.length
+    });
+    
     if (measurePerformance) {
-        const { result, executionTime } = measureExecutionTime(hashFunction, [str]);
-        updateMetrics(algorithm, executionTime);
-        
         return {
             hash: result,
             algorithm,
-            executionTime,
+            executionTime: performanceMonitor.getStatistics(`hash.${algorithm}`).average,
             timestamp: Date.now()
         };
     } else {
-        const startTime = performance.now();
-        const result = hashFunction(str);
-        const executionTime = performance.now() - startTime;
-        
-        updateMetrics(algorithm, executionTime);
         return result;
     }
 }
