@@ -804,7 +804,7 @@ The modular design allows for gradual implementation, starting with basic layout
 - **`generateLayoutKey(viewType, date, options)`** - Generates a unique cache key for layout calculations.
 - **`hashString(str)`** - Simple string hash function for generating cache keys.
 - **`needsRecalculation(cachedLayout, currentOptions)`** - Checks if layout needs recalculation based on cache age and options.
-- **`calculateResponsiveBreakpoints(containerWidth, containerHeight)`** - Calculates responsive breakpoints based on container size.
+- **`calculateResponsiveBreakpoints(containerWidth, containerHeight)`** - **DEPRECATED** Calculates responsive breakpoints based on container size. Use `createLayoutConfig` from `utils/responsive/index.js` instead.
 
 #### Performance Utilities (PerformanceUtils object)
 - **`measureLayoutPerformance(layoutFunction, args)`** - Measures execution time and memory usage of layout functions.
@@ -881,7 +881,7 @@ The modular design allows for gradual implementation, starting with basic layout
 - **`calculateEventPillLayout(events, maxDisplay, options)`** - Calculates event pill layout for month view with overflow handling.
 
 #### Responsive Design
-- **`calculateResponsiveBreakpoints(containerWidth)`** - Calculates responsive breakpoints based on container width (duplicate of ResponsiveLayout functionality).
+- **`calculateResponsiveBreakpoints(containerWidth)`** - **DEPRECATED** Calculates responsive breakpoints based on container width. Use `createLayoutConfig` from `utils/responsive/index.js` instead.
 
 #### Performance and Caching
 - **`optimizeLayout(layouts, containerWidth, containerHeight)`** - Optimizes layout by removing off-screen elements.
@@ -899,7 +899,7 @@ The modular design allows for gradual implementation, starting with basic layout
 ### Duplicate Functions
 - **`hashString(str)`** - Identical implementation in `index.js` LayoutUtils, should be extracted to shared utility.
 - **`groupOverlappingEvents(events)`** - Similar functionality in both `OverlapDetector.js` and `GridLayoutEngine.js` with different implementations.
-- **`calculateResponsiveBreakpoints(containerWidth)`** - Similar functionality in both `index.js` LayoutUtils and `GridLayoutEngine.js` with different implementations.
+- **`calculateResponsiveBreakpoints(containerWidth)`** - **DEPRECATED** Similar functionality in both `index.js` LayoutUtils and `GridLayoutEngine.js`. Use unified responsive system from `utils/responsive/index.js`.
 
 ### Similar Functions
 - **Cache key generation** - `index.js` LayoutUtils.generateLayoutKey vs `GridLayoutEngine.js` cacheLayout/getCachedLayout - different approaches to caching.
@@ -914,5 +914,5 @@ The modular design allows for gradual implementation, starting with basic layout
 
 ### Missing Integration Points
 - **Overlap detection coordination** - `GridLayoutEngine.js` has its own simple overlap grouping while `OverlapDetector.js` provides more sophisticated detection.
-- **Responsive breakpoint coordination** - Multiple components calculate responsive breakpoints independently.
+- **Responsive breakpoint coordination** - **RESOLVED** All components now use unified responsive system from `utils/responsive/index.js`.
 - **Cache coordination** - Different caching strategies across components without integration.

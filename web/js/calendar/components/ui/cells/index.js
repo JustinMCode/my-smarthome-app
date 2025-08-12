@@ -389,39 +389,14 @@ export const CellUtils = {
      * @param {number} containerWidth - Container width
      * @param {number} containerHeight - Container height
      * @returns {Object} Responsive cell configuration
+     * @deprecated Use createCellConfig from utils/responsive/index.js instead
      */
     calculateResponsiveConfig: (containerWidth, containerHeight) => {
-        const aspectRatio = containerWidth / containerHeight;
+        console.warn('CellUtils.calculateResponsiveConfig is deprecated. Use createCellConfig from utils/responsive/index.js instead.');
         
-        if (containerWidth < 768) {
-            return {
-                maxEvents: 2,
-                compactMode: true,
-                enableTouch: true,
-                enableRipple: true
-            };
-        } else if (containerWidth < 1024) {
-            return {
-                maxEvents: 3,
-                compactMode: false,
-                enableTouch: true,
-                enableRipple: true
-            };
-        } else if (containerWidth < 1440) {
-            return {
-                maxEvents: 4,
-                compactMode: false,
-                enableTouch: false,
-                enableRipple: false
-            };
-        } else {
-            return {
-                maxEvents: 5,
-                compactMode: false,
-                enableTouch: false,
-                enableRipple: false
-            };
-        }
+        // Import the new responsive system
+        const { createCellConfig } = require('../../../utils/responsive/index.js');
+        return createCellConfig(containerWidth, containerHeight);
     },
     
     /**

@@ -593,7 +593,7 @@ The modular design allows for gradual implementation, starting with basic cell r
 - **`generateCellKey(date, options)`** - Generates a unique key for cell identification and caching.
 - **`hashString(str)`** - Simple string hash function for generating cache keys.
 - **`needsUpdate(cachedCell, currentOptions)`** - Checks if a cached cell needs updating based on age and options.
-- **`calculateResponsiveConfig(containerWidth, containerHeight)`** - Calculates responsive cell configuration based on container dimensions.
+- **`calculateResponsiveConfig(containerWidth, containerHeight)`** - **DEPRECATED** Calculates responsive cell configuration based on container dimensions. Use `createCellConfig` from `utils/responsive/index.js` instead.
 - **`groupEventsByDate(events)`** - Groups events by date for efficient cell updates.
 
 #### Performance Utilities (CellPerformanceUtils object)
@@ -642,7 +642,7 @@ The modular design allows for gradual implementation, starting with basic cell r
 ### Similar Functions
 - **Cache key generation** - `index.js` CellManager.generateCacheKey vs `index.js` CellUtils.generateCellKey - similar functionality with different naming.
 - **Event grouping** - `index.js` CellUtils.groupEventsByDate vs similar functions in other components.
-- **Responsive configuration** - `index.js` CellUtils.calculateResponsiveConfig vs similar functions in layout components.
+- **Responsive configuration** - `index.js` CellUtils.calculateResponsiveConfig is deprecated. Use unified responsive system from `utils/responsive/index.js`.
 
 ### Unique Functions
 - **Cell creation and management** - `index.js` CellManager has sophisticated cell lifecycle management with pooling and caching.

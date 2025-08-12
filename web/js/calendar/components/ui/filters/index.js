@@ -508,43 +508,14 @@ export const FilterUtils = {
      * @param {number} containerWidth - Container width
      * @param {number} containerHeight - Container height
      * @returns {Object} Responsive filter configuration
+     * @deprecated Use createFilterConfig from utils/responsive/index.js instead
      */
     calculateResponsiveConfig: (containerWidth, containerHeight) => {
-        const aspectRatio = containerWidth / containerHeight;
+        console.warn('FilterUtils.calculateResponsiveConfig is deprecated. Use createFilterConfig from utils/responsive/index.js instead.');
         
-        if (containerWidth < 768) {
-            return {
-                enableCaching: true,
-                maxCacheSize: 50,
-                enableAnimations: false,
-                showEventCounts: false,
-                compactMode: true
-            };
-        } else if (containerWidth < 1024) {
-            return {
-                enableCaching: true,
-                maxCacheSize: 100,
-                enableAnimations: true,
-                showEventCounts: true,
-                compactMode: false
-            };
-        } else if (containerWidth < 1440) {
-            return {
-                enableCaching: true,
-                maxCacheSize: 150,
-                enableAnimations: true,
-                showEventCounts: true,
-                compactMode: false
-            };
-        } else {
-            return {
-                enableCaching: true,
-                maxCacheSize: 200,
-                enableAnimations: true,
-                showEventCounts: true,
-                compactMode: false
-            };
-        }
+        // Import the new responsive system
+        const { createFilterConfig } = require('../../../utils/responsive/index.js');
+        return createFilterConfig(containerWidth, containerHeight);
     },
     
     /**

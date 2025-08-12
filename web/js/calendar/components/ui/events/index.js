@@ -438,43 +438,14 @@ export const EventUtils = {
      * @param {number} containerWidth - Container width
      * @param {number} containerHeight - Container height
      * @returns {Object} Responsive event configuration
+     * @deprecated Use createEventConfig from utils/responsive/index.js instead
      */
     calculateResponsiveConfig: (containerWidth, containerHeight) => {
-        const aspectRatio = containerWidth / containerHeight;
+        console.warn('EventUtils.calculateResponsiveConfig is deprecated. Use createEventConfig from utils/responsive/index.js instead.');
         
-        if (containerWidth < 768) {
-            return {
-                showTime: false,
-                showLocation: false,
-                compact: true,
-                enableTouch: true,
-                enableRipple: true
-            };
-        } else if (containerWidth < 1024) {
-            return {
-                showTime: true,
-                showLocation: false,
-                compact: false,
-                enableTouch: true,
-                enableRipple: true
-            };
-        } else if (containerWidth < 1440) {
-            return {
-                showTime: true,
-                showLocation: true,
-                compact: false,
-                enableTouch: false,
-                enableRipple: false
-            };
-        } else {
-            return {
-                showTime: true,
-                showLocation: true,
-                compact: false,
-                enableTouch: false,
-                enableRipple: false
-            };
-        }
+        // Import the new responsive system
+        const { createEventConfig } = require('../../../utils/responsive/index.js');
+        return createEventConfig(containerWidth, containerHeight);
     },
     
     /**

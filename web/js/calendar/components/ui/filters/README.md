@@ -372,7 +372,7 @@ The modular architecture is sound, but implementation details need refinement. F
 - **`generateFilterKey(events, filterConfig)`** - Generates a unique key for filter identification and caching.
 - **`hashString(str)`** - Simple string hash function for generating cache keys.
 - **`needsUpdate(cachedFilter, currentConfig)`** - Checks if a cached filter needs updating based on age and configuration.
-- **`calculateResponsiveConfig(containerWidth, containerHeight)`** - Calculates responsive filter configuration based on container dimensions.
+- **`calculateResponsiveConfig(containerWidth, containerHeight)`** - **DEPRECATED** Calculates responsive filter configuration based on container dimensions. Use `createFilterConfig` from `utils/responsive/index.js` instead.
 - **`groupEventsByCalendar(events)`** - Groups events by calendar for efficient filtering.
 - **`countEventsByCalendar(events)`** - Counts events per calendar.
 - **`validateFilterConfig(config)`** - Validates filter configuration and returns validation results.
@@ -439,7 +439,7 @@ The modular architecture is sound, but implementation details need refinement. F
 ### Similar Functions
 - **Cache key generation** - `index.js` FilterManager.generateCacheKey vs `index.js` FilterUtils.generateFilterKey - similar functionality with different naming.
 - **Event grouping** - `index.js` FilterUtils.groupEventsByCalendar vs similar functions in other components.
-- **Responsive configuration** - `index.js` FilterUtils.calculateResponsiveConfig vs similar functions in layout components.
+- **Responsive configuration** - `index.js` FilterUtils.calculateResponsiveConfig is deprecated. Use unified responsive system from `utils/responsive/index.js`.
 - **Performance monitoring** - `index.js` FilterPerformanceUtils vs similar utilities in other components.
 
 ### Unique Functions

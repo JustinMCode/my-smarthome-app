@@ -341,39 +341,14 @@ export const LayoutUtils = {
      * @param {number} containerWidth - Container width
      * @param {number} containerHeight - Container height
      * @returns {Object} Responsive breakpoint configuration
+     * @deprecated Use createLayoutConfig from utils/responsive/index.js instead
      */
     calculateResponsiveBreakpoints: (containerWidth, containerHeight) => {
-        const aspectRatio = containerWidth / containerHeight;
+        console.warn('LayoutUtils.calculateResponsiveBreakpoints is deprecated. Use createLayoutConfig from utils/responsive/index.js instead.');
         
-        if (containerWidth < 768) {
-            return {
-                breakpoint: 'mobile',
-                columns: 1,
-                maxEventsPerDay: 2,
-                compactMode: true
-            };
-        } else if (containerWidth < 1024) {
-            return {
-                breakpoint: 'tablet',
-                columns: 2,
-                maxEventsPerDay: 3,
-                compactMode: false
-            };
-        } else if (containerWidth < 1440) {
-            return {
-                breakpoint: 'desktop',
-                columns: 3,
-                maxEventsPerDay: 5,
-                compactMode: false
-            };
-        } else {
-            return {
-                breakpoint: 'large',
-                columns: 4,
-                maxEventsPerDay: 7,
-                compactMode: false
-            };
-        }
+        // Import the new responsive system
+        const { createLayoutConfig } = require('../../utils/responsive/index.js');
+        return createLayoutConfig(containerWidth, containerHeight);
     }
 };
 

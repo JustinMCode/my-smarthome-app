@@ -731,7 +731,7 @@ The modular design allows for gradual implementation, starting with basic event 
 - **`generateEventKey(event, options)`** - Generates a unique key for event identification and caching.
 - **`hashString(str)`** - Simple string hash function for generating cache keys.
 - **`needsUpdate(cachedEvent, currentEvent)`** - Checks if a cached event needs updating based on age and data changes.
-- **`calculateResponsiveConfig(containerWidth, containerHeight)`** - Calculates responsive event configuration based on container dimensions.
+- **`calculateResponsiveConfig(containerWidth, containerHeight)`** - **DEPRECATED** Calculates responsive event configuration based on container dimensions. Use `createEventConfig` from `utils/responsive/index.js` instead.
 - **`groupEventsByDate(events)`** - Groups events by date for efficient rendering.
 - **`sortEventsByTime(events)`** - Sorts events by time with all-day events first.
 - **`calculateEventDuration(event)`** - Calculates event duration in minutes.
@@ -812,7 +812,7 @@ The modular design allows for gradual implementation, starting with basic event 
 ### Similar Functions
 - **Cache key generation** - `index.js` EventManager.generateEventKey vs `index.js` EventUtils.generateEventKey - similar functionality with different naming.
 - **Event grouping** - `index.js` EventUtils.groupEventsByDate vs similar functions in other components.
-- **Responsive configuration** - `index.js` EventUtils.calculateResponsiveConfig vs similar functions in layout components.
+- **Responsive configuration** - `index.js` EventUtils.calculateResponsiveConfig is deprecated. Use unified responsive system from `utils/responsive/index.js`.
 - **Event overlap detection** - `index.js` EventUtils.eventsOverlap vs similar functions in layout components.
 
 ### Unique Functions
