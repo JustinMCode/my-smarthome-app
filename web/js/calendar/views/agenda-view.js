@@ -8,7 +8,8 @@ import { CALENDAR_CONFIG, CSS_CLASSES, SELECTORS } from '../utils/calendar-const
 import { 
     addDays, 
     isToday, 
-    isSameDay 
+    isSameDay,
+    formatDate
 } from '../utils/calendar-date-utils.js';
 import { calendarManager } from '../config/index.js';
 

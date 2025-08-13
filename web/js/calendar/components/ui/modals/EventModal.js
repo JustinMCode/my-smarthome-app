@@ -3,6 +3,8 @@
  * Centralized modal/popup creation for event details and day events
  */
 
+import { formatDate } from '../../../utils/calendar-date-utils.js';
+
 export class EventModal {
     constructor() {
         this.activeModals = new Set();
@@ -581,20 +583,13 @@ export class EventModal {
      * Format date for popup header
      */
     formatDateForPopupHeader(date) {
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                       'July', 'August', 'September', 'October', 'November', 'December'];
-        
-        const dayName = days[date.getDay()];
-        const monthName = months[date.getMonth()];
-        const dayNum = date.getDate();
-        const year = date.getFullYear();
         const currentYear = new Date().getFullYear();
+        const year = date.getFullYear();
         
         if (year === currentYear) {
-            return `${dayName}, ${monthName} ${dayNum}`;
+            return formatDate(date, 'long');
         } else {
-            return `${dayName}, ${monthName} ${dayNum}, ${year}`;
+            return formatDate(date, 'full');
         }
     }
 

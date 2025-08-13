@@ -14,7 +14,7 @@ import { EventModal } from './EventModal.js';
 import { CreateEventModalController } from './create/CreateEventModalController.js';
 
 // Import centralized hash utility
-import { hashString } from '../../utils/core/hash.js';
+import { hashString } from '../../../utils/core/hash.js';
 
 export { BaseModal, EventModal, CreateEventModalController };
 

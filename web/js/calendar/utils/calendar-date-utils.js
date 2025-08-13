@@ -153,15 +153,33 @@ export function getDayName(date, short = false) {
  * @returns {string} - Formatted date string
  */
 export function formatDate(date, format = 'short') {
+    // Handle null/undefined dates
+    if (!date || !(date instanceof Date)) {
+        console.warn('formatDate: Invalid date provided', date);
+        return '';
+    }
+
     switch (format) {
         case 'full':
             return `${getDayName(date)} ${getMonthName(date)} ${date.getDate()}, ${date.getFullYear()}`;
+        case 'long':
+            return `${getDayName(date)} ${getMonthName(date)} ${date.getDate()}`;
+        case 'short':
+            return `${getDayName(date, true)} ${getMonthName(date, true)} ${date.getDate()}`;
         case 'month-year':
             return `${getMonthName(date)} ${date.getFullYear()}`;
         case 'short-date':
             return `${getMonthName(date, true)} ${date.getDate()}`;
         case 'day-month':
             return `${date.getDate()} ${getMonthName(date, true)}`;
+        case 'weekday':
+            return getDayName(date);
+        case 'weekday-short':
+            return getDayName(date, true);
+        case 'date-only':
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        case 'iso':
+            return date.toISOString().split('T')[0];
         default:
             return `${getMonthName(date, true)} ${date.getDate()}, ${date.getFullYear()}`;
     }

@@ -4,6 +4,7 @@
  */
 
 import { EVENT_CATEGORY_COLORS } from '../../../utils/calendar-constants.js';
+import { formatDate } from '../../../utils/calendar-date-utils.js';
 
 export class EventPill {
     constructor(core, event, options = {}) {
@@ -234,24 +235,7 @@ export class EventPill {
         }, 100);
     }
     
-    /**
-     * Format date for display
-     */
-    formatDate(date, format = 'short') {
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        
-        switch (format) {
-            case 'full':
-                return `${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
-            case 'month-year':
-                return `${months[date.getMonth()]} ${date.getFullYear()}`;
-            case 'short-date':
-                return `${months[date.getMonth()]} ${date.getDate()}`;
-            default:
-                return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
-        }
-    }
+
     
     /**
      * Format time for display
