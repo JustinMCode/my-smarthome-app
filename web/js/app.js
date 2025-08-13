@@ -5,7 +5,8 @@
 
 import { CONFIG } from './constants/config.js';
 import { TouchCalendarManager } from './calendar/index.js';
-import { formatTime, formatDate, loadFromStorage, saveToStorage } from './utils/utils.js';
+import { loadFromStorage, saveToStorage } from './utils/utils.js';
+import { formatTime, formatDate } from './calendar/utils/calendar-date-utils.js';
 import { logger } from './utils/logger.js';
 import { createPerformanceDashboard } from './performance/components/PerformanceDashboard.js';
 

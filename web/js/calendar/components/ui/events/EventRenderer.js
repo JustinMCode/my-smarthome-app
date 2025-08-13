@@ -5,6 +5,7 @@
 
 import { calendarConfigService } from '../../../config/calendar-config-service.js';
 import { CALENDAR_CONFIG } from '../../../utils/calendar-constants.js';
+import { formatTime } from '../../../utils/calendar-date-utils.js';
 
 export class EventRenderer {
     constructor() {
@@ -136,7 +137,7 @@ export class EventRenderer {
     createEventContent(event, options = {}) {
         const { showTime = true, showBullet = true, isTimedEvent = false } = options;
         
-        const startTime = event.start ? this.formatTime(new Date(event.start)) : null;
+        const startTime = event.start ? formatTime(new Date(event.start)) : null;
         const hasTime = startTime && startTime !== '12:00 AM' && !event.allDay;
         
         if (isTimedEvent || hasTime) {
@@ -325,7 +326,7 @@ export class EventRenderer {
     isTimedEvent(event) {
         if (event.allDay) return false;
         
-        const startTime = event.start ? this.formatTime(new Date(event.start)) : null;
+        const startTime = event.start ? formatTime(new Date(event.start)) : null;
         return startTime && startTime !== '12:00 AM';
     }
 
@@ -340,16 +341,7 @@ export class EventRenderer {
         });
     }
 
-    /**
-     * Format time for display
-     */
-    formatTime(date) {
-        return date.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit',
-            hour12: true 
-        });
-    }
+
 
     /**
      * Convert hex color to RGB

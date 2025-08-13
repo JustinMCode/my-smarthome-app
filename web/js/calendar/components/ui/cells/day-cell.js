@@ -4,7 +4,7 @@
  */
 
 import { CSS_CLASSES, EVENT_CATEGORY_COLORS } from '../../../utils/calendar-constants.js';
-import { isToday, isWeekend, formatDate } from '../../../utils/calendar-date-utils.js';
+import { isToday, isWeekend, formatDate, formatTime } from '../../../utils/calendar-date-utils.js';
 
 export class DayCell {
     constructor(core, date, options = {}) {
@@ -246,10 +246,10 @@ export class DayCell {
         modal.innerHTML = `
             <h2 style="font-size: 24px; margin-bottom: 16px;">${event.title}</h2>
             <p style="font-size: 18px; color: var(--text-secondary); margin-bottom: 8px;">
-                📅 ${this.formatDate(event.start, 'full')}
+                📅 ${formatDate(event.start, 'full')}
             </p>
             <p style="font-size: 18px; color: var(--text-secondary); margin-bottom: 8px;">
-                ⏰ ${this.formatTime(event.start)}
+                ⏰ ${formatTime(event.start)}
             </p>
             ${event.location ? `<p style="font-size: 18px; color: var(--text-secondary);">📍 ${event.location}</p>` : ''}
             ${event.description ? `<p style="font-size: 16px; color: var(--text-muted); margin-top: 16px;">${event.description}</p>` : ''}
@@ -281,16 +281,7 @@ export class DayCell {
     
 
     
-    /**
-     * Format time for display
-     */
-    formatTime(date) {
-        return date.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit',
-            hour12: true 
-        });
-    }
+
     
     /**
      * Update the cell

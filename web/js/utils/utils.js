@@ -4,47 +4,9 @@
  */
 
 import { CONFIG, getStorageKey } from '../constants/config.js';
+import { formatDate } from '../calendar/utils/calendar-date-utils.js';
 
-/**
- * Date and Time Formatting
- */
 
-export function formatTime(date, use24Hour = false, includeSeconds = false) {
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const seconds = date.getSeconds();
-    
-    if (use24Hour) {
-        const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-        return includeSeconds ? `${timeStr}:${seconds.toString().padStart(2, '0')}` : timeStr;
-    } else {
-        const hour12 = hours % 12 || 12;
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        const timeStr = `${hour12}:${minutes.toString().padStart(2, '0')}`;
-        const fullTime = includeSeconds ? `${timeStr}:${seconds.toString().padStart(2, '0')}` : timeStr;
-        return `${fullTime} ${ampm}`;
-    }
-}
-
-export function formatDate(date, format = 'full') {
-    const options = {
-        'full': { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' },
-        'long': { weekday: 'long', month: 'long', day: 'numeric' },
-        'short': { weekday: 'short', month: 'short', day: 'numeric' },
-        'short-date': { month: 'short', day: 'numeric' },
-        'month-year': { month: 'long', year: 'numeric' },
-        'weekday': { weekday: 'long' },
-        'weekday-short': { weekday: 'short' },
-        'date-only': { year: 'numeric', month: '2-digit', day: '2-digit' },
-        'iso': { year: 'numeric', month: '2-digit', day: '2-digit' }
-    };
-    
-    if (format === 'iso') {
-        return date.toISOString().split('T')[0];
-    }
-    
-    return date.toLocaleDateString('en-US', options[format] || options['full']);
-}
 
 export function formatRelativeTime(date) {
     const now = new Date();
@@ -444,8 +406,6 @@ export function lightenColor(color, percent) {
  */
 export default {
     // Date/Time
-    formatTime,
-    formatDate,
     formatRelativeTime,
     formatDuration,
     

@@ -3,7 +3,7 @@
  * Centralized modal/popup creation for event details and day events
  */
 
-import { formatDate } from '../../../utils/calendar-date-utils.js';
+import { formatDate, formatTime } from '../../../utils/calendar-date-utils.js';
 
 export class EventModal {
     constructor() {
@@ -340,8 +340,8 @@ export class EventModal {
      */
     createQuickAddContent(startTime, endTime) {
         const message = endTime 
-            ? `Create event: ${this.formatTime(startTime)} - ${this.formatTime(endTime)}`
-            : `Create event at ${this.formatTime(startTime)}`;
+            ? `Create event: ${formatTime(startTime)} - ${formatTime(endTime)}`
+            : `Create event at ${formatTime(startTime)}`;
             
         return `
             <div style="padding: 24px;">
@@ -507,8 +507,8 @@ export class EventModal {
         }
         
         // For timed events, show the time
-        const startTime = this.formatTime(startDate);
-        const endTime = endDate ? this.formatTime(endDate) : null;
+        const startTime = formatTime(startDate);
+        const endTime = endDate ? formatTime(endDate) : null;
         const timeStr = endTime ? `${startTime} – ${endTime}` : startTime;
         
         return {
@@ -593,16 +593,7 @@ export class EventModal {
         }
     }
 
-    /**
-     * Format time for display
-     */
-    formatTime(date) {
-        return date.toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
-        });
-    }
+
 
     /**
      * Get active modals count

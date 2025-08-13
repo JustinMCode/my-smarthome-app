@@ -4,7 +4,7 @@
  */
 
 import { EVENT_CATEGORY_COLORS } from '../../../utils/calendar-constants.js';
-import { formatDate } from '../../../utils/calendar-date-utils.js';
+import { formatDate, formatTime } from '../../../utils/calendar-date-utils.js';
 
 export class EventPill {
     constructor(core, event, options = {}) {
@@ -87,7 +87,7 @@ export class EventPill {
         if (this.options.showTime && !this.event.allDay) {
             const time = document.createElement('div');
             time.className = 'event-pill-time';
-            time.textContent = this.formatTime(this.event.start);
+            time.textContent = formatTime(this.event.start);
             content.appendChild(time);
         }
         
@@ -189,10 +189,10 @@ export class EventPill {
         modal.innerHTML = `
             <h2 style="font-size: 24px; margin-bottom: 16px;">${this.event.title}</h2>
             <p style="font-size: 18px; color: var(--text-secondary); margin-bottom: 8px;">
-                📅 ${this.formatDate(this.event.start, 'full')}
+                📅 ${formatDate(this.event.start, 'full')}
             </p>
             <p style="font-size: 18px; color: var(--text-secondary); margin-bottom: 8px;">
-                ⏰ ${this.event.allDay ? 'All Day' : this.formatTime(this.event.start)}
+                ⏰ ${this.event.allDay ? 'All Day' : formatTime(this.event.start)}
             </p>
             ${this.event.location ? `<p style="font-size: 18px; color: var(--text-secondary);">📍 ${this.event.location}</p>` : ''}
             ${this.event.description ? `<p style="font-size: 16px; color: var(--text-muted); margin-top: 16px;">${this.event.description}</p>` : ''}
@@ -237,16 +237,7 @@ export class EventPill {
     
 
     
-    /**
-     * Format time for display
-     */
-    formatTime(date) {
-        return date.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit',
-            hour12: true 
-        });
-    }
+
     
     /**
      * Update the pill

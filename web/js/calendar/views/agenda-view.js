@@ -103,11 +103,11 @@ export class AgendaView extends ViewBase {
         
         const dateEl = document.createElement('div');
         dateEl.className = 'agenda-date';
-        dateEl.textContent = this.formatDate(currentDate, 'full');
+                    dateEl.textContent = formatDate(currentDate, 'full');
         
         const dayEl = document.createElement('div');
         dayEl.className = 'agenda-day';
-        dayEl.textContent = this.formatDate(currentDate, 'day-month');
+                    dayEl.textContent = formatDate(currentDate, 'day-month');
         
         header.appendChild(dateEl);
         header.appendChild(dayEl);
@@ -207,7 +207,7 @@ export class AgendaView extends ViewBase {
         const date = new Date(dateKey);
         const label = document.createElement('div');
         label.className = 'agenda-date-label';
-        label.textContent = this.formatDate(date, 'short-date');
+                    label.textContent = formatDate(date, 'short-date');
         
         const count = document.createElement('div');
         count.className = 'agenda-date-count';
@@ -263,13 +263,13 @@ export class AgendaView extends ViewBase {
         } else {
             const startTime = document.createElement('div');
             startTime.className = 'agenda-time-start';
-            startTime.textContent = this.formatTime(event.start);
+            startTime.textContent = formatTime(event.start);
             timeSection.appendChild(startTime);
             
             if (event.end) {
                 const endTime = document.createElement('div');
                 endTime.className = 'agenda-time-end';
-                endTime.textContent = this.formatTime(event.end);
+                endTime.textContent = formatTime(event.end);
                 timeSection.appendChild(endTime);
             }
         }
