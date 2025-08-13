@@ -13,6 +13,9 @@ import { BaseModal } from './BaseModal.js';
 import { EventModal } from './EventModal.js';
 import { CreateEventModalController } from './create/CreateEventModalController.js';
 
+// Import centralized hash utility
+import { hashString } from '../../utils/core/hash.js';
+
 export { BaseModal, EventModal, CreateEventModalController };
 
 /**
@@ -497,24 +500,9 @@ export const ModalUtils = {
      * @returns {string} Cache key
      */
     generateModalKey: (modalType, content, options = {}) => {
-        const contentHash = ModalUtils.hashString(JSON.stringify(content));
-        const optionsHash = ModalUtils.hashString(JSON.stringify(options));
+        const contentHash = hashString(JSON.stringify(content));
+        const optionsHash = hashString(JSON.stringify(options));
         return `modal_${modalType}_${contentHash}_${optionsHash}`;
-    },
-    
-    /**
-     * Simple string hash function
-     * @param {string} str - String to hash
-     * @returns {string} Hash value
-     */
-    hashString: (str) => {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
-        }
-        return Math.abs(hash).toString(36);
     },
     
     /**
