@@ -3,7 +3,7 @@
  * Centralized modal/popup creation for event details and day events
  */
 
-import { formatDate, formatTime } from '../../../utils/calendar-date-utils.js';
+import { formatDate, formatTime } from '../../../utils/basic/calendar-date-utils.js';
 
 export class EventModal {
     constructor() {

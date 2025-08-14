@@ -3,9 +3,9 @@
  * Abstract base class for all calendar views
  */
 
-import { CALENDAR_CONFIG, CSS_CLASSES } from '../utils/calendar-constants.js';
-import { formatDate, formatTime } from '../utils/calendar-date-utils.js';
-import { addTouchFeedback, createRipple } from '../utils/touch-interactions.js';
+import { CALENDAR_CONFIG, CSS_CLASSES } from '../utils/basic/calendar-constants.js';
+import { formatDate, formatTime } from '../utils/basic/calendar-date-utils.js';
+import { addTouchFeedback, createRipple } from '../utils/ui/touch-interactions.js';
 import { EventModal } from '../components/ui/modals/index.js';
 
 export class ViewBase {

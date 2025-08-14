@@ -3,9 +3,9 @@
  * Handles event display and interactions
  */
 
-import { EVENT_CATEGORY_COLORS } from '../../../utils/calendar-constants.js';
-import { formatDate, formatTime } from '../../../utils/calendar-date-utils.js';
-import { addTouchFeedback, createRipple } from '../../../utils/touch-interactions.js';
+import { EVENT_CATEGORY_COLORS } from '../../../utils/basic/calendar-constants.js';
+import { formatDate, formatTime } from '../../../utils/basic/calendar-date-utils.js';
+import { addTouchFeedback, createRipple } from '../../../utils/ui/touch-interactions.js';
 import { EventModal } from '../modals/index.js';
 
 export class EventPill {

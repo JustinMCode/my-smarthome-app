@@ -4,7 +4,7 @@
  */
 
 import { CONFIG, getStorageKey } from '../constants/config.js';
-import { formatDate } from '../calendar/utils/calendar-date-utils.js';
+import { formatDate } from '../calendar/utils/basic/calendar-date-utils.js';
 
 
 

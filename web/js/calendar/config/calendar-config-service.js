@@ -3,7 +3,7 @@
  * Dynamically loads calendar configuration from the API
  */
 
-import { CALENDAR_CONFIG } from '../utils/calendar-constants.js';
+import { CALENDAR_CONFIG } from '../utils/basic/calendar-constants.js';
 
 export class CalendarConfigService {
     constructor() {

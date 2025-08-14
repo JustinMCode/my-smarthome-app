@@ -5,15 +5,15 @@
 
 import { ViewBase } from './view-base.js';
 import { ViewMixin } from '../mixins/ViewMixin.js';
-import { CALENDAR_CONFIG, CSS_CLASSES } from '../utils/calendar-constants.js';
+import { CALENDAR_CONFIG, CSS_CLASSES } from '../utils/basic/calendar-constants.js';
 import { 
     getStartOfWeek, 
     addDays, 
     isToday, 
     isWeekend,
     isSameDay
-} from '../utils/calendar-date-utils.js';
-import { addTouchFeedback, createRipple } from '../utils/touch-interactions.js';
+} from '../utils/basic/calendar-date-utils.js';
+import { addTouchFeedback, createRipple } from '../utils/ui/touch-interactions.js';
 import { calendarConfigService } from '../config/calendar-config-service.js';
 
 // Apply the ViewMixin to create an enhanced base class

@@ -5,7 +5,7 @@
 
 import { CalendarState } from './calendar-state.js';
 import { CalendarEvents } from './calendar-events.js';
-import { CALENDAR_CONFIG } from '../utils/calendar-constants.js';
+import { CALENDAR_CONFIG } from '../utils/basic/calendar-constants.js';
 import { ViewManager } from '../views/view-manager.js';
 import { CalendarHeader } from '../components/ui/navigation/index.js';
 import { TouchGestures } from '../interactions/touch-gestures.js';

@@ -3,9 +3,9 @@
  * Handles individual day cell rendering and interactions
  */
 
-import { CSS_CLASSES, EVENT_CATEGORY_COLORS } from '../../../utils/calendar-constants.js';
-import { isToday, isWeekend, formatDate, formatTime } from '../../../utils/calendar-date-utils.js';
-import { addTouchFeedback, createRipple } from '../../../utils/touch-interactions.js';
+import { CSS_CLASSES, EVENT_CATEGORY_COLORS } from '../../../utils/basic/calendar-constants.js';
+import { isToday, isWeekend, formatDate, formatTime } from '../../../utils/basic/calendar-date-utils.js';
+import { addTouchFeedback, createRipple } from '../../../utils/ui/touch-interactions.js';
 import { EventModal } from '../modals/index.js';
 
 export class DayCell {

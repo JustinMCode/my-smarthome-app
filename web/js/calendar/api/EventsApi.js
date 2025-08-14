@@ -3,6 +3,8 @@
  * Wrapper around backend endpoints for events
  */
 
+import { _parseJson } from './utils.js';
+
 export class EventsApi {
   /**
    * Create a new event
@@ -18,19 +20,19 @@ export class EventsApi {
       body: JSON.stringify({ calendarId, eventData })
     });
 
-    const data = await EventsApi._parseJson(resp);
+    const data = await _parseJson(resp);
     if (!resp.ok || data?.success === false) {
       throw new Error(data?.error || 'Failed to create event');
     }
     return data?.event || data;
   }
 
+  /**
+   * @deprecated Use shared utility from utils.js instead
+   * This method is maintained for backward compatibility but delegates to the shared utility
+   */
   static async _parseJson(resp) {
-    try {
-      return await resp.json();
-    } catch (_) {
-      return null;
-    }
+    return _parseJson(resp);
   }
 }
 

@@ -3,7 +3,7 @@
  * Manages view switching and lifecycle for all calendar views
  */
 
-import { CALENDAR_CONFIG, CSS_CLASSES } from '../utils/calendar-constants.js';
+import { CALENDAR_CONFIG, CSS_CLASSES } from '../utils/basic/calendar-constants.js';
 import { MonthViewRefactored as MonthView } from './month-view.js';
 import { WeekViewRefactored as WeekView } from './week-view.js';
 import { AgendaView } from './agenda-view.js';

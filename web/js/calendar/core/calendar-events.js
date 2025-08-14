@@ -3,10 +3,11 @@
  * Handles event data, API integration, and event processing
  */
 
-import { CALENDAR_CONFIG, EVENT_CATEGORY_COLORS, EVENT_CATEGORY_ICONS } from '../utils/calendar-constants.js';
-import { isSameDay } from '../utils/calendar-date-utils.js';
+import { CALENDAR_CONFIG, EVENT_CATEGORY_COLORS, EVENT_CATEGORY_ICONS } from '../utils/basic/calendar-constants.js';
+import { isSameDay } from '../utils/basic/calendar-date-utils.js';
 import { calendarConfigService } from '../config/calendar-config-service.js';
 import { logger } from '../../utils/logger.js';
+import { categorizeEvent } from '../utils/events/event-categorization.js';
 
 export class CalendarEvents {
     constructor(state) {
@@ -211,25 +212,13 @@ export class CalendarEvents {
 
     /**
      * Categorize event based on title and description
+     * @deprecated Use the centralized categorizeEvent utility directly
+     * @param {Object} event - Event to categorize
+     * @returns {string} Event category
      */
     categorizeEvent(event) {
-        const title = (event.title || event.summary || '').toLowerCase();
-        const description = (event.description || '').toLowerCase();
-        const text = `${title} ${description}`;
-        
-        if (text.includes('work') || text.includes('meeting') || text.includes('office') || text.includes('team')) {
-            return CALENDAR_CONFIG.EVENT_CATEGORIES.WORK;
-        } else if (text.includes('family') || text.includes('kids') || text.includes('child') || text.includes('home')) {
-            return CALENDAR_CONFIG.EVENT_CATEGORIES.FAMILY;
-        } else if (text.includes('health') || text.includes('doctor') || text.includes('appointment') || text.includes('medical')) {
-            return CALENDAR_CONFIG.EVENT_CATEGORIES.HEALTH;
-        } else if (text.includes('party') || text.includes('social') || text.includes('dinner') || text.includes('celebration')) {
-            return CALENDAR_CONFIG.EVENT_CATEGORIES.SOCIAL;
-        } else if (text.includes('personal') || text.includes('private') || text.includes('me time')) {
-            return CALENDAR_CONFIG.EVENT_CATEGORIES.PERSONAL;
-        }
-        
-        return CALENDAR_CONFIG.EVENT_CATEGORIES.OTHER;
+        // Delegate to the centralized utility
+        return categorizeEvent(event);
     }
     
     /**

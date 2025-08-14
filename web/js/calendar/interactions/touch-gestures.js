@@ -3,8 +3,8 @@
  * Handles touch and swipe interactions for the calendar
  */
 
-import { CALENDAR_CONFIG, SELECTORS } from '../utils/calendar-constants.js';
-import { addTouchFeedback, createRipple } from '../utils/touch-interactions.js';
+import { CALENDAR_CONFIG, SELECTORS } from '../utils/basic/calendar-constants.js';
+import { addTouchFeedback, createRipple } from '../utils/ui/touch-interactions.js';
 
 export class TouchGestures {
     constructor(core) {

@@ -4,7 +4,7 @@
  * Consolidates duplicate implementations from across the codebase
  */
 
-import { CALENDAR_CONFIG } from './calendar-constants.js';
+import { CALENDAR_CONFIG } from '../basic/calendar-constants.js';
 
 /**
  * Default configuration for touch interactions

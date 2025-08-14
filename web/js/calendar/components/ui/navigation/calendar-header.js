@@ -3,8 +3,8 @@
  * Handles calendar navigation and view switching
  */
 
-import { CALENDAR_CONFIG, CSS_CLASSES, SELECTORS } from '../../../utils/calendar-constants.js';
-import { formatDate } from '../../../utils/calendar-date-utils.js';
+import { CALENDAR_CONFIG, CSS_CLASSES, SELECTORS } from '../../../utils/basic/calendar-constants.js';
+import { formatDate } from '../../../utils/basic/calendar-date-utils.js';
 import { CalendarFilter } from '../filters/index.js';
 import { logger } from '../../../../utils/logger.js';
 import { CreateEventModalController } from '../modals/index.js';

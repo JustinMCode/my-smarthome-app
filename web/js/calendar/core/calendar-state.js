@@ -3,7 +3,7 @@
  * Centralized state management for the calendar system
  */
 
-import { CALENDAR_CONFIG } from '../utils/calendar-constants.js';
+import { CALENDAR_CONFIG } from '../utils/basic/calendar-constants.js';
 
 export class CalendarState {
     constructor() {

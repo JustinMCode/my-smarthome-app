@@ -7,7 +7,7 @@ import { EventRenderer } from '../components/ui/events/index.js';
 import { DateNavigation } from '../components/ui/navigation/index.js';
 import { createDataManager, createLayoutManager } from '../utils/factory/index.js';
 import { EventModal } from '../components/ui/modals/index.js';
-import { addTouchFeedback, createRipple } from '../utils/touch-interactions.js';
+import { addTouchFeedback, createRipple } from '../utils/ui/touch-interactions.js';
 
 export const ViewMixin = (BaseClass) => class extends BaseClass {
     constructor(core, container) {

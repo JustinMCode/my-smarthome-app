@@ -3,7 +3,7 @@
  * Centralized navigation logic for calendar views
  */
 
-import { addDays, addMonths } from '../../../utils/calendar-date-utils.js';
+import { addDays, addMonths } from '../../../utils/basic/calendar-date-utils.js';
 
 export class DateNavigation {
     constructor(core) {

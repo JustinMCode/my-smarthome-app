@@ -4,6 +4,7 @@
  */
 
 import { CacheFactory } from '../../utils/core/cache/index.js';
+import { categorizeEvent } from '../../utils/events/event-categorization.js';
 
 export class EventDataManager {
     constructor(core) {
@@ -200,25 +201,13 @@ export class EventDataManager {
 
     /**
      * Categorize event based on content
+     * @deprecated Use the centralized categorizeEvent utility directly
+     * @param {Object} event - Event to categorize
+     * @returns {string} Event category
      */
     categorizeEvent(event) {
-        const title = (event.title || event.summary || '').toLowerCase();
-        const description = (event.description || '').toLowerCase();
-        const text = `${title} ${description}`;
-        
-        if (text.includes('work') || text.includes('meeting') || text.includes('office') || text.includes('team')) {
-            return 'work';
-        } else if (text.includes('family') || text.includes('kids') || text.includes('child') || text.includes('home')) {
-            return 'family';
-        } else if (text.includes('health') || text.includes('doctor') || text.includes('appointment') || text.includes('medical')) {
-            return 'health';
-        } else if (text.includes('party') || text.includes('social') || text.includes('dinner') || text.includes('celebration')) {
-            return 'social';
-        } else if (text.includes('personal') || text.includes('private') || text.includes('me time')) {
-            return 'personal';
-        }
-        
-        return 'other';
+        // Delegate to the centralized utility
+        return categorizeEvent(event);
     }
 
     /**

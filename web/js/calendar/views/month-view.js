@@ -5,15 +5,15 @@
 
 import { ViewBase } from './view-base.js';
 import { ViewMixin } from '../mixins/ViewMixin.js';
-import { CALENDAR_CONFIG, CSS_CLASSES } from '../utils/calendar-constants.js';
+import { CALENDAR_CONFIG, CSS_CLASSES } from '../utils/basic/calendar-constants.js';
 import { 
     getCalendarGridDates, 
     isToday, 
     isWeekend, 
     isCurrentMonth,
     isSameDay
-} from '../utils/calendar-date-utils.js';
-import { addTouchFeedback, createRipple } from '../utils/touch-interactions.js';
+} from '../utils/basic/calendar-date-utils.js';
+import { addTouchFeedback, createRipple } from '../utils/ui/touch-interactions.js';
 import { calendarConfigService } from '../config/calendar-config-service.js';
 import { logger } from '../../utils/logger.js';
 

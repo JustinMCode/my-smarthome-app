@@ -4,14 +4,14 @@
  */
 
 import { ViewBase } from './view-base.js';
-import { CALENDAR_CONFIG, CSS_CLASSES, SELECTORS } from '../utils/calendar-constants.js';
+import { CALENDAR_CONFIG, CSS_CLASSES, SELECTORS } from '../utils/basic/calendar-constants.js';
 import { 
     addDays, 
     isToday, 
     isSameDay,
     formatDate
-} from '../utils/calendar-date-utils.js';
-import { addTouchFeedback, createRipple } from '../utils/touch-interactions.js';
+} from '../utils/basic/calendar-date-utils.js';
+import { addTouchFeedback, createRipple } from '../utils/ui/touch-interactions.js';
 import { calendarManager } from '../config/index.js';
 
 export class AgendaView extends ViewBase {

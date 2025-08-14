@@ -24,8 +24,8 @@ export { EventPill } from './components/ui/events/index.js';
 export { TouchGestures } from './interactions/touch-gestures.js';
 
 // Utility exports
-export * from './utils/calendar-constants.js';
-export * from './utils/calendar-date-utils.js';
+export * from './utils/basic/calendar-constants.js';
+export * from './utils/basic/calendar-date-utils.js';
 
 // Modular system exports
 export * from './components/index.js';
