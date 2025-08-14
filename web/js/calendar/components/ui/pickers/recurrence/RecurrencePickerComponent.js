@@ -33,7 +33,6 @@ export class RecurrencePickerComponent {
       wrapper.innerHTML = this._template();
 
       this._attachHandlers(wrapper);
-      this._initializeDefaults(wrapper);
 
       return wrapper;
     } catch (error) {
@@ -100,6 +99,19 @@ export class RecurrencePickerComponent {
       </div>
       
       <div id="recurring-options" class="recurring-details" style="display: none;">
+        <!-- Options will be populated when checkbox is checked -->
+      </div>
+    `;
+  }
+
+  /**
+   * Populate recurring options content when checkbox is checked
+   * @private
+   * @param {HTMLElement} recurringOptions
+   */
+  _populateRecurringOptions(recurringOptions) {
+    if (recurringOptions.children.length === 0) {
+      recurringOptions.innerHTML = `
         <div class="recurring-config">
           <div class="recurring-frequency-section">
             <label>Repeat</label>
@@ -152,8 +164,11 @@ export class RecurrencePickerComponent {
           
           <div id="end-condition-container"></div>
         </div>
-      </div>
-    `;
+      `;
+      
+      // Re-attach handlers for the newly created elements
+      this._attachRecurringOptionsHandlers(recurringOptions.closest('.recurring-section'));
+    }
   }
 
   /**
@@ -185,7 +200,6 @@ export class RecurrencePickerComponent {
   _attachHandlers(wrapper) {
     const recurringCheckbox = wrapper.querySelector('#event-recurring');
     const recurringOptions = wrapper.querySelector('#recurring-options');
-    const frequencySelect = wrapper.querySelector('#recurring-frequency');
 
     // Toggle recurring options visibility
     if (recurringCheckbox) {
@@ -195,6 +209,7 @@ export class RecurrencePickerComponent {
         this.isRecurring = e.target.checked;
         
         if (e.target.checked) {
+          this._populateRecurringOptions(recurringOptions);
           recurringOptions.style.display = 'block';
           this._initializeDefaults(wrapper);
         } else {
@@ -203,6 +218,15 @@ export class RecurrencePickerComponent {
         this._notifyChange();
       });
     }
+  }
+
+  /**
+   * Attach handlers for recurring options (called after content is populated)
+   * @private
+   * @param {HTMLElement} wrapper
+   */
+  _attachRecurringOptionsHandlers(wrapper) {
+    const frequencySelect = wrapper.querySelector('#recurring-frequency');
 
     // Handle frequency changes
     if (frequencySelect) {

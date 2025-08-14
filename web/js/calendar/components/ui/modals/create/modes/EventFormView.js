@@ -2,8 +2,8 @@ import { TouchDateTimePicker } from '../../../pickers/TouchDateTimePicker.js';
 import { RecurrencePickerComponent } from '../../../pickers/recurrence/RecurrencePickerComponent.js';
 
 /**
- * EventFormView
- * Renders the event creation form and emits a custom event on submit
+ * EventFormView - Optimized for 15" touch screen
+ * Renders the event creation form with touch-friendly UI
  */
 export class EventFormView {
   constructor({ calendars }) {
@@ -11,12 +11,16 @@ export class EventFormView {
     this.startDate = new Date();
     this.endDate = new Date(this.startDate.getTime() + 60 * 60 * 1000); // 1 hour later
     this.recurrenceConfig = null;
-    this.recurrencePicker = null; // Store reference to recurrence picker
+    this.recurrencePicker = null;
   }
 
   render() {
     const wrapper = document.createElement('div');
-    wrapper.className = 'event-form-view';
+    wrapper.className = 'event-form-view-touch';
+    
+    // Add styles
+    this._injectStyles();
+    
     wrapper.innerHTML = this._template();
 
     const form = wrapper.querySelector('form');
@@ -31,37 +35,35 @@ export class EventFormView {
         const description = wrapper.querySelector('#event-description').value.trim();
         const location = wrapper.querySelector('#event-location').value.trim();
         
-        // Get recurrence configuration from the picker component
         const recurringData = this.recurrenceConfig;
         const isRecurring = recurringData && recurringData.frequency && recurringData.frequency !== '';
 
-        // Enhanced validation
+        // Validation
         if (!title) {
-          wrapper.dispatchEvent(new CustomEvent('formError', { bubbles: true, detail: { message: 'Event title is required' } }));
+          this._showError(wrapper, 'Event title is required');
           return;
         }
         
         if (!calendarId) {
-          wrapper.dispatchEvent(new CustomEvent('formError', { bubbles: true, detail: { message: 'Please select a calendar' } }));
+          this._showError(wrapper, 'Please select a calendar');
           return;
         }
         
         if (!startLocal || !endLocal) {
-          wrapper.dispatchEvent(new CustomEvent('formError', { bubbles: true, detail: { message: 'Start and end times are required' } }));
+          this._showError(wrapper, 'Start and end times are required');
           return;
         }
 
-        // Validate dates
         const startDate = new Date(startLocal);
         const endDate = new Date(endLocal);
         
         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-          wrapper.dispatchEvent(new CustomEvent('formError', { bubbles: true, detail: { message: 'Invalid date format' } }));
+          this._showError(wrapper, 'Invalid date format');
           return;
         }
         
         if (endDate <= startDate) {
-          wrapper.dispatchEvent(new CustomEvent('formError', { bubbles: true, detail: { message: 'End time must be after start time' } }));
+          this._showError(wrapper, 'End time must be after start time');
           return;
         }
 
@@ -81,7 +83,7 @@ export class EventFormView {
         wrapper.dispatchEvent(new CustomEvent('submitEvent', { bubbles: true, detail: payload }));
       } catch (error) {
         console.error('EventFormView: Form submission error', error);
-        wrapper.dispatchEvent(new CustomEvent('formError', { bubbles: true, detail: { message: 'Error processing form data' } }));
+        this._showError(wrapper, 'Error processing form data');
       }
     });
 
@@ -89,162 +91,443 @@ export class EventFormView {
       wrapper.dispatchEvent(new CustomEvent('cancel', { bubbles: true }));
     });
 
-    // Attach date/time picker handlers
     this.attachDateTimePickerHandlers(wrapper);
-    
-    // Initialize recurrence picker with proper error handling
     this.initializeRecurrencePicker(wrapper);
+    this._attachInputEnhancements(wrapper);
 
     return wrapper;
   }
 
-  /**
-   * Initialize recurrence picker with error handling
-   * @param {HTMLElement} wrapper
-   */
-  initializeRecurrencePicker(wrapper) {
-    try {
-      const recurrencePickerContainer = wrapper.querySelector('#recurrence-picker-container');
-      if (!recurrencePickerContainer) {
-        console.warn('EventFormView: Recurrence picker container not found');
-        return;
-      }
-
-      // Create recurrence picker instance
-      this.recurrencePicker = new RecurrencePickerComponent({
-        startDate: this.startDate,
-        onChange: (config) => {
-          console.log('EventFormView: Recurrence config updated:', config);
-          this.recurrenceConfig = config;
-        }
-      });
-
-      // Render and append the recurrence picker
-      const recurrenceElement = this.recurrencePicker.render();
-      if (recurrenceElement) {
-        recurrencePickerContainer.appendChild(recurrenceElement);
-        
-        // Ensure the recurring options are visible if checkbox is checked
-        const recurringCheckbox = recurrenceElement.querySelector('#event-recurring');
-        const recurringOptions = recurrenceElement.querySelector('#recurring-options');
-        
-        if (recurringCheckbox && recurringOptions) {          
-          // Add a small delay to ensure DOM is ready
-          setTimeout(() => {
-            if (recurringCheckbox.checked) {
-              recurringOptions.style.display = 'block';
-              console.log('EventFormView: Recurring options made visible');
-            }
-          }, 100);
-          
-          // Add additional event listener for debugging
-          recurringCheckbox.addEventListener('change', (e) => {
-          });
-        } else {
-          console.warn('EventFormView: Recurrence checkbox or options not found');
-        }
-      } else {
-        console.error('EventFormView: Failed to render recurrence picker');
-      }
-    } catch (error) {
-      console.error('EventFormView: Error initializing recurrence picker:', error);
-      // Show a fallback message to the user
-      const recurrencePickerContainer = wrapper.querySelector('#recurrence-picker-container');
-      if (recurrencePickerContainer) {
-        recurrencePickerContainer.innerHTML = `
-          <div class="recurring-section">
-            <div class="recurring-header">
-              <label class="checkbox-container">
-                <input type="checkbox" id="event-recurring" disabled>
-                <span class="checkmark"></span>
-                <span class="checkbox-label">Recurring events unavailable</span>
-              </label>
-            </div>
-          </div>
-        `;
-      }
-    }
-  }
-
   _template() {
-    const now = new Date();
-    const inOneHour = new Date(now.getTime() + 60 * 60 * 1000);
-    const pad = (n) => String(n).padStart(2, '0');
-    const fmt = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     const calendarOptions = this.calendars.length > 0 
       ? this.calendars.map(c => `<option value="${c.id}">${c.name}</option>`).join('')
       : '<option value="">No calendars available</option>';
 
     return `
-      <form class="event-form">
-        <div class="row two-col">
-          <div class="field">
-            <label>Title</label>
-            <input id="event-title" type="text" required placeholder="Event title" />
+      <form class="touch-event-form">
+        <div class="form-body">
+          <!-- Title Section -->
+          <div class="form-section primary-section">
+            <div class="input-group">
+              <input 
+                id="event-title" 
+                type="text" 
+                required 
+                placeholder="Add title"
+                class="title-input"
+                autocomplete="off"
+              />
+            </div>
           </div>
-          <div class="field">
-            <label>Calendar</label>
-            <select id="event-calendar" required>${calendarOptions}</select>
-          </div>
-        </div>
-        <div class="row two-col">
-          <div class="field">
-            <label>Start Date & Time</label>
-            <button type="button" id="event-start-btn" class="datetime-picker-btn">
-              <div class="datetime-display">
-                <div class="date-part">${this.formatDisplayDate(this.startDate)}</div>
-                <div class="time-part">${this.formatDisplayTime(this.startDate)}</div>
-              </div>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+
+          <!-- Calendar Selection -->
+          <div class="form-section">
+            <div class="select-group">
+              <svg class="field-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
               </svg>
-            </button>
-            <input type="hidden" id="event-start" value="${this.formatInputValue(this.startDate)}" required />
+              <select id="event-calendar" required class="calendar-select">
+                <option value="" disabled selected>Select calendar</option>
+                ${calendarOptions}
+              </select>
+            </div>
           </div>
-          <div class="field">
-            <label>End Date & Time</label>
-            <button type="button" id="event-end-btn" class="datetime-picker-btn">
-              <div class="datetime-display">
-                <div class="date-part">${this.formatDisplayDate(this.endDate)}</div>
-                <div class="time-part">${this.formatDisplayTime(this.endDate)}</div>
-              </div>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+
+          <!-- Date & Time Section -->
+          <div class="form-section datetime-section">
+            <div class="datetime-row">
+              <button type="button" id="event-start-btn" class="datetime-btn">
+                <div class="datetime-label">Starts</div>
+                <div class="datetime-value">
+                  <span class="date-display">${this.formatDisplayDate(this.startDate)}</span>
+                  <span class="time-display">${this.formatDisplayTime(this.startDate)}</span>
+                </div>
+              </button>
+              <input type="hidden" id="event-start" value="${this.formatInputValue(this.startDate)}" required />
+            </div>
+            
+            <div class="datetime-row">
+              <button type="button" id="event-end-btn" class="datetime-btn">
+                <div class="datetime-label">Ends</div>
+                <div class="datetime-value">
+                  <span class="date-display">${this.formatDisplayDate(this.endDate)}</span>
+                  <span class="time-display">${this.formatDisplayTime(this.endDate)}</span>
+                </div>
+              </button>
+              <input type="hidden" id="event-end" value="${this.formatInputValue(this.endDate)}" required />
+            </div>
+          </div>
+
+          <!-- Location Section -->
+          <div class="form-section">
+            <div class="input-group with-icon">
+              <svg class="field-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
               </svg>
-            </button>
-            <input type="hidden" id="event-end" value="${this.formatInputValue(this.endDate)}" required />
+              <input 
+                id="event-location" 
+                type="text" 
+                placeholder="Add location (optional)"
+                class="location-input"
+                autocomplete="off"
+              />
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Description (optional)</label>
-            <textarea id="event-description" rows="3"></textarea>
+
+          <!-- Description Section -->
+          <div class="form-section">
+            <div class="input-group">
+              <svg class="field-icon textarea-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+              </svg>
+              <textarea 
+                id="event-description" 
+                rows="3"
+                placeholder="Add description (optional)"
+                class="description-input"
+              ></textarea>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Location (optional)</label>
-            <input id="event-location" type="text" placeholder="Add location" />
-          </div>
-        </div>
-        
-        <div class="row">
-          <div class="field">
+
+          <!-- Recurrence Section -->
+          <div class="form-section recurrence-section">
             <div id="recurrence-picker-container"></div>
           </div>
+
+          <!-- Error Message -->
+          <div class="error-message" id="error-message"></div>
         </div>
-        
-        <div class="actions">
-          <button type="button" class="cancel-btn">Cancel</button>
-          <button type="submit" class="primary">Create Event</button>
+
+        <!-- Action Buttons -->
+        <div class="form-footer">
+          <button type="button" class="btn cancel-btn">Cancel</button>
+          <button type="submit" class="btn primary-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+            Create Event
+          </button>
         </div>
       </form>
     `;
   }
 
-  /**
-   * Format date for display (user-friendly)
-   */
+  _injectStyles() {
+    if (document.getElementById('event-form-touch-styles')) return;
+    
+    const style = document.createElement('style');
+    style.id = 'event-form-touch-styles';
+    style.textContent = `
+      .event-form-view-touch {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        color: #1a1a1a;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .touch-event-form {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .form-body {
+        flex: 1;
+        padding: 28px;
+        background: #fafafa;
+      }
+
+      .form-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+
+      .primary-section {
+        background: white;
+        border: 2px solid #667eea;
+      }
+
+      .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .input-group.with-icon {
+        gap: 12px;
+      }
+
+      .field-icon {
+        color: #667eea;
+        flex-shrink: 0;
+      }
+
+      .textarea-icon {
+        align-self: flex-start;
+        margin-top: 14px;
+      }
+
+      .title-input {
+        width: 100%;
+        font-size: 20px;
+        padding: 14px 0;
+        border: none;
+        background: transparent;
+        font-weight: 500;
+        outline: none;
+      }
+
+      
+
+      .floating-label {
+        position: absolute;
+        top: -8px;
+        left: 0;
+        font-size: 12px;
+        color: #667eea;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .select-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .calendar-select {
+        flex: 1;
+        padding: 14px 16px;
+        font-size: 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-height: 52px;
+      }
+
+      .calendar-select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .datetime-section {
+        padding: 0;
+        background: transparent;
+      }
+
+      .datetime-row {
+        margin-bottom: 12px;
+      }
+
+      .datetime-btn {
+        width: 100%;
+        padding: 16px 20px;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-height: 72px;
+      }
+
+      .datetime-btn:hover {
+        border-color: #667eea;
+        background: #f8f9ff;
+      }
+
+      .datetime-btn:active {
+        transform: scale(0.98);
+      }
+
+      .datetime-label {
+        font-size: 14px;
+        color: #666;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .datetime-value {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+      }
+
+      .date-display {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1a1a1a;
+      }
+
+      .time-display {
+        font-size: 14px;
+        color: #667eea;
+        font-weight: 500;
+      }
+
+      .location-input,
+      .description-input {
+        flex: 1;
+        padding: 14px 16px;
+        font-size: 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        background: white;
+        transition: all 0.3s ease;
+        font-family: inherit;
+      }
+
+      .location-input:focus,
+      .description-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .description-input {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      .recurrence-section {
+        background: #f8f9ff;
+        border: 2px dashed #667eea;
+      }
+
+      .error-message {
+        display: none;
+        padding: 12px 16px;
+        background: #fee;
+        color: #c00;
+        border-radius: 8px;
+        margin-top: 16px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .error-message.show {
+        display: block;
+        animation: shake 0.5s ease;
+      }
+
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+      }
+
+      .form-footer {
+        display: flex;
+        gap: 16px;
+        padding: 24px 28px;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 16px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 56px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .cancel-btn {
+        background: #f5f5f5;
+        color: #666;
+      }
+
+      .cancel-btn:hover {
+        background: #e0e0e0;
+      }
+
+      .cancel-btn:active {
+        transform: scale(0.98);
+      }
+
+      .primary-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .primary-btn:hover {
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        transform: translateY(-2px);
+      }
+
+      .primary-btn:active {
+        transform: scale(0.98);
+      }
+
+
+
+      /* Responsive adjustments for 15" touch screen */
+      @media (max-width: 1366px) {
+        .event-form-view-touch {
+          max-width: 100%;
+          border-radius: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  _showError(wrapper, message) {
+    const errorEl = wrapper.querySelector('#error-message');
+    if (errorEl) {
+      errorEl.textContent = message;
+      errorEl.classList.add('show');
+      setTimeout(() => {
+        errorEl.classList.remove('show');
+      }, 5000);
+    }
+    wrapper.dispatchEvent(new CustomEvent('formError', { 
+      bubbles: true, 
+      detail: { message } 
+    }));
+  }
+
+  _attachInputEnhancements(wrapper) {
+    // Add floating label effects
+    const inputs = wrapper.querySelectorAll('input[type="text"], textarea');
+    inputs.forEach(input => {
+      input.addEventListener('focus', () => {
+        input.parentElement?.classList.add('focused');
+      });
+      
+      input.addEventListener('blur', () => {
+        if (!input.value) {
+          input.parentElement?.classList.remove('focused');
+        }
+      });
+    });
+  }
+
   formatDisplayDate(date) {
     return date.toLocaleDateString('en-US', { 
       weekday: 'short',
@@ -254,9 +537,6 @@ export class EventFormView {
     });
   }
 
-  /**
-   * Format time for display (user-friendly)
-   */
   formatDisplayTime(date) {
     return date.toLocaleTimeString('en-US', { 
       hour: 'numeric', 
@@ -265,9 +545,6 @@ export class EventFormView {
     });
   }
 
-  /**
-   * Format date for input value (ISO format)
-   */
   formatInputValue(date) {
     const pad = (n) => String(n).padStart(2, '0');
     const yyyy = date.getFullYear();
@@ -278,9 +555,6 @@ export class EventFormView {
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
   }
 
-  /**
-   * Attach date/time picker event handlers
-   */
   attachDateTimePickerHandlers(wrapper) {
     const startBtn = wrapper.querySelector('#event-start-btn');
     const endBtn = wrapper.querySelector('#event-end-btn');
@@ -298,9 +572,6 @@ export class EventFormView {
     }
   }
 
-  /**
-   * Show date/time picker
-   */
   showDateTimePicker(type, wrapper) {
     const currentDate = type === 'start' ? this.startDate : this.endDate;
     
@@ -308,20 +579,18 @@ export class EventFormView {
       initialDate: currentDate,
       mode: 'datetime',
       format24h: false,
-      minDate: new Date() // Prevent past dates
+      minDate: new Date()
     });
 
     picker.show((selectedDate) => {
       if (type === 'start') {
         this.startDate = selectedDate;
-        // Auto-adjust end time to be 1 hour after start if end is before start
         if (this.endDate <= this.startDate) {
           this.endDate = new Date(this.startDate.getTime() + 60 * 60 * 1000);
           this.updateDateTimeDisplay('end', wrapper);
         }
         this.updateDateTimeDisplay('start', wrapper);
       } else {
-        // Ensure end time is after start time
         if (selectedDate <= this.startDate) {
           selectedDate = new Date(this.startDate.getTime() + 60 * 60 * 1000);
         }
@@ -331,20 +600,17 @@ export class EventFormView {
     });
   }
 
-  /**
-   * Update date/time display after selection
-   */
   updateDateTimeDisplay(type, wrapper) {
     const date = type === 'start' ? this.startDate : this.endDate;
     const btn = wrapper.querySelector(`#event-${type}-btn`);
     const hiddenInput = wrapper.querySelector(`#event-${type}`);
 
     if (btn) {
-      const datePart = btn.querySelector('.date-part');
-      const timePart = btn.querySelector('.time-part');
+      const dateDisplay = btn.querySelector('.date-display');
+      const timeDisplay = btn.querySelector('.time-display');
       
-      if (datePart) datePart.textContent = this.formatDisplayDate(date);
-      if (timePart) timePart.textContent = this.formatDisplayTime(date);
+      if (dateDisplay) dateDisplay.textContent = this.formatDisplayDate(date);
+      if (timeDisplay) timeDisplay.textContent = this.formatDisplayTime(date);
     }
 
     if (hiddenInput) {
@@ -352,9 +618,46 @@ export class EventFormView {
     }
   }
 
+  initializeRecurrencePicker(wrapper) {
+    try {
+      const recurrencePickerContainer = wrapper.querySelector('#recurrence-picker-container');
+      if (!recurrencePickerContainer) {
+        console.warn('EventFormView: Recurrence picker container not found');
+        return;
+      }
 
+      this.recurrencePicker = new RecurrencePickerComponent({
+        startDate: this.startDate,
+        onChange: (config) => {
+          console.log('EventFormView: Recurrence config updated:', config);
+          this.recurrenceConfig = config;
+        }
+      });
+
+      const recurrenceElement = this.recurrencePicker.render();
+      if (recurrenceElement) {
+        recurrencePickerContainer.appendChild(recurrenceElement);
+        
+
+      }
+    } catch (error) {
+      console.error('EventFormView: Error initializing recurrence picker:', error);
+      const recurrencePickerContainer = wrapper.querySelector('#recurrence-picker-container');
+      if (recurrencePickerContainer) {
+        recurrencePickerContainer.innerHTML = `
+          <div class="recurring-section">
+            <div class="recurring-header">
+              <label class="checkbox-container">
+                <input type="checkbox" id="event-recurring" disabled>
+                <span class="checkmark"></span>
+                <span class="checkbox-label">Recurring events unavailable</span>
+              </label>
+            </div>
+          </div>
+        `;
+      }
+    }
+  }
 }
 
 export default EventFormView;
-
-
