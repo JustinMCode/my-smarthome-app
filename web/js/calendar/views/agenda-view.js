@@ -11,6 +11,7 @@ import {
     isSameDay,
     formatDate
 } from '../utils/calendar-date-utils.js';
+import { addTouchFeedback, createRipple } from '../utils/touch-interactions.js';
 import { calendarManager } from '../config/index.js';
 
 export class AgendaView extends ViewBase {
@@ -364,11 +365,11 @@ export class AgendaView extends ViewBase {
         });
         
         // Touch feedback
-        this.addTouchFeedback(item);
+                    addTouchFeedback(item);
         
         // Touch events for ripple effect
         item.addEventListener('touchstart', (e) => {
-            this.createRipple(e, item);
+            createRipple(e, item);
         });
     }
     

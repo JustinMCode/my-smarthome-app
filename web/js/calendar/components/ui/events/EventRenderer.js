@@ -6,6 +6,7 @@
 import { calendarConfigService } from '../../../config/calendar-config-service.js';
 import { CALENDAR_CONFIG } from '../../../utils/calendar-constants.js';
 import { formatTime } from '../../../utils/calendar-date-utils.js';
+import { addTouchFeedback, createRipple } from '../../../utils/touch-interactions.js';
 
 export class EventRenderer {
     constructor() {
@@ -229,7 +230,7 @@ export class EventRenderer {
         });
         
         // Add touch feedback
-        this.addTouchFeedback(eventEl);
+        addTouchFeedback(eventEl);
     }
 
     /**
@@ -247,20 +248,7 @@ export class EventRenderer {
         });
     }
 
-    /**
-     * Add touch feedback to element
-     */
-    addTouchFeedback(element) {
-        element.addEventListener('touchstart', () => {
-            element.style.transform = 'scale(0.95)';
-        });
-        
-        element.addEventListener('touchend', () => {
-            setTimeout(() => {
-                element.style.transform = '';
-            }, 100);
-        });
-    }
+
 
     /**
      * Get event color from calendar source

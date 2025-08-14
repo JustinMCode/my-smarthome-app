@@ -5,6 +5,8 @@
 
 import { CALENDAR_CONFIG, CSS_CLASSES } from '../utils/calendar-constants.js';
 import { formatDate, formatTime } from '../utils/calendar-date-utils.js';
+import { addTouchFeedback, createRipple } from '../utils/touch-interactions.js';
+import { EventModal } from '../components/ui/modals/index.js';
 
 export class ViewBase {
     constructor(core, container) {
@@ -12,6 +14,7 @@ export class ViewBase {
         this.container = container;
         this.isActive = false;
         this.isRendered = false;
+        this.eventModal = new EventModal();
         
         // Bind methods
         this.render = this.render.bind(this);
@@ -108,56 +111,7 @@ export class ViewBase {
      * Show event details
      */
     showEventDetails(event) {
-        // Create a touch-friendly modal
-        const modal = document.createElement('div');
-        modal.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 32px;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            min-width: 400px;
-            animation: modalIn 0.3s ease;
-        `;
-        
-        modal.innerHTML = `
-            <h2 style="font-size: 24px; margin-bottom: 16px;">${event.title}</h2>
-            <p style="font-size: 18px; color: var(--text-secondary); margin-bottom: 8px;">
-                📅 ${formatDate(event.start, 'full')}
-            </p>
-            <p style="font-size: 18px; color: var(--text-secondary); margin-bottom: 8px;">
-                ⏰ ${formatTime(event.start)}
-            </p>
-            ${event.location ? `<p style="font-size: 18px; color: var(--text-secondary);">📍 ${event.location}</p>` : ''}
-            ${event.description ? `<p style="font-size: 16px; color: var(--text-muted); margin-top: 16px;">${event.description}</p>` : ''}
-            <button onclick="this.parentElement.remove()" style="
-                margin-top: 24px;
-                padding: 12px 24px;
-                background: var(--accent-primary);
-                color: white;
-                border: none;
-                border-radius: 12px;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-            ">Close</button>
-        `;
-        
-        document.body.appendChild(modal);
-        
-        // Close on background click
-        setTimeout(() => {
-            document.addEventListener('click', function closeModal(e) {
-                if (!modal.contains(e.target)) {
-                    modal.remove();
-                    document.removeEventListener('click', closeModal);
-                }
-            });
-        }, 100);
+        this.eventModal.showEventDetails(event);
     }
     
 
@@ -193,43 +147,9 @@ export class ViewBase {
         }
     }
     
-    /**
-     * Add touch feedback to element
-     */
-    addTouchFeedback(element) {
-        element.addEventListener('touchstart', () => {
-            element.style.transform = 'scale(0.95)';
-        });
-        
-        element.addEventListener('touchend', () => {
-            setTimeout(() => {
-                element.style.transform = '';
-            }, 100);
-        });
-    }
+
     
-    /**
-     * Create ripple effect
-     */
-    createRipple(event, element) {
-        const ripple = document.createElement('span');
-        ripple.className = 'ripple';
-        
-        const rect = element.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = event.touches[0].clientX - rect.left - size / 2;
-        const y = event.touches[0].clientY - rect.top - size / 2;
-        
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
-        
-        element.style.position = 'relative';
-        element.style.overflow = 'hidden';
-        element.appendChild(ripple);
-        
-        setTimeout(() => ripple.remove(), 600);
-    }
+
     
     /**
      * Destroy the view

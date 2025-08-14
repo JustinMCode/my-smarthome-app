@@ -13,6 +13,7 @@ import {
     isCurrentMonth,
     isSameDay
 } from '../utils/calendar-date-utils.js';
+import { addTouchFeedback, createRipple } from '../utils/touch-interactions.js';
 import { calendarConfigService } from '../config/calendar-config-service.js';
 import { logger } from '../../utils/logger.js';
 
@@ -210,11 +211,11 @@ export class MonthViewRefactored extends EnhancedViewBase {
         });
         
         // Touch feedback using shared component
-        this.addTouchFeedback(cell);
+                    addTouchFeedback(cell);
         
         // Touch events for ripple effect
         cell.addEventListener('touchstart', (e) => {
-            this.createRipple(e, cell);
+            createRipple(e, cell);
         });
     }
     

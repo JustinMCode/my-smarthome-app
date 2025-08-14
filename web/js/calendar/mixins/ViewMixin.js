@@ -7,6 +7,7 @@ import { EventRenderer } from '../components/ui/events/index.js';
 import { DateNavigation } from '../components/ui/navigation/index.js';
 import { createDataManager, createLayoutManager } from '../utils/factory/index.js';
 import { EventModal } from '../components/ui/modals/index.js';
+import { addTouchFeedback, createRipple } from '../utils/touch-interactions.js';
 
 export const ViewMixin = (BaseClass) => class extends BaseClass {
     constructor(core, container) {
@@ -316,12 +317,7 @@ export const ViewMixin = (BaseClass) => class extends BaseClass {
         };
     }
 
-    /**
-     * Add touch feedback to element
-     */
-    addTouchFeedback(element) {
-        this.eventRenderer.addTouchFeedback(element);
-    }
+
 
     /**
      * Arrange events in grid layout
@@ -368,28 +364,7 @@ export const ViewMixin = (BaseClass) => class extends BaseClass {
         }
     }
 
-    /**
-     * Create ripple effect
-     */
-    createRipple(event, element) {
-        const ripple = document.createElement('span');
-        ripple.className = 'ripple';
-        
-        const rect = element.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = event.touches[0].clientX - rect.left - size / 2;
-        const y = event.touches[0].clientY - rect.top - size / 2;
-        
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
-        
-        element.style.position = 'relative';
-        element.style.overflow = 'hidden';
-        element.appendChild(ripple);
-        
-        setTimeout(() => ripple.remove(), 600);
-    }
+
 
     /**
      * Show loading state

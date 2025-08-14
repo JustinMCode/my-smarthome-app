@@ -13,12 +13,14 @@ import * as Constants from './calendar-constants.js';
 import * as DateUtils from './calendar-date-utils.js';
 import * as HashUtils from './core/hash.js';
 import * as FactoryUtils from './factory/index.js';
+import * as TouchUtils from './touch-interactions.js';
 
 // Utility modules
 export * from './calendar-constants.js';
 export * from './calendar-date-utils.js';
 export * from './core/hash.js';
 export * from './factory/index.js';
+export * from './touch-interactions.js';
 
 // Named exports for better organization
 export { 
@@ -64,6 +66,17 @@ export {
     DEFAULT_ALGORITHM
 } from './core/hash.js';
 
+export {
+    addTouchFeedback,
+    createRipple,
+    removeTouchFeedback,
+    isTouchDevice,
+    addTouchEffects,
+    initTouchInteractions,
+    cleanupTouchInteractions,
+    getTouchStats
+} from './touch-interactions.js';
+
 
 
 // Legacy exports for backward compatibility
@@ -80,6 +93,7 @@ export default {
     ...DateUtils,
     ...HashUtils,
     ...FactoryUtils,
+    ...TouchUtils,
     
     // Legacy exports
     LegacyCalendarConfig: Constants.CALENDAR_CONFIG,
