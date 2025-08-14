@@ -11,6 +11,7 @@ export class EventFormView {
     this.startDate = new Date();
     this.endDate = new Date(this.startDate.getTime() + 60 * 60 * 1000); // 1 hour later
     this.recurrenceConfig = null;
+    this.recurrencePicker = null; // Store reference to recurrence picker
   }
 
   render() {
@@ -29,8 +30,10 @@ export class EventFormView {
         const endLocal = wrapper.querySelector('#event-end').value;
         const description = wrapper.querySelector('#event-description').value.trim();
         const location = wrapper.querySelector('#event-location').value.trim();
+        
         // Get recurrence configuration from the picker component
         const recurringData = this.recurrenceConfig;
+        const isRecurring = recurringData && recurringData.frequency && recurringData.frequency !== '';
 
         // Enhanced validation
         if (!title) {
@@ -89,19 +92,78 @@ export class EventFormView {
     // Attach date/time picker handlers
     this.attachDateTimePickerHandlers(wrapper);
     
-    // Initialize recurrence picker
-    const recurrencePickerContainer = wrapper.querySelector('#recurrence-picker-container');
-    if (recurrencePickerContainer) {
-      const recurrencePicker = new RecurrencePickerComponent({
+    // Initialize recurrence picker with proper error handling
+    this.initializeRecurrencePicker(wrapper);
+
+    return wrapper;
+  }
+
+  /**
+   * Initialize recurrence picker with error handling
+   * @param {HTMLElement} wrapper
+   */
+  initializeRecurrencePicker(wrapper) {
+    try {
+      const recurrencePickerContainer = wrapper.querySelector('#recurrence-picker-container');
+      if (!recurrencePickerContainer) {
+        console.warn('EventFormView: Recurrence picker container not found');
+        return;
+      }
+
+      // Create recurrence picker instance
+      this.recurrencePicker = new RecurrencePickerComponent({
         startDate: this.startDate,
         onChange: (config) => {
+          console.log('EventFormView: Recurrence config updated:', config);
           this.recurrenceConfig = config;
         }
       });
-      recurrencePickerContainer.appendChild(recurrencePicker.render());
-    }
 
-    return wrapper;
+      // Render and append the recurrence picker
+      const recurrenceElement = this.recurrencePicker.render();
+      if (recurrenceElement) {
+        recurrencePickerContainer.appendChild(recurrenceElement);
+        
+        // Ensure the recurring options are visible if checkbox is checked
+        const recurringCheckbox = recurrenceElement.querySelector('#event-recurring');
+        const recurringOptions = recurrenceElement.querySelector('#recurring-options');
+        
+        if (recurringCheckbox && recurringOptions) {          
+          // Add a small delay to ensure DOM is ready
+          setTimeout(() => {
+            if (recurringCheckbox.checked) {
+              recurringOptions.style.display = 'block';
+              console.log('EventFormView: Recurring options made visible');
+            }
+          }, 100);
+          
+          // Add additional event listener for debugging
+          recurringCheckbox.addEventListener('change', (e) => {
+          });
+        } else {
+          console.warn('EventFormView: Recurrence checkbox or options not found');
+        }
+      } else {
+        console.error('EventFormView: Failed to render recurrence picker');
+      }
+    } catch (error) {
+      console.error('EventFormView: Error initializing recurrence picker:', error);
+      // Show a fallback message to the user
+      const recurrencePickerContainer = wrapper.querySelector('#recurrence-picker-container');
+      if (recurrencePickerContainer) {
+        recurrencePickerContainer.innerHTML = `
+          <div class="recurring-section">
+            <div class="recurring-header">
+              <label class="checkbox-container">
+                <input type="checkbox" id="event-recurring" disabled>
+                <span class="checkmark"></span>
+                <span class="checkbox-label">Recurring events unavailable</span>
+              </label>
+            </div>
+          </div>
+        `;
+      }
+    }
   }
 
   _template() {

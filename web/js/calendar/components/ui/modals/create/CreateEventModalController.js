@@ -160,7 +160,7 @@ export class CreateEventModalController {
           const submitBtn = el.querySelector('button[type="submit"]');
           const originalText = submitBtn ? submitBtn.textContent : '';
           
-          try {
+          try {            
             // Show loading state
             if (submitBtn) {
               submitBtn.disabled = true;

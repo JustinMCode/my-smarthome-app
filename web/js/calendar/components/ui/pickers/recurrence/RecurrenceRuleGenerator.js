@@ -29,6 +29,11 @@ export class RecurrenceRuleGenerator {
       endDate
     } = config;
 
+    // Validate required fields
+    if (!frequency || !startDate) {
+      return '';
+    }
+
     let rrule = `FREQ=${frequency.toUpperCase()}`;
 
     // Add frequency-specific rules
@@ -43,7 +48,8 @@ export class RecurrenceRuleGenerator {
         if (monthlyType === MONTHLY_TYPE.SAME_DAY) {
           rrule += `;BYMONTHDAY=${startDate.getDate()}`;
         } else if (monthlyType === MONTHLY_TYPE.SAME_WEEKDAY) {
-          rrule += `;BYDAY=${this._getWeekdayOccurrence(startDate)}`;
+          const weekdayOccurrence = this._getWeekdayOccurrence(startDate);
+          rrule += `;BYDAY=${weekdayOccurrence}`;
         }
         break;
 
@@ -52,7 +58,8 @@ export class RecurrenceRuleGenerator {
           rrule += `;BYMONTHDAY=${startDate.getDate()}`;
           rrule += `;BYMONTH=${startDate.getMonth() + 1}`;
         } else if (yearlyType === YEARLY_TYPE.SAME_WEEKDAY) {
-          rrule += `;BYDAY=${this._getWeekdayOccurrence(startDate)}`;
+          const weekdayOccurrence = this._getWeekdayOccurrence(startDate);
+          rrule += `;BYDAY=${weekdayOccurrence}`;
           rrule += `;BYMONTH=${startDate.getMonth() + 1}`;
         }
         break;
@@ -67,11 +74,40 @@ export class RecurrenceRuleGenerator {
         break;
       case END_TYPE.ON:
         if (endDate) {
-          rrule += `;UNTIL=${endDate}`;
+          console.log('RecurrenceRuleGenerator: Processing UNTIL date:', endDate);
+          
+          // Parse the end date
+          const endDateObj = new Date(endDate);
+          
+          // Validate that we have a valid date
+          if (isNaN(endDateObj.getTime())) {
+            console.error('RecurrenceRuleGenerator: Invalid end date provided:', endDate);
+            break;
+          }
+          
+          // For RRULE UNTIL, we want to include events up to and including the end date
+          // Set to end of day in the same timezone as the event start
+          const endOfDay = new Date(endDateObj);
+          
+          // If the original date is already in ISO format with time, preserve that
+          // Otherwise, set to end of day
+          if (typeof endDate === 'string' && endDate.includes('T')) {
+            // Already has time component, use as-is but ensure it's end of day
+            endOfDay.setHours(23, 59, 59, 999);
+          } else {
+            // Date-only format, set to end of day
+            endOfDay.setHours(23, 59, 59, 999);
+          }
+          
+          // Format as YYYYMMDDTHHMMSSZ (RFC 5545 UTC format)
+          // For Google Calendar, UNTIL should be in UTC
+          // Convert to UTC properly
+          const formattedDate = endOfDay.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+          
+          rrule += `;UNTIL=${formattedDate}`;
         }
         break;
     }
-
     return rrule;
   }
 

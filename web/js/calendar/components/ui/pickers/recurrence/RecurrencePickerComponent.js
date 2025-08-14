@@ -19,6 +19,7 @@ export class RecurrencePickerComponent {
     this.monthlyType = MONTHLY_TYPE.SAME_DAY;
     this.yearlyType = YEARLY_TYPE.SAME_DATE;
     this.endCondition = null;
+    this.isRecurring = false; // Track checkbox state internally
   }
 
   /**
@@ -26,31 +27,61 @@ export class RecurrencePickerComponent {
    * @returns {HTMLElement}
    */
   render() {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'recurring-section';
-    wrapper.innerHTML = this._template();
+    try {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'recurring-section';
+      wrapper.innerHTML = this._template();
 
-    this._attachHandlers(wrapper);
-    this._initializeDefaults(wrapper);
+      this._attachHandlers(wrapper);
+      this._initializeDefaults(wrapper);
 
-    return wrapper;
+      return wrapper;
+    } catch (error) {
+      console.error('RecurrencePickerComponent: Error rendering:', error);
+      // Return a fallback element
+      const fallback = document.createElement('div');
+      fallback.className = 'recurring-section';
+      fallback.innerHTML = `
+        <div class="recurring-header">
+          <label class="checkbox-container">
+            <input type="checkbox" id="event-recurring" disabled>
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Recurring events unavailable</span>
+          </label>
+        </div>
+      `;
+      return fallback;
+    }
   }
 
   /**
    * Get the current recurrence configuration
    * @returns {Object}
    */
-  getRecurrenceConfig() {
+  getRecurrenceConfig() {    
+    // Double-check with DOM state for debugging
+    const recurringCheckbox = document.querySelector('#event-recurring');
+    const domChecked = recurringCheckbox ? recurringCheckbox.checked : false;
+
+    // Use internal state as primary source of truth
+    if (!this.isRecurring) {
+      console.log('RecurrencePickerComponent: Not recurring (internal state), returning empty config');
+      return {};
+    }
+    
     const endCondition = this.endCondition?.getEndCondition() || {};
     
-    return {
+    const rrule = this._generateRRule();
+    
+    const config = {
       frequency: this.frequency,
       selectedDays: Array.from(this.selectedDays),
       monthlyType: this.monthlyType,
       yearlyType: this.yearlyType,
       ...endCondition,
-      rrule: this._generateRRule()
-    };
+      rrule: rrule
+    }; 
+    return config;
   }
 
   /**
@@ -159,6 +190,10 @@ export class RecurrencePickerComponent {
     // Toggle recurring options visibility
     if (recurringCheckbox) {
       recurringCheckbox.addEventListener('change', (e) => {
+        
+        // Update internal state
+        this.isRecurring = e.target.checked;
+        
         if (e.target.checked) {
           recurringOptions.style.display = 'block';
           this._initializeDefaults(wrapper);
@@ -227,17 +262,31 @@ export class RecurrencePickerComponent {
    * @private
    * @param {HTMLElement} wrapper
    */
-  _initializeDefaults(wrapper) {
+  _initializeDefaults(wrapper) {    
+    // Set the frequency dropdown to the default value
+    const frequencySelect = wrapper.querySelector('#recurring-frequency');
+    if (frequencySelect) {
+      frequencySelect.value = this.frequency;
+    }
+    
     // Set current day of week as selected for weekly recurrence
     const currentDay = this.startDate.getDay();
     const dayMap = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
     const currentDayCode = dayMap[currentDay];
-    
+        
     const dayButton = wrapper.querySelector(`[data-day="${currentDayCode}"]`);
     if (dayButton) {
       dayButton.classList.add('selected');
       this.selectedDays.add(currentDayCode);
     }
+    
+    // Initialize end condition
+    if (!this.endCondition) {
+      this.endCondition = new RecurrenceEndCondition();
+    }
+    
+    // Update frequency details to show the correct options
+    this._updateFrequencyDetails(wrapper);
   }
 
   /**
@@ -273,16 +322,25 @@ export class RecurrencePickerComponent {
    * @returns {string}
    */
   _generateRRule() {
-    const endCondition = this.endCondition?.getEndCondition() || {};
+    // Only generate RRULE if recurring is enabled
+    if (!this.isRecurring) {
+      console.log('RecurrencePickerComponent: Not recurring, returning empty RRULE');
+      return '';
+    }
     
-    return RecurrenceRuleGenerator.generateRRule({
+    // Get end condition
+    const endCondition = this.endCondition?.getEndCondition() || {};    
+    const config = {
       frequency: this.frequency,
       startDate: this.startDate,
       selectedDays: Array.from(this.selectedDays),
       monthlyType: this.monthlyType,
       yearlyType: this.yearlyType,
       ...endCondition
-    });
+    };    
+    const rrule = RecurrenceRuleGenerator.generateRRule(config);
+    
+    return rrule;
   }
 
   /**
@@ -291,7 +349,8 @@ export class RecurrencePickerComponent {
    */
   _notifyChange() {
     if (this.onChange) {
-      this.onChange(this.getRecurrenceConfig());
+      const config = this.getRecurrenceConfig();
+      this.onChange(config);
     }
   }
 }
