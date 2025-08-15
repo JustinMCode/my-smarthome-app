@@ -5,6 +5,7 @@
 
 import { CONFIG } from './constants/config.js';
 import { TouchCalendarManager } from './calendar/index.js';
+import { TasksManager } from './components/tasks.js';
 import { loadFromStorage, saveToStorage } from './utils/utils.js';
 import { formatTime, formatDate } from './calendar/utils/basic/calendar-date-utils.js';
 import { logger } from './utils/logger.js';
@@ -24,7 +25,8 @@ export class FridgeDashboard {
         };
         
         this.managers = {
-            calendar: null
+            calendar: null,
+            tasks: null
         };
         
         // Performance monitoring
@@ -66,6 +68,10 @@ export class FridgeDashboard {
         // Initialize calendar with touch optimizations
         this.managers.calendar = new TouchCalendarManager(this);
         this.managers.calendar.init();
+        
+        // Initialize tasks manager
+        this.managers.tasks = new TasksManager(this);
+        this.managers.tasks.init();
     }
     
     /**
@@ -354,14 +360,7 @@ export class FridgeDashboard {
         if (weatherDesc) weatherDesc.textContent = weather.desc;
         if (location) location.textContent = weather.location;
         
-        // Update sidebar weather
-        const sidebarIcon = document.getElementById('sidebar-weather-icon');
-        const sidebarTemp = document.getElementById('sidebar-weather-temp');
-        const sidebarDesc = document.getElementById('sidebar-weather-desc');
-        
-        if (sidebarIcon) sidebarIcon.textContent = weather.icon;
-        if (sidebarTemp) sidebarTemp.textContent = `${weather.temp}${unit}`;
-        if (sidebarDesc) sidebarDesc.textContent = weather.desc;
+
     }
     
     /**
@@ -650,6 +649,11 @@ export class FridgeDashboard {
         // Special handling for calendar
         if (viewName === 'calendar' && this.managers.calendar) {
             this.managers.calendar.render();
+        }
+        
+        // Special handling for tasks view
+        if (viewName === 'tasks' && this.managers.tasks) {
+            this.managers.tasks.renderTasks();
         }
         
         // Special handling for performance view - initialize performance dashboard

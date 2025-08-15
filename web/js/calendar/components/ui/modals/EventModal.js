@@ -1,6 +1,6 @@
 /**
- * Event Modal Component
- * Centralized modal/popup creation for event details and day events
+ * Event Modal Component - Light Glassmorphism Design
+ * Minimal, flowing glass morphism style for event popups
  */
 
 import { formatDate, formatTime } from '../../../utils/basic/calendar-date-utils.js';
@@ -15,6 +15,133 @@ export class EventModal {
             animation: true,
             zIndex: 1000
         };
+        this.initGlassmorphismStyles();
+    }
+
+    /**
+     * Initialize glassmorphism styles
+     */
+    initGlassmorphismStyles() {
+        if (!document.getElementById('modal-glassmorphism-styles')) {
+            const style = document.createElement('style');
+            style.id = 'modal-glassmorphism-styles';
+            style.textContent = `
+                @keyframes modalFadeIn {
+                    from { 
+                        opacity: 0;
+                        backdrop-filter: blur(0px);
+                    }
+                    to { 
+                        opacity: 1;
+                        backdrop-filter: blur(12px);
+                    }
+                }
+                
+                @keyframes modalSlideUp {
+                    from { 
+                        opacity: 0;
+                        transform: translate(-50%, -45%) scale(0.95);
+                    }
+                    to { 
+                        opacity: 1;
+                        transform: translate(-50%, -50%) scale(1);
+                    }
+                }
+                
+                @keyframes shimmerEffect {
+                    0% { background-position: -100% center; }
+                    100% { background-position: 200% center; }
+                }
+                
+                .modal-glassmorphism {
+                    background: rgba(255, 255, 255, 0.25) !important;
+                    backdrop-filter: blur(20px) saturate(150%) !important;
+                    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+                    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+                    box-shadow: 
+                        0 8px 32px rgba(0, 0, 0, 0.08),
+                        inset 0 0 20px rgba(255, 255, 255, 0.5) !important;
+                }
+                
+                .modal-overlay-glass {
+                    background: linear-gradient(135deg, 
+                        rgba(227, 232, 255, 0.4) 0%, 
+                        rgba(240, 230, 255, 0.4) 25%, 
+                        rgba(230, 242, 255, 0.4) 50%, 
+                        rgba(227, 232, 255, 0.4) 100%) !important;
+                    background-size: 400% 400%;
+                    animation: softGradientFlow 25s ease infinite, modalFadeIn 0.3s ease !important;
+                }
+                
+                @keyframes softGradientFlow {
+                    0% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                    100% { background-position: 0% 50%; }
+                }
+                
+                .event-item-glass {
+                    transition: all 0.2s ease;
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .event-item-glass:hover {
+                    background: rgba(139, 92, 246, 0.04);
+                    transform: translateX(2px);
+                }
+                
+                .event-item-glass::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 2px;
+                    height: 0;
+                    background: linear-gradient(180deg, transparent, #8b5cf6, transparent);
+                    transition: height 0.2s ease;
+                }
+                
+                .event-item-glass:hover::before {
+                    height: 60%;
+                }
+                
+                .modal-close-btn {
+                    transition: all 0.2s ease !important;
+                }
+                
+                .modal-close-btn:hover {
+                    background: rgba(139, 92, 246, 0.08) !important;
+                    color: #8b5cf6 !important;
+                    transform: rotate(90deg);
+                }
+                
+                .modal-action-btn {
+                    transition: all 0.2s ease !important;
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .modal-action-btn::before {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 0;
+                    height: 0;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.3);
+                    transform: translate(-50%, -50%);
+                    transition: width 0.4s ease, height 0.4s ease;
+                }
+                
+                .modal-action-btn:hover::before {
+                    width: 100%;
+                    height: 100%;
+                }
+            `;
+            document.head.appendChild(style);
+        }
     }
 
     /**
@@ -27,7 +154,7 @@ export class EventModal {
         return this.showModal(content, {
             ...modalOptions,
             title: event.title,
-            className: 'event-details-modal'
+            className: 'event-details-modal modal-glassmorphism'
         });
     }
 
@@ -41,8 +168,8 @@ export class EventModal {
         return this.showModal(content, {
             ...modalOptions,
             title: this.formatDateForPopupHeader(date),
-            className: 'day-events-modal',
-            width: '448px'
+            className: 'day-events-modal modal-glassmorphism',
+            width: '480px'
         });
     }
 
@@ -55,8 +182,8 @@ export class EventModal {
         const content = this.createQuickAddContent(startTime, endTime);
         return this.showModal(content, {
             ...modalOptions,
-            title: 'Add Event',
-            className: 'quick-add-modal'
+            title: 'New Event',
+            className: 'quick-add-modal modal-glassmorphism'
         });
     }
 
@@ -82,37 +209,31 @@ export class EventModal {
         // Setup event listeners
         this.setupModalEventListeners(modal, overlay, modalOptions);
         
-        // Add animations
-        if (modalOptions.animation) {
-            this.addModalAnimations(modal, overlay);
-        }
-        
         return { modal, overlay };
     }
 
     /**
-     * Create overlay element
+     * Create overlay element with glassmorphism
      */
     createOverlay(options) {
         const overlay = document.createElement('div');
-        overlay.className = 'modal-overlay';
+        overlay.className = 'modal-overlay modal-overlay-glass';
         overlay.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             z-index: ${options.zIndex};
-            animation: fadeIn 0.2s ease;
         `;
         
         return overlay;
     }
 
     /**
-     * Create modal element
+     * Create modal element with glassmorphism
      */
     createModal(content, options) {
         const modal = document.createElement('div');
@@ -122,16 +243,22 @@ export class EventModal {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.08),
+                inset 0 0 20px rgba(255, 255, 255, 0.5);
             z-index: ${options.zIndex + 1};
-            width: ${options.width || '400px'};
+            width: ${options.width || '420px'};
             max-width: 90vw;
-            max-height: 80vh;
+            max-height: 85vh;
             display: flex;
             flex-direction: column;
-            animation: slideUp 0.3s ease;
+            animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         `;
         
         // Add header if title is provided
@@ -146,6 +273,7 @@ export class EventModal {
             overflow-y: auto;
             flex: 1;
             overscroll-behavior: contain;
+            padding: 0;
         `;
         contentContainer.innerHTML = content;
         modal.appendChild(contentContainer);
@@ -154,46 +282,61 @@ export class EventModal {
     }
 
     /**
-     * Create modal header
+     * Create modal header with glassmorphism
      */
     createModalHeader(title) {
         const header = document.createElement('div');
         header.style.cssText = `
-            padding: 24px 24px 20px;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 24px 28px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: relative;
         `;
+        
+        // Add subtle bottom border
+        const borderGradient = document.createElement('div');
+        borderGradient.style.cssText = `
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+        `;
+        header.appendChild(borderGradient);
         
         const titleEl = document.createElement('h2');
         titleEl.style.cssText = `
-            font-size: 22px;
-            font-weight: 400;
-            color: #3c4043;
+            font-size: 20px;
+            font-weight: 300;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin: 0;
-            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            letter-spacing: -0.3px;
         `;
         titleEl.textContent = title;
         
         const closeBtn = document.createElement('button');
+        closeBtn.className = 'modal-close-btn';
         closeBtn.innerHTML = `
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
             </svg>
         `;
         closeBtn.style.cssText = `
-            background: none;
+            background: transparent;
             border: none;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #5f6368;
-            transition: background 0.2s;
+            color: rgba(100, 116, 139, 0.7);
         `;
         closeBtn.title = 'Close';
         
@@ -204,37 +347,59 @@ export class EventModal {
     }
 
     /**
-     * Create event details content
+     * Create event details content with glassmorphism
      */
     createEventDetailsContent(event) {
         const datetime = this.formatEventDateTime(event);
-        const color = event.color || '#3B82F6';
+        const color = event.color || '#8b5cf6';
         
         return `
-            <div style="padding: 24px;">
+            <div style="padding: 28px;">
                 <div style="
                     font-size: 18px;
-                    color: #3c4043;
-                    margin-bottom: 16px;
-                    font-weight: 500;
-                ">${event.title}</div>
+                    color: rgba(30, 41, 59, 0.95);
+                    margin-bottom: 20px;
+                    font-weight: 400;
+                    position: relative;
+                    padding-left: 16px;
+                ">
+                    <div style="
+                        position: absolute;
+                        left: 0;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        width: 3px;
+                        height: 24px;
+                        background: linear-gradient(180deg, ${color}dd, ${color}66);
+                        border-radius: 2px;
+                    "></div>
+                    ${event.title}
+                </div>
                 
                 <div style="
                     font-size: 14px;
-                    color: #70757a;
-                    margin-bottom: 8px;
-                ">${datetime.fullString}</div>
+                    color: rgba(100, 116, 139, 0.8);
+                    margin-bottom: 12px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                ">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" opacity="0.6">
+                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                    </svg>
+                    ${datetime.fullString}
+                </div>
                 
                 ${event.location ? `
                     <div style="
                         font-size: 14px;
-                        color: #70757a;
-                        margin-bottom: 8px;
+                        color: rgba(100, 116, 139, 0.8);
+                        margin-bottom: 12px;
                         display: flex;
                         align-items: center;
-                        gap: 4px;
+                        gap: 8px;
                     ">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#70757a">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" opacity="0.6">
                             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                         </svg>
                         ${event.location}
@@ -244,9 +409,12 @@ export class EventModal {
                 ${event.description ? `
                     <div style="
                         font-size: 14px;
-                        color: #70757a;
-                        margin-top: 16px;
-                        line-height: 20px;
+                        color: rgba(51, 65, 85, 0.8);
+                        margin-top: 20px;
+                        padding: 16px;
+                        background: rgba(255, 255, 255, 0.15);
+                        border-radius: 12px;
+                        line-height: 22px;
                         white-space: pre-wrap;
                     ">${event.description}</div>
                 ` : ''}
@@ -255,48 +423,54 @@ export class EventModal {
     }
 
     /**
-     * Create day events content
+     * Create day events content with glassmorphism
      */
     createDayEventsContent(date, events) {
         if (events.length === 0) {
             return `
                 <div style="
-                    padding: 48px 24px;
+                    padding: 60px 32px;
                     text-align: center;
-                    color: #80868b;
+                    color: rgba(100, 116, 139, 0.7);
                 ">
                     <div style="
-                        width: 120px;
-                        height: 120px;
+                        width: 100px;
+                        height: 100px;
                         margin: 0 auto 24px;
-                        background: #f8f9fa;
+                        background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(99, 102, 241, 0.05));
                         border-radius: 50%;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                     ">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="#dadce0">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="url(#gradient)">
+                            <defs>
+                                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:0.3" />
+                                    <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.3" />
+                                </linearGradient>
+                            </defs>
                             <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
                         </svg>
                     </div>
-                    <div style="font-size: 14px; line-height: 20px;">No events</div>
+                    <div style="font-size: 14px; line-height: 20px; opacity: 0.8;">No events scheduled</div>
                 </div>
             `;
         }
 
-        const eventsHtml = events.map(event => {
+        const eventsHtml = events.map((event, index) => {
             const datetime = this.formatEventDateTime(event);
             const recurrence = this.formatRecurrence(event);
-            const color = event.color || '#3B82F6';
+            const color = event.color || '#8b5cf6';
 
             const dateTimeLine = `${datetime.date}${datetime.time ? ', ' + datetime.time : ''}`;
 
             return `
-                <div class="event-item" style="
+                <div class="event-item event-item-glass" style="
                     position: relative;
-                    padding: 16px 24px;
-                    border-bottom: 1px solid #e0e0e0;
-                    cursor: default;
+                    padding: 16px 24px 16px 20px;
+                    cursor: pointer;
+                    ${index < events.length - 1 ? 'border-bottom: 1px solid rgba(139, 92, 246, 0.06);' : ''}
                 ">
                     ${event.allDay ? `
                         <div style="
@@ -304,30 +478,38 @@ export class EventModal {
                             left: 0;
                             top: 0;
                             bottom: 0;
-                            width: 4px;
-                            background: ${color};
-                            border-radius: 0 4px 4px 0;
+                            width: 3px;
+                            background: linear-gradient(180deg, ${color}, ${color}66);
                         "></div>
                     ` : ''}
                     <div style="
-                        font-size: 16px;
-                        color: #3c4043;
-                        margin-bottom: 4px;
-                        font-weight: 600;
+                        font-size: 15px;
+                        color: rgba(30, 41, 59, 0.9);
+                        margin-bottom: 6px;
+                        font-weight: 500;
                         text-align: left;
                     ">${event.title || 'Event'}</div>
-                    <ul style="
-                        margin: 0;
-                        padding: 0;
-                        list-style-position: inside;
-                        color: #70757a;
-                        font-size: 14px;
-                        line-height: 18px;
+                    <div style="
+                        color: rgba(100, 116, 139, 0.7);
+                        font-size: 13px;
+                        line-height: 20px;
                         text-align: left;
                     ">
-                        <li style="margin: 0; padding: 0; text-indent: -6px; padding-left: 6px;">${dateTimeLine}</li>
-                        ${recurrence ? `<li style=\"margin: 0; padding: 0; text-indent: -6px; padding-left: 6px;\">${recurrence}</li>` : ''}
-                    </ul>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                            ${dateTimeLine}
+                        </div>
+                        ${recurrence ? `
+                            <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">
+                                    <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+                                </svg>
+                                ${recurrence}
+                            </div>
+                        ` : ''}
+                    </div>
                 </div>
             `;
         }).join('');
@@ -336,41 +518,75 @@ export class EventModal {
     }
 
     /**
-     * Create quick add content
+     * Create quick add content with glassmorphism
      */
     createQuickAddContent(startTime, endTime) {
         const message = endTime 
-            ? `Create event: ${formatTime(startTime)} - ${formatTime(endTime)}`
-            : `Create event at ${formatTime(startTime)}`;
+            ? `${formatTime(startTime)} - ${formatTime(endTime)}`
+            : `Starting at ${formatTime(startTime)}`;
             
         return `
-            <div style="padding: 24px;">
+            <div style="padding: 28px;">
+                <div style="
+                    font-size: 14px;
+                    color: rgba(100, 116, 139, 0.7);
+                    margin-bottom: 8px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.8px;
+                    font-size: 11px;
+                ">Schedule</div>
+                
                 <div style="
                     font-size: 16px;
-                    color: #3c4043;
-                    margin-bottom: 16px;
+                    color: rgba(30, 41, 59, 0.9);
+                    margin-bottom: 24px;
+                    font-weight: 400;
                 ">${message}</div>
+                
+                <input type="text" placeholder="Event title" style="
+                    width: 100%;
+                    padding: 12px 16px;
+                    background: rgba(255, 255, 255, 0.15);
+                    border: 1px solid rgba(139, 92, 246, 0.15);
+                    border-radius: 10px;
+                    font-size: 14px;
+                    color: rgba(30, 41, 59, 0.9);
+                    outline: none;
+                    transition: all 0.2s ease;
+                    margin-bottom: 20px;
+                " onfocus="this.style.borderColor='rgba(139, 92, 246, 0.4)'; this.style.background='rgba(255, 255, 255, 0.25)'" 
+                   onblur="this.style.borderColor='rgba(139, 92, 246, 0.15)'; this.style.background='rgba(255, 255, 255, 0.15)'">
                 
                 <div style="
                     display: flex;
                     gap: 12px;
                     justify-content: flex-end;
                 ">
-                    <button class="btn-secondary" style="
-                        padding: 8px 16px;
-                        border: 1px solid #dadce0;
-                        background: white;
-                        border-radius: 4px;
+                    <button class="modal-action-btn btn-secondary" style="
+                        padding: 10px 20px;
+                        border: 1px solid rgba(139, 92, 246, 0.2);
+                        background: transparent;
+                        border-radius: 10px;
                         cursor: pointer;
-                    ">Cancel</button>
-                    <button class="btn-primary" style="
-                        padding: 8px 16px;
-                        background: #1a73e8;
+                        color: rgba(51, 65, 85, 0.8);
+                        font-size: 14px;
+                        font-weight: 400;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='rgba(139, 92, 246, 0.05)'"
+                       onmouseout="this.style.background='transparent'">Cancel</button>
+                    <button class="modal-action-btn btn-primary" style="
+                        padding: 10px 24px;
+                        background: linear-gradient(135deg, #6366f1, #8b5cf6);
                         color: white;
                         border: none;
-                        border-radius: 4px;
+                        border-radius: 10px;
                         cursor: pointer;
-                    ">Create</button>
+                        font-size: 14px;
+                        font-weight: 500;
+                        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+                        position: relative;
+                        overflow: hidden;
+                    ">Create Event</button>
                 </div>
             </div>
         `;
@@ -383,7 +599,7 @@ export class EventModal {
         const closeModal = () => this.closeModal(modal, overlay);
         
         // Close button
-        const closeBtn = modal.querySelector('button');
+        const closeBtn = modal.querySelector('.modal-close-btn');
         if (closeBtn) {
             closeBtn.addEventListener('click', closeModal);
         }
@@ -408,70 +624,78 @@ export class EventModal {
         modal.addEventListener('click', (e) => {
             e.stopPropagation();
         });
-    }
-
-    /**
-     * Add modal animations
-     */
-    addModalAnimations(modal, overlay) {
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-            @keyframes slideUp {
-                from { 
-                    opacity: 0;
-                    transform: translate(-50%, -45%);
-                }
-                to { 
-                    opacity: 1;
-                    transform: translate(-50%, -50%);
-                }
-            }
-        `;
-        document.head.appendChild(style);
         
-        // Remove style when modal closes
-        modal.addEventListener('remove', () => {
-            style.remove();
+        // Add ripple effect to action buttons
+        modal.querySelectorAll('.modal-action-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const ripple = document.createElement('span');
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.5);
+                    top: ${y}px;
+                    left: ${x}px;
+                    pointer-events: none;
+                    transform: scale(0);
+                    animation: rippleEffect 0.6s ease-out;
+                `;
+                
+                btn.style.position = 'relative';
+                btn.style.overflow = 'hidden';
+                btn.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
         });
     }
 
     /**
-     * Close modal
+     * Close modal with animation
      */
     closeModal(modal, overlay) {
-        if (modal && modal.parentNode) {
-            modal.parentNode.removeChild(modal);
+        // Add closing animation
+        if (modal) {
+            modal.style.animation = 'modalSlideUp 0.2s ease reverse';
         }
-        if (overlay && overlay.parentNode) {
-            overlay.parentNode.removeChild(overlay);
+        if (overlay) {
+            overlay.style.animation = 'modalFadeIn 0.2s ease reverse';
         }
-        this.activeModals.delete(modal);
+        
+        // Remove after animation
+        setTimeout(() => {
+            if (modal && modal.parentNode) {
+                modal.parentNode.removeChild(modal);
+            }
+            if (overlay && overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+            }
+            this.activeModals.delete(modal);
+        }, 200);
     }
 
     /**
      * Close all modals
      */
     closeAllModals() {
-        // Create a copy of the set to avoid modification during iteration
         const modalsToClose = Array.from(this.activeModals);
         
         modalsToClose.forEach(modal => {
-            // Find the overlay that's closest to this modal
             let overlay = null;
             if (modal.previousElementSibling && modal.previousElementSibling.classList.contains('modal-overlay')) {
                 overlay = modal.previousElementSibling;
             } else {
-                // Fallback: find any overlay
                 overlay = document.querySelector('.modal-overlay');
             }
             this.closeModal(modal, overlay);
         });
         
-        // Also close any remaining modals that might not be in activeModals
         const remainingModals = document.querySelectorAll('.modal, .modal-overlay');
         remainingModals.forEach(element => {
             if (element.parentNode) {
@@ -497,7 +721,6 @@ export class EventModal {
         
         const dateStr = `${dayName}, ${monthName} ${dayNum}`;
         
-        // For all-day events, don't show time
         if (event.allDay) {
             return {
                 date: dateStr,
@@ -506,7 +729,6 @@ export class EventModal {
             };
         }
         
-        // For timed events, show the time
         const startTime = formatTime(startDate);
         const endTime = endDate ? formatTime(endDate) : null;
         const timeStr = endTime ? `${startTime} – ${endTime}` : startTime;
@@ -514,7 +736,7 @@ export class EventModal {
         return {
             date: dateStr,
             time: timeStr,
-            fullString: `${dateStr} ⋅ ${timeStr}`
+            fullString: `${dateStr} • ${timeStr}`
         };
     }
 
@@ -531,8 +753,7 @@ export class EventModal {
             return null;
         }
 
-        // Parse RRULE
-        const rruleStr = rrule.substring(6); // Remove 'RRULE:' prefix
+        const rruleStr = rrule.substring(6);
         const parts = rruleStr.split(';');
         const params = {};
         
@@ -543,19 +764,18 @@ export class EventModal {
             }
         });
 
-        // Handle different recurrence types
         if (params.FREQ === 'WEEKLY') {
             if (params.BYDAY) {
                 const days = params.BYDAY.split(',');
                 const dayNames = days.map(day => {
                     const dayMap = {
-                        'SU': 'Sunday',
-                        'MO': 'Monday', 
-                        'TU': 'Tuesday',
-                        'WE': 'Wednesday',
-                        'TH': 'Thursday',
-                        'FR': 'Friday',
-                        'SA': 'Saturday'
+                        'SU': 'Sun',
+                        'MO': 'Mon', 
+                        'TU': 'Tue',
+                        'WE': 'Wed',
+                        'TH': 'Thu',
+                        'FR': 'Fri',
+                        'SA': 'Sat'
                     };
                     return dayMap[day] || day;
                 });
@@ -563,7 +783,7 @@ export class EventModal {
                 if (dayNames.length === 1) {
                     return `Weekly on ${dayNames[0]}`;
                 } else {
-                    return `Weekly on ${dayNames.slice(0, -1).join(', ')} and ${dayNames[dayNames.length - 1]}`;
+                    return `Weekly on ${dayNames.join(', ')}`;
                 }
             } else {
                 return 'Weekly';
@@ -593,8 +813,6 @@ export class EventModal {
         }
     }
 
-
-
     /**
      * Get active modals count
      */
@@ -612,5 +830,3 @@ export class EventModal {
 }
 
 export default EventModal;
-
-

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/pages/idle.css">
     <link rel="stylesheet" href="css/layout/sidebar.css">
+    <link rel="stylesheet" href="css/views/tasks.css">
     <link rel="stylesheet" href="css/pages/calendar.css">
     <link rel="stylesheet" href="css/components/touch-datetime-picker.css">
     
@@ -75,17 +76,14 @@
                     <div class="sidebar-date" id="sidebar-date">Loading...</div>
                 </div>
 
-                <!-- Weather Widget -->
-                <div class="sidebar-weather">
-                    <div class="weather-icon" id="sidebar-weather-icon">☀️</div>
-                    <div class="weather-info">
-                        <div class="weather-temp" id="sidebar-weather-temp">--°F</div>
-                        <div class="weather-desc" id="sidebar-weather-desc">Loading...</div>
-                    </div>
-                </div>
+
 
                 <!-- Navigation Menu -->
                 <nav class="nav-menu" id="nav-menu">
+                    <button class="nav-item" data-view="tasks">
+                        <span class="nav-icon">📋</span>
+                        <span>Tasks</span>
+                    </button>
                     <button class="nav-item active" data-view="calendar">
                         <span class="nav-icon">📅</span>
                         <span>Calendar</span>
@@ -123,6 +121,31 @@
 
             <!-- Main Content Area -->
             <div class="main-content" id="main-content">
+                <!-- Tasks View -->
+                <section id="tasks-view" class="view-container">
+                    <div class="tasks-container">
+                        <div class="tasks-header">
+                            <h2>Task Management</h2>
+                            <button class="add-task-btn" id="add-task-btn">
+                                <span class="btn-icon">+</span>
+                                <span>Add Task</span>
+                            </button>
+                        </div>
+                        <div class="tasks-content">
+                            <div class="task-filters">
+                                <button class="filter-btn active" data-filter="all">All</button>
+                                <button class="filter-btn" data-filter="pending">Pending</button>
+                                <button class="filter-btn" data-filter="completed">Completed</button>
+                            </div>
+                            <div class="task-list-container">
+                                <div id="main-task-list" class="task-list-main">
+                                    <!-- Tasks will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Calendar View (Default) -->
                 <section id="calendar-view" class="view-container active">
                     <div class="calendar-container">
