@@ -47,7 +47,7 @@ export class CalendarFilter {
     }
 
     /**
-     * Discover available calendars from events
+     * Discover available calendars from configuration and events
      */
     discoverCalendars() {
         if (!this.core) {
@@ -55,25 +55,51 @@ export class CalendarFilter {
             return;
         }
         
+        // Get all available calendars from configuration service
+        const allCalendars = calendarConfigService.getAllCalendars();
+        logger.debug('Calendar Filter', `Found ${allCalendars.length} calendars from configuration`);
+        
+        // Get events for counting
         const events = this.core.getEvents();
-        logger.debug('Calendar Filter', `Found ${events.length} events for calendar discovery`);
+        logger.debug('Calendar Filter', `Found ${events.length} events for event counting`);
         
-        const sources = new Set(events.map(e => e.calendarSource));
-        logger.debug('Calendar Filter', `Calendar sources found: ${Array.from(sources)}`);
+        // Clear existing data
+        this.calendarNames = {};
+        this.visibleCalendars.clear();
+        this.eventCounts = {};
         
-        // Generate calendar names and set visible calendars
-        sources.forEach(source => {
-            const calendarName = calendarConfigService.getCalendarName(source);
-            const calendarColor = calendarConfigService.getCalendarColor(source);
-            this.calendarNames[source] = calendarName;
-            this.visibleCalendars.add(source); // Default to visible
+        // Process all calendars from configuration and count events
+        const calendarData = [];
+        allCalendars.forEach(calendar => {
+            const source = calendar.name; // Use calendar name as source to match events
+            const calendarId = calendar.id; // Keep ID for reference
+            const calendarName = calendar.name;
+            const calendarColor = calendar.color;
             
             // Count events per calendar
-            this.eventCounts[source] = events.filter(e => 
+            const eventCount = events.filter(e => 
                 e.calendarSource === source
             ).length;
             
-            logger.debug('Calendar Filter', `Added calendar ${source} with name ${calendarName} and ${this.eventCounts[source]} events`);
+            calendarData.push({
+                source,
+                calendarId,
+                calendarName,
+                calendarColor,
+                eventCount
+            });
+            
+            logger.debug('Calendar Filter', `Added calendar ${source} (ID: ${calendarId}) with name ${calendarName} and ${eventCount} events`);
+        });
+        
+        // Sort calendars by event count (most to least)
+        calendarData.sort((a, b) => b.eventCount - a.eventCount);
+        
+        // Store sorted calendars
+        calendarData.forEach(calendar => {
+            this.calendarNames[calendar.source] = calendar.calendarName;
+            this.visibleCalendars.add(calendar.source); // Default to visible
+            this.eventCounts[calendar.source] = calendar.eventCount;
         });
         
         logger.debug('Calendar Filter', `Total calendars discovered: ${this.visibleCalendars.size}`);
@@ -137,10 +163,18 @@ export class CalendarFilter {
      * Render the list of calendars
      */
     renderCalendarList() {
-        return Object.entries(this.calendarNames).map(([id, name]) => {
+        // Create sorted array of calendar entries
+        const sortedCalendars = Object.entries(this.calendarNames)
+            .map(([id, name]) => ({
+                id,
+                name,
+                eventCount: this.eventCounts[id] || 0
+            }))
+            .sort((a, b) => b.eventCount - a.eventCount); // Sort by event count (most to least)
+        
+        return sortedCalendars.map(({id, name, eventCount}) => {
             const isVisible = this.visibleCalendars.has(id);
             const color = calendarConfigService.getCalendarColor(id); // Get solid color, not gradient
-            const eventCount = this.eventCounts[id] || 0;
             
             return `
                 <div class="calendar-item" data-calendar-id="${id}">
@@ -180,7 +214,7 @@ export class CalendarFilter {
         
         const events = this.core.getEvents();
         
-        // Reset counts
+        // Reset counts for all known calendars
         Object.keys(this.calendarNames).forEach(source => {
             this.eventCounts[source] = 0;
         });
@@ -530,10 +564,20 @@ export class CalendarFilter {
                 if (validSavedCalendars.length > 0) {
                     this.visibleCalendars = new Set(validSavedCalendars);
                     logger.debug('Calendar Filter', 'Settings loaded');
+                } else {
+                    // If no valid saved calendars, default to showing all available calendars
+                    this.visibleCalendars = new Set(Object.keys(this.calendarNames));
+                    logger.debug('Calendar Filter', 'No valid saved settings, showing all calendars');
                 }
+            } else {
+                // No saved settings, default to showing all available calendars
+                this.visibleCalendars = new Set(Object.keys(this.calendarNames));
+                logger.debug('Calendar Filter', 'No saved settings, showing all calendars');
             }
         } catch (e) {
             console.warn('Failed to load calendar filter settings:', e);
+            // On error, default to showing all available calendars
+            this.visibleCalendars = new Set(Object.keys(this.calendarNames));
         }
     }
 
@@ -575,6 +619,18 @@ export class CalendarFilter {
         this.discoverCalendars();
         this.updateUI();
         logger.refresh('Calendar Filter', 'Refreshed');
+    }
+
+    /**
+     * Reset to default state (all calendars selected)
+     * Called after idle/restart scenarios
+     */
+    resetToDefault() {
+        // Ensure all available calendars are selected
+        this.visibleCalendars = new Set(Object.keys(this.calendarNames));
+        this.updateUI();
+        this.saveSettings();
+        logger.debug('Calendar Filter', 'Reset to default state - all calendars selected');
     }
 
     /**

@@ -106,18 +106,19 @@ export class EventFormView {
     return `
       <form class="touch-event-form">
         <div class="form-body">
-          <!-- Title Section -->
-          <div class="form-section primary-section">
-            <div class="input-group">
-              <input 
-                id="event-title" 
-                type="text" 
-                required 
-                placeholder="Add title"
-                class="title-input"
-                autocomplete="off"
-              />
-            </div>
+          <!-- Event Name -->
+          <div class="input-section">
+            <label class="section-label" for="event-title">Event Name *</label>
+            <input 
+              id="event-title" 
+              type="text" 
+              required 
+              placeholder="Enter event name"
+              class="input-primary"
+              autocomplete="off"
+              maxlength="50"
+            />
+            <div class="input-helper">Give your event a descriptive name</div>
           </div>
 
           <!-- Calendar Selection -->
@@ -158,35 +159,31 @@ export class EventFormView {
             </div>
           </div>
 
-          <!-- Location Section -->
-          <div class="form-section">
-            <div class="input-group with-icon">
-              <svg class="field-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-              </svg>
-              <input 
-                id="event-location" 
-                type="text" 
-                placeholder="Add location (optional)"
-                class="location-input"
-                autocomplete="off"
-              />
-            </div>
+          <!-- Location -->
+          <div class="input-section">
+            <label class="section-label" for="event-location">Location</label>
+            <input 
+              id="event-location" 
+              type="text" 
+              placeholder="Add a location for this event (optional)"
+              class="input-primary"
+              autocomplete="off"
+              maxlength="100"
+            />
+            <div class="input-helper">Optional: Add where this event will take place</div>
           </div>
 
-          <!-- Description Section -->
-          <div class="form-section">
-            <div class="input-group">
-              <svg class="field-icon textarea-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-              </svg>
-              <textarea 
-                id="event-description" 
-                rows="3"
-                placeholder="Add description (optional)"
-                class="description-input"
-              ></textarea>
-            </div>
+          <!-- Description -->
+          <div class="input-section">
+            <label class="section-label" for="event-description">Description</label>
+            <textarea 
+              id="event-description" 
+              rows="3"
+              placeholder="Add a description for this event (optional)"
+              class="textarea-touch"
+              maxlength="200"
+            ></textarea>
+            <div class="input-helper">Optional: Add notes about this event</div>
           </div>
 
           <!-- Recurrence Section -->
@@ -251,6 +248,83 @@ export class EventFormView {
       .primary-section {
         background: white;
         border: 2px solid #667eea;
+      }
+
+      /* Input Sections (Calendar Name style) */
+      .input-section {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        border: 1px solid #e1e4e8;
+      }
+
+      .section-label {
+        display: block;
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .input-helper {
+        margin-top: 8px;
+        font-size: 14px;
+        color: #6c757d;
+        font-style: italic;
+      }
+
+      /* Primary Input (Calendar Name style) */
+      .input-primary {
+        width: 100%;
+        height: 70px;
+        font-size: 22px;
+        padding: 0 20px;
+        border: 3px solid #e1e4e8;
+        border-radius: 12px;
+        background: #ffffff;
+        color: #2c3e50;
+        transition: all 0.2s;
+        font-weight: 500;
+      }
+
+      .input-primary:focus {
+        outline: none;
+        border-color: #667eea;
+        background: #f8f9ff;
+      }
+
+      .input-primary::placeholder {
+        color: #adb5bd;
+        font-weight: 400;
+      }
+
+      /* Textarea */
+      .textarea-touch {
+        width: 100%;
+        min-height: 120px;
+        font-size: 18px;
+        padding: 16px 20px;
+        border: 2px solid #e1e4e8;
+        border-radius: 12px;
+        background: #ffffff;
+        color: #2c3e50;
+        resize: vertical;
+        font-family: inherit;
+        transition: all 0.2s;
+      }
+
+      .textarea-touch:focus {
+        outline: none;
+        border-color: #667eea;
+        background: #f8f9ff;
+      }
+
+      .textarea-touch::placeholder {
+        color: #adb5bd;
       }
 
       .input-group {
@@ -492,6 +566,21 @@ export class EventFormView {
           max-width: 100%;
           border-radius: 0;
         }
+
+        .input-section {
+          padding: 20px;
+          margin-bottom: 20px;
+        }
+
+        .input-primary {
+          height: 60px;
+          font-size: 20px;
+        }
+
+        .textarea-touch {
+          min-height: 100px;
+          font-size: 16px;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -629,7 +718,6 @@ export class EventFormView {
       this.recurrencePicker = new RecurrencePickerComponent({
         startDate: this.startDate,
         onChange: (config) => {
-          console.log('EventFormView: Recurrence config updated:', config);
           this.recurrenceConfig = config;
         }
       });

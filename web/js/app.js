@@ -458,6 +458,11 @@ export class FridgeDashboard {
         
         this.state.isIdle = false;
         this.resetIdleTimer();
+        
+        // Reset calendar filter to ensure all calendars are selected after idle
+        if (this.managers.calendar && this.managers.calendar.core && this.managers.calendar.core.calendarFilter) {
+            this.managers.calendar.core.calendarFilter.resetToDefault();
+        }
     }
     
     /**
