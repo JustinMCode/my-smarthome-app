@@ -535,7 +535,7 @@ This section documents all functions across the utils folder to help identify po
 ## Constants and Configuration Objects
 
 ### CALENDAR_CONFIG Object
-- **VIEWS** - View type constants (month, week, agenda)
+- **VIEWS** - View type constants (month, week)
 - **EVENT_CATEGORIES** - Event category constants (work, family, health, social, personal, other)
 - **NAVIGATION** - Navigation direction constants (prev, next, today)
 - **TOUCH** - Touch gesture settings (swipe distance, timing)
@@ -561,8 +561,8 @@ This section documents all functions across the utils folder to help identify po
 - **other** - Calendar emoji (📅)
 
 ### CSS_CLASSES Object
-- **View containers** - Month, week, agenda view container classes
-- **Grid elements** - Month grid, week grid, agenda list classes
+- **View containers** - Month, week view container classes
+- **Grid elements** - Month grid, week grid classes
 - **Day cells** - Day cell, day number, day events classes
 - **Event elements** - Event pill, more events classes
 - **Navigation** - View switcher, calendar header classes
@@ -570,7 +570,7 @@ This section documents all functions across the utils folder to help identify po
 
 ### SELECTORS Object
 - **Main containers** - Calendar container, main content selectors
-- **View elements** - Month grid, week grid, agenda list selectors
+- **View elements** - Month grid, week grid selectors
 - **Navigation** - Previous, next, today button selectors
 - **View switcher** - View button selectors
 - **Header** - Calendar title selectors

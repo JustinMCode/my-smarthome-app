@@ -8,7 +8,6 @@
 | view-manager.js | Manages view switching and lifecycle | 427 | 12 | 🟠 |
 | month-view.js | Month view rendering and interactions | 279 | 15 | 🔴 |
 | week-view.js | Week view rendering and interactions | 736 | 22 | 🔴 |
-| agenda-view.js | Agenda view rendering and interactions | 449 | 18 | 🔴 |
 
 ## Improvement Recommendations
 
@@ -210,56 +209,13 @@
   - Suggested: Add comprehensive JSDoc comments
   - Impact: Better developer experience
 
-### agenda-view.js
 
-#### 🔴 Critical Issues
-- **Issue**: Large monolithic class (449 lines) with mixed responsibilities
-  - Current: Single file handling rendering, interactions, and business logic
-  - Suggested: Split into focused modules (rendering, interactions, grouping)
-  - Impact: Better maintainability and testability
-
-- **Issue**: Direct DOM manipulation without abstraction
-  - Current: Direct innerHTML assignments and DOM queries
-  - Suggested: Use virtual DOM or templating system
-  - Impact: Better performance and maintainability
-
-- **Issue**: Missing error boundaries for rendering
-  - Current: No error handling for rendering failures
-  - Suggested: Add error boundaries and fallback rendering
-  - Impact: Better error recovery
-
-#### 🟠 High Priority
-- **Issue**: Inline event handlers without cleanup
-  - Current: Event listeners added without proper cleanup
-  - Suggested: Implement proper event delegation and cleanup
-  - Impact: Prevents memory leaks
-
-- **Issue**: Hardcoded action buttons and icons
-  - Current: Edit/delete buttons with hardcoded icons
-  - Suggested: Extract to configurable action components
-  - Impact: Better maintainability and customization
-
-- **Issue**: Missing accessibility features
-  - Current: No ARIA attributes or keyboard navigation
-  - Suggested: Add comprehensive accessibility support
-  - Impact: Better accessibility compliance
-
-#### 🟡 Medium Priority
-- **Issue**: Inconsistent date formatting
-  - Current: Multiple date formatting approaches
-  - Suggested: Use centralized date formatting service
-  - Impact: Better consistency and maintainability
-
-- **Issue**: Missing input validation
-  - Current: No validation for date parameters
-  - Suggested: Add comprehensive input validation
-  - Impact: Better error handling
 
 ## Refactoring Effort Estimate
-- Total files needing work: 6
-- Estimated hours: 80-120 hours
+- Total files needing work: 5
+- Estimated hours: 60-90 hours
 - Quick wins: index.js, view-base.js (error handling improvements)
-- Complex refactors: week-view.js, month-view.js, agenda-view.js (modularization)
+- Complex refactors: week-view.js, month-view.js (modularization)
 
 ## Dependencies
 - Internal dependencies: 
@@ -344,7 +300,7 @@ class TouchFeedback {
 ## Common Patterns Identified
 
 ### Pattern: Loading State Management
-Files using this: view-base.js, month-view.js, week-view.js, agenda-view.js
+Files using this: view-base.js, month-view.js, week-view.js
 Current implementation count: 4 times
 Suggested abstraction: Extract to LoadingState component
 
@@ -359,7 +315,7 @@ Current implementation count: 6 times
 Suggested abstraction: Create ContainerValidator utility
 
 ### Pattern: Date Formatting
-Files using this: view-base.js, agenda-view.js
+Files using this: view-base.js
 Current implementation count: 3 times
 Suggested abstraction: Create DateFormatter service
 
@@ -376,7 +332,7 @@ Lines saved if consolidated: 25
 Suggested solution: Create ContainerValidator utility
 
 ### Functionality: Event listener cleanup
-Locations: week-view.js, agenda-view.js
+Locations: week-view.js
 Lines saved if consolidated: 20
 Suggested solution: Create EventManager utility
 
@@ -427,7 +383,7 @@ class DateFormatter {
 ### 1. Virtual Scrolling
 - **Issue**: Large event lists render all items at once
 - **Impact**: Poor performance with 100+ events
-- **Solution**: Implement virtual scrolling for week and agenda views
+- **Solution**: Implement virtual scrolling for week view
 
 ### 2. Event Delegation
 - **Issue**: Individual event listeners for each element
@@ -546,8 +502,8 @@ This section documents all functions across the views folder to help identify po
 #### Initialization Functions
 - **constructor(core)** - Initializes view manager with core reference and empty collections for views and containers
 - **init()** - Main initialization method that sets up containers, views, event listeners, and initial view state
-- **initializeContainers()** - Finds and stores DOM containers for month, week, and agenda views using selectors
-- **initializeViews()** - Creates view instances for month, week, and agenda views and stores them in views Map
+- **initializeContainers()** - Finds and stores DOM containers for month and week views using selectors
+- **initializeViews()** - Creates view instances for month and week views and stores them in views Map
 - **setupViewButtonListeners()** - Sets up event listeners for view switching buttons and keyboard navigation
 
 #### View Management Functions
@@ -620,7 +576,7 @@ This section documents all functions across the views folder to help identify po
 #### Interaction Functions
 - **handleTimeSlotClick(date, hour)** - Handles time slot clicks by creating event time and showing quick add dialog
 - **startDragCreate(e, date, hour)** - Starts drag-to-create event functionality with visual indicator
-- **addAgendaItemInteraction(item, event)** - Adds click handler and touch feedback to agenda item
+
 
 #### Time Management Functions
 - **updateCurrentTimeIndicator()** - Updates current time indicator position and visibility
@@ -636,51 +592,14 @@ This section documents all functions across the views folder to help identify po
 - **onHide()** - Stops current time updater when view is hidden
 - **destroy()** - Cleans up current time interval
 
-### agenda-view.js Functions
 
-#### Core Functions
-- **constructor(core, container)** - Initializes agenda view with core reference, container, agenda container, and agenda list
-- **init()** - Initializes agenda view by finding agenda container and setting up event listeners
-- **render()** - Renders agenda view by creating agenda header and list
-- **getName()** - Returns 'agenda' as the view name
-
-#### Setup Functions
-- **setupEventListeners()** - Sets up event listeners (currently empty, interactions handled in createAgendaItem)
-
-#### Rendering Functions
-- **renderAgenda(currentDate, selectedDate)** - Renders agenda by clearing container and creating header and list
-- **createAgendaHeader(currentDate)** - Creates agenda header with date and day elements
-- **createAgendaList(currentDate, selectedDate)** - Creates agenda list with events grouped by date
-- **createDateGroup(dateKey, dayEvents, selectedDate)** - Creates date group with header and agenda items
-- **createDateHeader(dateKey, eventCount)** - Creates date header with date label and event count
-- **createAgendaItem(event, selectedDate)** - Creates individual agenda item with time, content, and actions sections
-
-#### Content Creation Functions
-- **createTimeSection(event)** - Creates time section showing "All Day" or start/end times
-- **createContentSection(event)** - Creates content section with title, location, description, and duration
-- **createActionsSection(event)** - Creates actions section with edit and delete buttons
-- **addAgendaItemInteraction(item, event)** - Adds click handler and touch feedback to agenda item
-
-#### Event Management Functions
-- **getEventsForNextDays(startDate, days)** - Gets events for next N days with calendar filtering
-- **groupEventsByDate(events)** - Groups events by date string for agenda display
-- **editEvent(event)** - Shows notification for edit event (placeholder implementation)
-- **deleteEvent(event)** - Confirms and deletes event with user confirmation
-- **onEventSelect(event)** - Calls parent onEventSelect method
-
-#### Utility Functions
-- **calculateDuration(start, end)** - Calculates duration between start and end times in hours and minutes
-- **updateTitle(date)** - Updates calendar title (handled by CalendarHeader component)
-- **update()** - Updates view if active and rendered
-- **onShow()** - Renders view when shown
-- **onHide()** - Resets rendered flag when view is hidden
 
 ## Potential Reimplementations Identified
 
 ### Date Formatting Functions
 - **view-base.js: formatDate()** - Formats dates with hardcoded arrays
 - **view-base.js: formatTime()** - Formats time using toLocaleTimeString
-- **agenda-view.js: calculateDuration()** - Calculates time duration
+
 - **week-view.js: formatEventTime()** - Formats event time
 - **week-view.js: formatHour()** - Formats hour display
 - **week-view.js: formatWeekRange()** - Formats week range
@@ -699,7 +618,7 @@ This section documents all functions across the views folder to help identify po
 - **view-base.js: addTouchFeedback()** - Adds touch feedback
 - **view-base.js: createRipple()** - Creates ripple effect
 - **month-view.js: addDayCellInteraction()** - Uses addTouchFeedback
-- **week-view.js: addAgendaItemInteraction()** - Uses addTouchFeedback
+
 
 **Recommendation**: Create TouchFeedback utility class
 
@@ -713,7 +632,7 @@ This section documents all functions across the views folder to help identify po
 ### Container Validation Functions
 - **month-view.js: init()** - Validates grid container
 - **week-view.js: init()** - Validates grid container  
-- **agenda-view.js: init()** - Validates agenda container
+
 - **view-manager.js: initializeContainers()** - Validates all containers
 
 **Recommendation**: Create ContainerValidator utility class
@@ -721,7 +640,7 @@ This section documents all functions across the views folder to help identify po
 ### Event Interaction Functions
 - **month-view.js: addDayCellInteraction()** - Adds click and touch handlers
 - **week-view.js: createTimeSlot()** - Adds click and drag handlers
-- **agenda-view.js: addAgendaItemInteraction()** - Adds click and touch handlers
+
 
 **Recommendation**: Create EventInteraction utility class
 

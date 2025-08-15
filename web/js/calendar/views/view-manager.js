@@ -6,7 +6,6 @@
 import { CALENDAR_CONFIG, CSS_CLASSES } from '../utils/basic/calendar-constants.js';
 import { MonthViewRefactored as MonthView } from './month-view.js';
 import { WeekViewRefactored as WeekView } from './week-view.js';
-import { AgendaView } from './agenda-view.js';
 
 export class ViewManager {
     constructor(core) {
@@ -26,18 +25,13 @@ export class ViewManager {
                              document.querySelector('.month-view-container');
         const weekContainer = document.querySelector('#week') || 
                             document.querySelector('.week-view-container');
-        const agendaContainer = document.querySelector('#agenda') || 
-                              document.querySelector('.agenda-container');
-        
         // Store containers
         this.containers.set(CALENDAR_CONFIG.VIEWS.MONTH, monthContainer);
         this.containers.set(CALENDAR_CONFIG.VIEWS.WEEK, weekContainer);
-        this.containers.set(CALENDAR_CONFIG.VIEWS.AGENDA, agendaContainer);
         
         console.log('📅 View containers initialized:', {
             month: !!monthContainer,
-            week: !!weekContainer,
-            agenda: !!agendaContainer
+            week: !!weekContainer
         });
     }
     
@@ -48,7 +42,6 @@ export class ViewManager {
         // Create view instances
         const monthContainer = this.containers.get(CALENDAR_CONFIG.VIEWS.MONTH);
         const weekContainer = this.containers.get(CALENDAR_CONFIG.VIEWS.WEEK);
-        const agendaContainer = this.containers.get(CALENDAR_CONFIG.VIEWS.AGENDA);
         
         if (monthContainer) {
             const monthView = new MonthView(this.core, monthContainer);
@@ -60,12 +53,6 @@ export class ViewManager {
             const weekView = new WeekView(this.core, weekContainer);
             weekView.init();
             this.views.set(CALENDAR_CONFIG.VIEWS.WEEK, weekView);
-        }
-        
-        if (agendaContainer) {
-            const agendaView = new AgendaView(this.core, agendaContainer);
-            agendaView.init();
-            this.views.set(CALENDAR_CONFIG.VIEWS.AGENDA, agendaView);
         }
         
         console.log('📅 Views initialized:', Array.from(this.views.keys()));
@@ -276,7 +263,7 @@ export class ViewManager {
                 const viewMap = {
                     '1': 'month',
                     '2': 'week', 
-                    '3': 'agenda'
+            
                 };
                 
                 const viewName = viewMap[e.key];

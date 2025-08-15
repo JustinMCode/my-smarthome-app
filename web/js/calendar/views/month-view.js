@@ -223,7 +223,7 @@ export class MonthViewRefactored extends EnhancedViewBase {
      * Handle date selection
      */
     onDateSelect(date) {
-        // Don't call super.onDateSelect() to avoid switching to agenda view
+        // Don't call super.onDateSelect() to avoid switching to other views
         // Just update the selected date in state
         this.core.state.setSelectedDate(date);
         

@@ -269,9 +269,6 @@ export class CalendarHeader {
                 const endOfWeek = this.addDays(startOfWeek, 6);
                 titleText = `Week: ${formatDate(startOfWeek, 'short-date')} - ${formatDate(endOfWeek, 'short-date')}`;
                 break;
-            case CALENDAR_CONFIG.VIEWS.AGENDA:
-                titleText = formatDate(currentDate, 'full');
-                break;
             default:
                 titleText = formatDate(currentDate, 'month-year');
         }

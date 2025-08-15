@@ -17,9 +17,7 @@ export const VIEWS = {
     /** Month view */
     MONTH: 'month',
     /** Week view */
-    WEEK: 'week',
-    /** Agenda view */
-    AGENDA: 'agenda'
+    WEEK: 'week'
 };
 
 /**

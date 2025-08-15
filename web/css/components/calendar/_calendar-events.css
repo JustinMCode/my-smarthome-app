@@ -38,9 +38,7 @@
     background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
 }
 
-.agenda-item.work {
-    border-left-color: #3B82F6;
-}
+
 
 /* Event Category Colors - Personal */
 .event-pill.personal,
@@ -59,9 +57,7 @@
     background: linear-gradient(135deg, #10B981 0%, #059669 100%);
 }
 
-.agenda-item.personal {
-    border-left-color: #10B981;
-}
+
 
 /* Event Category Colors - Family */
 .event-pill.family,
@@ -80,9 +76,7 @@
     background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
 }
 
-.agenda-item.family {
-    border-left-color: #F59E0B;
-}
+
 
 /* Event Category Colors - Health */
 .event-pill.health,
@@ -101,9 +95,7 @@
     background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
 }
 
-.agenda-item.health {
-    border-left-color: #EF4444;
-}
+
 
 /* Event Category Colors - Meeting */
 .event-pill.meeting,
@@ -122,9 +114,7 @@
     background: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%);
 }
 
-.agenda-item.meeting {
-    border-left-color: #A855F7;
-}
+
 
 /* Special Event States */
 .day-cell.today .event-pill {

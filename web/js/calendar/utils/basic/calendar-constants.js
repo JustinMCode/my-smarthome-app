@@ -7,8 +7,7 @@ export const CALENDAR_CONFIG = {
     // View types
     VIEWS: {
         MONTH: 'month',
-        WEEK: 'week',
-        AGENDA: 'agenda'
+        WEEK: 'week'
     },
     
     // Event categories
@@ -86,12 +85,10 @@ export const CSS_CLASSES = {
     // View containers
     MONTH_VIEW: 'month-view-container',
     WEEK_VIEW: 'week-view-container',
-    AGENDA_VIEW: 'agenda-container',
     
     // Grid elements
     MONTH_GRID: 'month-grid',
     WEEK_GRID: 'week-grid',
-    AGENDA_LIST: 'agenda-list',
     
     // Day cells
     DAY_CELL: 'day-cell',
@@ -122,7 +119,6 @@ export const SELECTORS = {
     // View elements
     MONTH_GRID: '#month-grid',
     WEEK_GRID: '#week-grid',
-    AGENDA_LIST: '#agenda-list',
     
     // Navigation
     PREV_NAV: '.prev-nav, #prev-month, #prev-week',

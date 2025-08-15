@@ -1,6 +1,6 @@
 /**
- * Calendar Week View - Refactored
- * Enhanced week view using modular components
+ * Calendar Week View - Touchscreen Optimized
+ * Enhanced week view for 15-inch touchscreen displays
  */
 
 import { ViewBase } from './view-base.js';
@@ -24,7 +24,14 @@ export class WeekViewRefactored extends EnhancedViewBase {
         super(core, container);
         this.gridContainer = null;
         this.currentTimeInterval = null;
-        this.dragState = null;
+        this.touchStartData = null;
+        this.scrollContainer = null;
+        this.hourHeight = 80; // Optimized for touch
+        this.startHour = 0;
+        this.endHour = 24;
+        this.columnWidth = 0;
+        this.alignmentTimeout = null;
+        this.resizeObserver = null;
     }
     
     /**
@@ -42,7 +49,13 @@ export class WeekViewRefactored extends EnhancedViewBase {
         // Initialize shared functionality
         await this.initShared();
         
-        console.log('📅 Week view initialized');
+        // Set up touch event handlers
+        this.setupTouchHandlers();
+        
+        // Set up resize observer for dynamic alignment
+        this.setupResizeObserver();
+        
+        console.log('📅 Week view initialized (Touchscreen optimized)');
     }
     
     /**
@@ -54,205 +67,177 @@ export class WeekViewRefactored extends EnhancedViewBase {
             return;
         }
         
-        // Only show loading if we're not already rendered and the core is loading
-        if (!this.isRendered && this.core.state.get('isLoading')) {
-            this.showLoading();
-            return;
-        }
-        
         const currentDate = this.core.getCurrentDate();
         const selectedDate = this.core.getSelectedDate();
         
         // Clear and rebuild
         this.gridContainer.innerHTML = '';
+        this.gridContainer.className = 'week-view-touchscreen';
         
         // Create main structure
         this.createWeekStructure(currentDate, selectedDate);
         
-        // Update current time indicator
-        this.updateCurrentTimeIndicator();
+        // Ensure grid alignment after render
+        this.ensureGridAlignment();
+        
+        // Start time indicator
+        this.startCurrentTimeUpdater();
+        
+        // Scroll to current time on initial render
+        if (!this.isRendered) {
+            this.scrollToCurrentTime();
+        }
         
         this.isRendered = true;
     }
     
     /**
-     * Create week structure
+     * Create week structure optimized for touch
      */
     createWeekStructure(currentDate, selectedDate) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'week-grid-wrapper';
+        // Main container
+        const mainContainer = document.createElement('div');
+        mainContainer.className = 'week-main-container';
         
-        // Header section
-        const headerSection = this.createHeaderSection(currentDate);
-        this.gridContainer.appendChild(headerSection);
+        // Fixed header
+        const fixedHeader = this.createFixedHeader(currentDate);
+        mainContainer.appendChild(fixedHeader);
         
-        // Grid container
-        const gridContainer = document.createElement('div');
-        gridContainer.className = 'week-grid-container';
-        
-        // Day headers
-        const dayHeaders = this.createDayHeaders(currentDate);
-        gridContainer.appendChild(dayHeaders);
-        
-        // All day section
-        const allDaySection = this.createAllDaySection(currentDate);
-        gridContainer.appendChild(allDaySection);
+        // Scrollable content area
+        const scrollArea = document.createElement('div');
+        scrollArea.className = 'week-scroll-area';
+        this.scrollContainer = scrollArea;
         
         // Time grid
         const timeGrid = this.createTimeGrid(currentDate, selectedDate);
-        gridContainer.appendChild(timeGrid);
+        scrollArea.appendChild(timeGrid);
         
-        // Current time indicator
-        const currentTimeIndicator = this.createCurrentTimeIndicator();
-        timeGrid.appendChild(currentTimeIndicator);
-        
-        wrapper.appendChild(gridContainer);
-        this.gridContainer.appendChild(wrapper);
+        mainContainer.appendChild(scrollArea);
+        this.gridContainer.appendChild(mainContainer);
     }
     
     /**
-     * Create header section
+     * Create fixed header with day headers only
      */
-    createHeaderSection(currentDate) {
+    createFixedHeader(currentDate) {
         const header = document.createElement('div');
-        header.className = 'week-header-section';
+        header.className = 'week-fixed-header';
         
-        const titleContainer = document.createElement('div');
-        titleContainer.className = 'week-title-container';
+        // Day headers
+        const dayHeaders = this.createDayHeaders(currentDate);
         
-        const title = document.createElement('h2');
-        title.className = 'week-title';
-        title.textContent = this.formatNavigationTitle(currentDate, 'week');
-        
-        const dateRange = document.createElement('div');
-        dateRange.className = 'week-date-range';
-        dateRange.textContent = this.formatWeekRange(currentDate);
-        
-        titleContainer.appendChild(title);
-        titleContainer.appendChild(dateRange);
-        
-        // Navigation using shared component
-        const nav = this.createNavigationControls({
-            className: 'week-nav',
-            prevText: '←',
-            nextText: '→',
-            todayText: 'Today'
-        });
-        
-        header.appendChild(titleContainer);
-        header.appendChild(nav);
+        header.appendChild(dayHeaders);
         
         return header;
     }
     
+
+    
     /**
-     * Create day headers
+     * Create day headers with all-day events area
      */
     createDayHeaders(currentDate) {
         const container = document.createElement('div');
-        container.className = 'week-day-headers';
+        container.className = 'week-days-header';
         
-        // Empty cell for time column
-        const timeHeader = document.createElement('div');
-        timeHeader.className = 'week-day-header time-header';
-        container.appendChild(timeHeader);
+        // Time column header
+        const timeColHeader = document.createElement('div');
+        timeColHeader.className = 'time-col-header';
+        container.appendChild(timeColHeader);
         
         const startOfWeek = getStartOfWeek(currentDate);
         
+        // Day columns
         for (let i = 0; i < 7; i++) {
             const dayDate = addDays(startOfWeek, i);
-            const dayHeader = document.createElement('div');
-            dayHeader.className = 'week-day-header';
+            const dayCol = document.createElement('div');
+            dayCol.className = 'day-header-col';
             
             if (isToday(dayDate)) {
-                dayHeader.classList.add('today');
+                dayCol.classList.add('today');
             }
             if (isWeekend(dayDate)) {
-                dayHeader.classList.add('weekend');
+                dayCol.classList.add('weekend');
             }
             
+            // Day header info
+            const dayInfo = document.createElement('div');
+            dayInfo.className = 'day-header-info';
+            
             const dayName = document.createElement('div');
-            dayName.className = 'week-day-name';
+            dayName.className = 'day-name';
             dayName.textContent = CALENDAR_CONFIG.DISPLAY.WEEKDAYS_SHORT[dayDate.getDay()];
             
-            const dayNumber = document.createElement('div');
-            dayNumber.className = 'week-day-number';
-            dayNumber.textContent = dayDate.getDate();
+            const dayNum = document.createElement('div');
+            dayNum.className = 'day-num';
+            dayNum.textContent = dayDate.getDate();
             
-            dayHeader.appendChild(dayName);
-            dayHeader.appendChild(dayNumber);
+            dayInfo.appendChild(dayName);
+            dayInfo.appendChild(dayNum);
             
-            // Add click handler
-            dayHeader.addEventListener('click', () => {
+            // All-day events container
+            const allDayContainer = document.createElement('div');
+            allDayContainer.className = 'all-day-container';
+            
+            // Get and render all-day events
+            this.renderAllDayEvents(dayDate, allDayContainer);
+            
+            dayCol.appendChild(dayInfo);
+            dayCol.appendChild(allDayContainer);
+            
+            // Touch handler for day selection
+            dayCol.addEventListener('click', (e) => {
+                if (e.target.closest('.all-day-event')) return;
                 this.core.setSelectedDate(dayDate);
+                this.render();
             });
             
-            container.appendChild(dayHeader);
+            container.appendChild(dayCol);
         }
         
         return container;
     }
     
     /**
-     * Create all-day events section
+     * Render all-day events
      */
-    createAllDaySection(currentDate) {
-        const section = document.createElement('div');
-        section.className = 'all-day-section';
+    renderAllDayEvents(date, container) {
+        let events = this.core.getEventsForDate(date);
         
-        const label = document.createElement('div');
-        label.className = 'all-day-label';
-        label.textContent = 'All Day';
-        section.appendChild(label);
-        
-        const startOfWeek = getStartOfWeek(currentDate);
-        
-        for (let i = 0; i < 7; i++) {
-            const dayDate = addDays(startOfWeek, i);
-            const cell = document.createElement('div');
-            cell.className = 'all-day-cell';
-            
-            if (isToday(dayDate)) {
-                cell.classList.add('today');
-            }
-            if (isWeekend(dayDate)) {
-                cell.classList.add('weekend');
-            }
-            
-            // Get all-day events using original method for proper calendar filtering
-            let allDayEvents = this.core.getEventsForDate(dayDate);
-            
-            // Apply calendar filter if available
-            if (this.core.calendarFilter) {
-                allDayEvents = this.core.calendarFilter.filterEvents(allDayEvents);
-            }
-            
-            allDayEvents = allDayEvents.filter(event => event.allDay === true);
-            allDayEvents.forEach(event => {
-                const eventEl = this.createAllDayEvent(event);
-                cell.appendChild(eventEl);
-            });
-            
-            // Add drop zone for all-day events
-            cell.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                cell.classList.add('drag-over');
-            });
-            
-            cell.addEventListener('dragleave', () => {
-                cell.classList.remove('drag-over');
-            });
-            
-            cell.addEventListener('drop', (e) => {
-                e.preventDefault();
-                cell.classList.remove('drag-over');
-                // Handle drop logic
-            });
-            
-            section.appendChild(cell);
+        if (this.core.calendarFilter) {
+            events = this.core.calendarFilter.filterEvents(events);
         }
         
-        return section;
+        const allDayEvents = events.filter(e => e.allDay === true);
+        
+        // Clear existing events
+        container.innerHTML = '';
+        
+        allDayEvents.slice(0, 2).forEach(event => {
+            const eventEl = document.createElement('div');
+            eventEl.className = 'all-day-event';
+            eventEl.textContent = event.title;
+            
+            const color = this.getEventColor(event);
+            eventEl.style.backgroundColor = color;
+            
+            eventEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.onEventSelect(event);
+            });
+            
+            container.appendChild(eventEl);
+        });
+        
+        if (allDayEvents.length > 2) {
+            const moreEl = document.createElement('div');
+            moreEl.className = 'all-day-more';
+            moreEl.textContent = `+${allDayEvents.length - 2} more`;
+            container.appendChild(moreEl);
+        }
+        
+        // Trigger alignment update after all-day events change
+        this.scheduleGridAlignment();
     }
     
     /**
@@ -262,295 +247,129 @@ export class WeekViewRefactored extends EnhancedViewBase {
         const grid = document.createElement('div');
         grid.className = 'week-time-grid';
         
-        const startOfWeek = getStartOfWeek(currentDate);
-        const startHour = 6;
-        const endHour = 22;
-        
-        // Create time column
+        // Time labels column
         const timeColumn = document.createElement('div');
-        timeColumn.className = 'time-column';
+        timeColumn.className = 'time-labels-column';
         
-        for (let hour = startHour; hour < endHour; hour++) {
+        for (let hour = this.startHour; hour < this.endHour; hour++) {
             const timeLabel = document.createElement('div');
             timeLabel.className = 'time-label';
+            timeLabel.style.height = `${this.hourHeight}px`;
             timeLabel.textContent = this.formatHour(hour);
             timeColumn.appendChild(timeLabel);
         }
         
         grid.appendChild(timeColumn);
         
-        // Create day columns
-        for (let day = 0; day < 7; day++) {
-            const dayDate = addDays(startOfWeek, day);
-            const dayColumn = this.createDayColumn(dayDate, selectedDate, startHour, endHour);
+        // Create individual day columns that align with header
+        const startOfWeek = getStartOfWeek(currentDate);
+        
+        for (let i = 0; i < 7; i++) {
+            const dayDate = addDays(startOfWeek, i);
+            const dayColumn = this.createDayColumn(dayDate, selectedDate);
             grid.appendChild(dayColumn);
         }
+        
+        // Current time indicator (now positioned absolutely across all day columns)
+        const currentTimeIndicator = this.createCurrentTimeIndicator();
+        grid.appendChild(currentTimeIndicator);
         
         return grid;
     }
     
     /**
-     * Create day column
+     * Create day column with time slots and events
      */
-    createDayColumn(dayDate, selectedDate, startHour, endHour) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'day-column-wrapper';
+    createDayColumn(date, selectedDate) {
+        const column = document.createElement('div');
+        column.className = 'day-column';
+        column.dataset.date = date.toISOString().split('T')[0];
         
-        if (isToday(dayDate)) wrapper.classList.add('today');
-        if (isWeekend(dayDate)) wrapper.classList.add('weekend');
+        if (isToday(date)) column.classList.add('today');
+        if (isWeekend(date)) column.classList.add('weekend');
+        if (isSameDay(date, selectedDate)) column.classList.add('selected');
         
-        // Create time slots
-        for (let hour = startHour; hour < endHour; hour++) {
-            const slot = this.createTimeSlot(dayDate, hour);
-            wrapper.appendChild(slot);
+        // Create hour slots
+        for (let hour = this.startHour; hour < this.endHour; hour++) {
+            const slot = document.createElement('div');
+            slot.className = 'hour-slot';
+            slot.style.height = `${this.hourHeight}px`;
+            slot.dataset.hour = hour;
+            
+            // Event creation disabled - no click handler
+            
+            column.appendChild(slot);
         }
         
-        // Add events using original layout logic for proper calendar filtering
-        let events = this.core.getEventsForDate(dayDate);
+        // Add events
+        this.renderDayEvents(date, column);
         
-        // Apply calendar filter if available
+        return column;
+    }
+    
+    /**
+     * Render events for a day
+     */
+    renderDayEvents(date, column) {
+        let events = this.core.getEventsForDate(date);
+        
         if (this.core.calendarFilter) {
             events = this.core.calendarFilter.filterEvents(events);
         }
         
-        events = events.filter(event => !event.allDay);
-        const eventElements = this.layoutDayEvents(events, wrapper, startHour, endHour);
-        eventElements.forEach(el => wrapper.appendChild(el));
+        const timedEvents = events.filter(e => !e.allDay);
         
-        return wrapper;
+        timedEvents.forEach(event => {
+            const eventEl = this.createEventElement(event);
+            column.appendChild(eventEl);
+        });
     }
     
     /**
-     * Layout events for a day with overlap handling
+     * Create event element
      */
-    layoutDayEvents(events, container, startHour, endHour) {
-        const elements = [];
-        const slotHeight = 72; // Match CSS variable
-        
-        // Sort events by start time
-        events.sort((a, b) => new Date(a.start) - new Date(b.start));
-        
-        // Group overlapping events
-        const groups = [];
-        events.forEach(event => {
-            const eventStart = new Date(event.start);
-            const eventEnd = new Date(event.end || event.start);
-            
-            let added = false;
-            for (const group of groups) {
-                const groupEnd = Math.max(...group.map(e => new Date(e.end || e.start).getTime()));
-                if (eventStart.getTime() < groupEnd) {
-                    group.push(event);
-                    added = true;
-                    break;
-                }
-            }
-            
-            if (!added) {
-                groups.push([event]);
-            }
-        });
-        
-        // Create elements for each group
-        groups.forEach((group, groupIndex) => {
-            group.forEach((event, index) => {
-                const eventEl = this.createWeekEvent(event);
-                
-                // Calculate position
-                const eventStart = new Date(event.start);
-                const eventEnd = new Date(event.end || event.start);
-                const startMinutes = (eventStart.getHours() - startHour) * 60 + eventStart.getMinutes();
-                const endMinutes = (eventEnd.getHours() - startHour) * 60 + eventEnd.getMinutes();
-                const duration = Math.max(30, endMinutes - startMinutes); // Minimum 30 minutes height
-                
-                const top = (startMinutes / 60) * slotHeight;
-                const height = (duration / 60) * slotHeight;
-                
-                eventEl.style.top = `${top}px`;
-                eventEl.style.height = `${height}px`;
-                
-                // Handle overlaps
-                if (group.length > 1) {
-                    const width = 100 / group.length;
-                    eventEl.style.width = `calc(${width}% - 6px)`;
-                    eventEl.style.left = `${width * index}%`;
-                    eventEl.classList.add(`overlap-${Math.min(index + 1, 3)}`);
-                }
-                
-                elements.push(eventEl);
-            });
-        });
-        
-        return elements;
-    }
-    
-    /**
-     * Create week event element (original implementation for proper calendar colors)
-     */
-    createWeekEvent(event) {
+    createEventElement(event) {
         const eventEl = document.createElement('div');
-        eventEl.className = `week-event ${event.category || 'default'}`;
-        eventEl.draggable = true;
+        eventEl.className = 'week-event';
         
-        const timeEl = document.createElement('div');
-        timeEl.className = 'week-event-time';
-        timeEl.textContent = this.formatEventTime(event);
+        const startDate = new Date(event.start);
+        const endDate = new Date(event.end || event.start);
         
-        const titleEl = document.createElement('div');
-        titleEl.className = 'week-event-title';
-        titleEl.textContent = event.title;
+        // Calculate position
+        const startHour = startDate.getHours() + startDate.getMinutes() / 60;
+        const endHour = endDate.getHours() + endDate.getMinutes() / 60;
+        const duration = Math.max(0.5, endHour - startHour); // Minimum 30 min height
         
-        if (event.location) {
-            const locationEl = document.createElement('div');
-            locationEl.className = 'week-event-location';
-            locationEl.innerHTML = `📍 ${event.location}`;
-            eventEl.appendChild(locationEl);
-        }
+        const top = (startHour - this.startHour) * this.hourHeight;
+        const height = duration * this.hourHeight;
         
-        eventEl.appendChild(timeEl);
-        eventEl.appendChild(titleEl);
+        eventEl.style.top = `${top}px`;
+        eventEl.style.height = `${height}px`;
         
-        // Apply calendar color
+        // Event content
+        const timeText = document.createElement('div');
+        timeText.className = 'event-time';
+        timeText.textContent = this.formatEventTime(event);
+        
+        const titleText = document.createElement('div');
+        titleText.className = 'event-title';
+        titleText.textContent = event.title;
+        
+        eventEl.appendChild(timeText);
+        eventEl.appendChild(titleText);
+        
+        // Apply color
         const color = this.getEventColor(event);
-        if (color) {
-            // For timed events, use the actual Google Calendar color
-            eventEl.style.background = color;
-            eventEl.style.border = `1px solid ${color}`;
-        }
+        eventEl.style.backgroundColor = color;
+        eventEl.style.borderLeftColor = color;
         
-        // Event handlers
+        // Touch handler
         eventEl.addEventListener('click', (e) => {
             e.stopPropagation();
             this.onEventSelect(event);
         });
         
-        eventEl.addEventListener('dragstart', (e) => {
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', JSON.stringify(event));
-            eventEl.classList.add('dragging');
-        });
-        
-        eventEl.addEventListener('dragend', () => {
-            eventEl.classList.remove('dragging');
-        });
-        
-        // Add touch feedback
-        addTouchFeedback(eventEl);
-        
         return eventEl;
-    }
-    
-    /**
-     * Create all-day event element (original implementation for proper calendar colors)
-     */
-    createAllDayEvent(event) {
-        const eventEl = document.createElement('div');
-        eventEl.className = 'all-day-event';
-        
-        // Check if this is a multi-day event
-        const isMultiDay = this.isMultiDayEvent(event);
-        eventEl.textContent = event.title;
-        
-        const color = this.getEventColor(event);
-        if (color) {
-            // For all-day events, use filled background with actual Google Calendar color and white text
-            eventEl.style.background = color;
-            eventEl.style.border = 'none';
-            eventEl.style.color = 'white';
-            eventEl.style.fontWeight = '600';
-            eventEl.style.boxShadow = `0 2px 4px ${color}40`; // Add subtle shadow with color
-        }
-        
-        eventEl.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.onEventSelect(event);
-        });
-        
-        addTouchFeedback(eventEl);
-        
-        return eventEl;
-    }
-    
-    /**
-     * Get event color for styling
-     */
-    getEventColor(event) {
-        // Use the actual Google Calendar color if available
-        if (event.color) {
-            return event.color;
-        }
-        
-        // Fallback to calendar configuration service
-        const calendarSource = event.calendarSource;
-        if (calendarSource) {
-            try {
-                return calendarConfigService.getCalendarColor(calendarSource);
-            } catch (error) {
-                console.warn('Calendar configuration not available for:', calendarSource);
-            }
-        }
-        
-        // Final fallback to Google Calendar default blue
-        return '#4285f4';
-    }
-
-    /**
-     * Check if an event spans multiple days
-     */
-    isMultiDayEvent(event) {
-        const start = new Date(event.start);
-        const end = new Date(event.end);
-        
-        // For all-day events, check if they span more than one day
-        if (event.allDay) {
-            const startDate = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-            const endDate = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-            const diffTime = endDate.getTime() - startDate.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays > 1;
-        }
-        
-        // For timed events, check if they span across midnight
-        const startDate = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-        const endDate = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-        return startDate.getTime() !== endDate.getTime();
-    }
-    
-    /**
-     * Format event time for display
-     */
-    formatEventTime(event) {
-        const start = new Date(event.start);
-        return start.toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit' 
-        });
-    }
-    
-    /**
-     * Create time slot
-     */
-    createTimeSlot(dayDate, hour) {
-        const slot = document.createElement('div');
-        slot.className = 'time-slot';
-        slot.dataset.date = dayDate.toISOString();
-        slot.dataset.hour = hour;
-        
-        // Add interaction
-        slot.addEventListener('click', (e) => {
-            if (e.target === slot) {
-                this.handleTimeSlotClick(dayDate, hour);
-            }
-        });
-        
-        // Drag to create event
-        slot.addEventListener('mousedown', (e) => {
-            if (e.target === slot) {
-                this.startDragCreate(e, dayDate, hour);
-            }
-        });
-        
-        return slot;
     }
     
     /**
@@ -558,126 +377,128 @@ export class WeekViewRefactored extends EnhancedViewBase {
      */
     createCurrentTimeIndicator() {
         const indicator = document.createElement('div');
-        indicator.className = 'current-time-indicator';
+        indicator.className = 'current-time-line';
         
-        const timeText = document.createElement('div');
-        timeText.className = 'current-time-text';
-        indicator.appendChild(timeText);
+        const dot = document.createElement('div');
+        dot.className = 'current-time-dot';
+        indicator.appendChild(dot);
         
         return indicator;
     }
     
     /**
-     * Handle time slot click
-     */
-    handleTimeSlotClick(date, hour) {
-        const eventTime = new Date(date);
-        eventTime.setHours(hour, 0, 0, 0);
-        
-        this.onDateSelect(eventTime);
-        this.showQuickAddDialog(eventTime);
-    }
-    
-    /**
-     * Start drag to create event
-     */
-    startDragCreate(e, date, hour) {
-        this.dragState = {
-            startDate: date,
-            startHour: hour,
-            startY: e.clientY
-        };
-        
-        const indicator = document.createElement('div');
-        indicator.className = 'event-creation-indicator';
-        indicator.style.top = `${(hour - 6) * 72}px`;
-        indicator.style.height = '72px';
-        e.target.parentElement.appendChild(indicator);
-        
-        const handleMouseMove = (e) => {
-            const dragIndicator = this.gridLayoutEngine.calculateDragIndicator(
-                this.dragState.startY, 
-                e.clientY, 
-                this.dragState.startHour
-            );
-            indicator.style.height = `${dragIndicator.height}px`;
-        };
-        
-        const handleMouseUp = () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-            
-            indicator.remove();
-            
-            // Create event with calculated duration
-            const dragIndicator = this.gridLayoutEngine.calculateDragIndicator(
-                this.dragState.startY, 
-                e.clientY, 
-                this.dragState.startHour
-            );
-            
-            const startTime = new Date(this.dragState.startDate);
-            startTime.setHours(this.dragState.startHour, 0, 0, 0);
-            
-            const endTime = new Date(startTime);
-            endTime.setHours(startTime.getHours() + dragIndicator.hours);
-            
-            this.showQuickAddDialog(startTime, endTime);
-            
-            this.dragState = null;
-        };
-        
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-    }
-    
-    /**
-     * Update current time indicator position
+     * Update current time indicator
      */
     updateCurrentTimeIndicator() {
-        const indicator = this.container.querySelector('.current-time-indicator');
+        const indicator = this.container.querySelector('.current-time-line');
         if (!indicator) return;
         
-        const position = this.calculateCurrentTimePosition();
+        const now = new Date();
+        const currentHour = now.getHours() + now.getMinutes() / 60;
         
-        if (!position.visible) {
+        if (currentHour < this.startHour || currentHour > this.endHour) {
             indicator.style.display = 'none';
             return;
         }
         
+        const top = (currentHour - this.startHour) * this.hourHeight;
+        indicator.style.top = `${top}px`;
         indicator.style.display = 'block';
-        indicator.style.top = `${position.top}px`;
         
-        // Update time text
-        const timeText = indicator.querySelector('.current-time-text');
-        if (timeText) {
-            timeText.textContent = position.time;
+        // Check if today is in current week
+        const currentDate = this.core.getCurrentDate();
+        const startOfWeek = getStartOfWeek(currentDate);
+        const endOfWeek = addDays(startOfWeek, 6);
+        
+        if (now < startOfWeek || now > endOfWeek) {
+            indicator.style.display = 'none';
         }
     }
     
     /**
-     * Start current time indicator updater
+     * Scroll to current time
      */
-    startCurrentTimeUpdater() {
-        // Clear existing interval
-        if (this.currentTimeInterval) {
-            clearInterval(this.currentTimeInterval);
-        }
+    scrollToCurrentTime() {
+        if (!this.scrollContainer) return;
         
-        // Update every minute
-        this.currentTimeInterval = setInterval(() => {
-            if (this.isActive) {
-                this.updateCurrentTimeIndicator();
+        const now = new Date();
+        const currentHour = Math.max(0, now.getHours() - 1); // Show 1 hour before
+        const scrollTop = (currentHour - this.startHour) * this.hourHeight;
+        
+        setTimeout(() => {
+            this.scrollContainer.scrollTop = Math.max(0, scrollTop);
+        }, 100);
+    }
+    
+
+    
+    /**
+     * Setup touch handlers
+     */
+    setupTouchHandlers() {
+        if (!this.gridContainer) return;
+        
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchStartTime = 0;
+        
+        this.gridContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchStartTime = Date.now();
+        }, { passive: true });
+        
+        this.gridContainer.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const touchDuration = Date.now() - touchStartTime;
+            
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+            
+            // Horizontal swipe detection
+            if (Math.abs(deltaX) > 100 && Math.abs(deltaY) < 50 && touchDuration < 500) {
+                if (deltaX > 0) {
+                    this.navigatePrevious();
+                } else {
+                    this.navigateNext();
+                }
             }
-        }, 60000);
-        
-        // Initial update
-        this.updateCurrentTimeIndicator();
+        }, { passive: true });
     }
     
     /**
-     * Format week range
+     * Navigation methods
      */
+    navigatePrevious() {
+        const currentDate = this.core.getCurrentDate();
+        const prevWeek = addDays(currentDate, -7);
+        this.core.setCurrentDate(prevWeek);
+        this.render();
+    }
+    
+    navigateNext() {
+        const currentDate = this.core.getCurrentDate();
+        const nextWeek = addDays(currentDate, 7);
+        this.core.setCurrentDate(nextWeek);
+        this.render();
+    }
+    
+    navigateToday() {
+        this.core.setCurrentDate(new Date());
+        this.render();
+        this.scrollToCurrentTime();
+    }
+    
+    /**
+     * Format helpers
+     */
+    formatWeekTitle(date) {
+        const month = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        const weekNum = this.getWeekNumber(date);
+        return `${month} - Week ${weekNum}`;
+    }
+    
     formatWeekRange(date) {
         const start = getStartOfWeek(date);
         const end = addDays(start, 6);
@@ -688,9 +509,6 @@ export class WeekViewRefactored extends EnhancedViewBase {
         return `${startStr} - ${endStr}`;
     }
     
-    /**
-     * Format hour for display
-     */
     formatHour(hour) {
         if (hour === 0) return '12 AM';
         if (hour < 12) return `${hour} AM`;
@@ -698,19 +516,199 @@ export class WeekViewRefactored extends EnhancedViewBase {
         return `${hour - 12} PM`;
     }
     
-    /**
-     * Called when view is shown
-     */
-    onShow() {
-        super.onShow();
-        this.startCurrentTimeUpdater();
+    formatEventTime(event) {
+        const start = new Date(event.start);
+        return start.toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit' 
+        });
     }
     
     /**
-     * Called when view is hidden
+     * Get week number
      */
-    onHide() {
-        super.onHide();
+    getWeekNumber(date) {
+        const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+        const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+        return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+    }
+    
+    /**
+     * Ensure grid alignment between header and time grid
+     */
+    ensureGridAlignment() {
+        // Use requestAnimationFrame to ensure DOM is ready
+        requestAnimationFrame(() => {
+            const headerGrid = this.container.querySelector('.week-days-header');
+            const timeGrid = this.container.querySelector('.week-time-grid');
+            
+            if (!headerGrid || !timeGrid) return;
+            
+            // Temporarily remove transitions to prevent visual glitches
+            headerGrid.style.transition = 'none';
+            timeGrid.style.transition = 'none';
+            
+            // Force recalculation of grid layout
+            headerGrid.style.display = 'none';
+            headerGrid.offsetHeight; // Force reflow
+            headerGrid.style.display = 'grid';
+            
+            timeGrid.style.display = 'none';
+            timeGrid.offsetHeight; // Force reflow
+            timeGrid.style.display = 'grid';
+
+            // Compensate header width for scrollbar so columns line up
+            this.updateHeaderScrollbarCompensation();
+            // Normalize all-day row heights so each column matches tallest
+            this.normalizeAllDayRowHeights();
+            
+            // Restore transitions after a frame
+            requestAnimationFrame(() => {
+                headerGrid.style.transition = '';
+                timeGrid.style.transition = '';
+                
+                // Verify alignment and log if there are issues
+                this.validateColumnAlignment();
+            });
+        });
+    }
+
+    /**
+     * Measure and apply scrollbar compensation to header width
+     */
+    updateHeaderScrollbarCompensation() {
+        const headerGrid = this.container.querySelector('.week-days-header');
+        if (!headerGrid || !this.scrollContainer) return;
+        const scrollbarWidth = Math.max(0, this.scrollContainer.offsetWidth - this.scrollContainer.clientWidth);
+        if (scrollbarWidth > 0) {
+            headerGrid.style.width = `calc(100% - ${scrollbarWidth}px)`;
+        } else {
+            headerGrid.style.width = '';
+        }
+    }
+
+    /**
+     * Ensure all-day containers share the same height (max across days)
+     */
+    normalizeAllDayRowHeights() {
+        const allDayContainers = Array.from(this.container.querySelectorAll('.week-days-header .all-day-container'));
+        if (!allDayContainers.length) return;
+        // Reset any previous explicit heights to measure natural heights
+        allDayContainers.forEach(el => {
+            el.style.height = '';
+        });
+        const maxHeight = allDayContainers.reduce((max, el) => Math.max(max, el.scrollHeight), 0);
+        if (maxHeight > 0) {
+            allDayContainers.forEach(el => {
+                el.style.height = `${maxHeight}px`;
+            });
+        }
+    }
+    
+    /**
+     * Validate column alignment (for debugging)
+     */
+    validateColumnAlignment() {
+        const headerCols = this.container.querySelectorAll('.day-header-col');
+        const dayCols = this.container.querySelectorAll('.day-column');
+        
+        if (headerCols.length !== dayCols.length) {
+            console.warn('Column count mismatch:', headerCols.length, 'vs', dayCols.length);
+            return;
+        }
+        
+        // Check if columns are properly aligned
+        for (let i = 0; i < headerCols.length; i++) {
+            const headerRect = headerCols[i].getBoundingClientRect();
+            const dayRect = dayCols[i].getBoundingClientRect();
+            
+            const widthDiff = Math.abs(headerRect.width - dayRect.width);
+            const leftDiff = Math.abs(headerRect.left - dayRect.left);
+            
+            if (widthDiff > 1 || leftDiff > 1) {
+                console.warn(`Column ${i} alignment issue:`, {
+                    headerWidth: headerRect.width,
+                    dayWidth: dayRect.width,
+                    headerLeft: headerRect.left,
+                    dayLeft: dayRect.left
+                });
+            }
+        }
+    }
+    
+    /**
+     * Schedule grid alignment update (debounced)
+     */
+    scheduleGridAlignment() {
+        if (this.alignmentTimeout) {
+            clearTimeout(this.alignmentTimeout);
+        }
+        
+        this.alignmentTimeout = setTimeout(() => {
+            this.ensureGridAlignment();
+            this.alignmentTimeout = null;
+        }, 50);
+    }
+    
+    /**
+     * Handle window resize to maintain alignment
+     */
+    handleResize() {
+        this.scheduleGridAlignment();
+    }
+    
+    /**
+     * Setup resize observer for dynamic alignment
+     */
+    setupResizeObserver() {
+        if (!window.ResizeObserver || !this.container) return;
+        
+        this.resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                if (entry.target === this.container) {
+                    this.scheduleGridAlignment();
+                    break;
+                }
+            }
+        });
+        
+        this.resizeObserver.observe(this.container);
+    }
+    
+    /**
+     * Get event color
+     */
+    getEventColor(event) {
+        if (event.color) {
+            return event.color;
+        }
+        
+        const calendarSource = event.calendarSource;
+        if (calendarSource) {
+            try {
+                return calendarConfigService.getCalendarColor(calendarSource);
+            } catch (error) {
+                console.warn('Calendar configuration not available for:', calendarSource);
+            }
+        }
+        
+        return '#4285f4';
+    }
+    
+    /**
+     * Start/stop time updater
+     */
+    startCurrentTimeUpdater() {
+        this.stopCurrentTimeUpdater();
+        
+        this.updateCurrentTimeIndicator();
+        
+        this.currentTimeInterval = setInterval(() => {
+            this.updateCurrentTimeIndicator();
+        }, 60000); // Update every minute
+    }
+    
+    stopCurrentTimeUpdater() {
         if (this.currentTimeInterval) {
             clearInterval(this.currentTimeInterval);
             this.currentTimeInterval = null;
@@ -718,18 +716,37 @@ export class WeekViewRefactored extends EnhancedViewBase {
     }
     
     /**
-     * Clean up
+     * Lifecycle methods
      */
+    onShow() {
+        super.onShow();
+        this.startCurrentTimeUpdater();
+        this.scrollToCurrentTime();
+    }
+    
+    onHide() {
+        super.onHide();
+        this.stopCurrentTimeUpdater();
+    }
+    
     destroy() {
-        if (this.currentTimeInterval) {
-            clearInterval(this.currentTimeInterval);
+        this.stopCurrentTimeUpdater();
+        
+        // Clean up alignment timeout
+        if (this.alignmentTimeout) {
+            clearTimeout(this.alignmentTimeout);
+            this.alignmentTimeout = null;
         }
+        
+        // Clean up resize observer
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+            this.resizeObserver = null;
+        }
+        
         super.destroy();
     }
     
-    /**
-     * Get view name
-     */
     getName() {
         return CALENDAR_CONFIG.VIEWS.WEEK;
     }

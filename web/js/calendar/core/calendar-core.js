@@ -372,11 +372,6 @@ export class CalendarCore {
      */
     selectDate(date) {
         this.state.setSelectedDate(date);
-        
-        // Auto-switch to agenda view when selecting a date from month view
-        if (this.state.getView() === CALENDAR_CONFIG.VIEWS.MONTH) {
-            this.state.setView(CALENDAR_CONFIG.VIEWS.AGENDA);
-        }
     }
     
     /**

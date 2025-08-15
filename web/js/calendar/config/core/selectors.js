@@ -29,9 +29,7 @@ export const VIEW_ELEMENTS = {
     /** Month grid */
     MONTH_GRID: '#month-grid',
     /** Week grid */
-    WEEK_GRID: '#week-grid',
-    /** Agenda list */
-    AGENDA_LIST: '#agenda-list'
+    WEEK_GRID: '#week-grid'
 };
 
 /**
@@ -82,7 +80,6 @@ export const SELECTORS = {
     // View elements
     MONTH_GRID: VIEW_ELEMENTS.MONTH_GRID,
     WEEK_GRID: VIEW_ELEMENTS.WEEK_GRID,
-    AGENDA_LIST: VIEW_ELEMENTS.AGENDA_LIST,
     
     // Navigation
     PREV_NAV: NAVIGATION.PREV_NAV,

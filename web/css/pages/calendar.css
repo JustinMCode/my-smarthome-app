@@ -5,7 +5,7 @@
  * This file imports all calendar components:
  * - Variables and theming
  * - Header and navigation
- * - View-specific styles (month, week, agenda)
+ * - View-specific styles (month, week)
  * - Shared events and interactions
  */
 
@@ -18,7 +18,7 @@
 /* Import view-specific components */
 @import url('../components/calendar/_calendar-month.css');
 @import url('../components/calendar/_calendar-week.css');
-@import url('../components/calendar/_calendar-agenda.css');
+
 
 /* Import shared components */
 @import url('../components/calendar/_calendar-events.css');

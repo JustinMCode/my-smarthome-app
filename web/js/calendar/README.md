@@ -38,8 +38,7 @@ web/js/calendar/
 │   ├── month-view.js              # ✅ Month view implementation
 │   ├── month-view-refactored.js   # ✅ Refactored month view
 │   ├── week-view.js               # ✅ Week view implementation
-│   ├── week-view-refactored.js    # ✅ Refactored week view
-│   └── agenda-view.js             # ✅ Agenda view implementation
+│   └── week-view-refactored.js    # ✅ Refactored week view
 └── rendering/                     # ✅ Rendering system (empty)
 ```
 
@@ -78,7 +77,6 @@ The views system manages different calendar view types:
 - **`view-manager.js`**: View switching and lifecycle management
 - **`month-view.js`**: Month view implementation
 - **`week-view.js`**: Week view implementation
-- **`agenda-view.js`**: Agenda view implementation
 
 ### **Interactions System (`interactions/`)**
 The interactions system handles user input and gestures:
@@ -298,8 +296,7 @@ import {
     ViewManager,
     ViewBase,
     MonthView,
-    WeekView,
-    AgendaView
+    WeekView
 } from './views/index.js';
 ```
 

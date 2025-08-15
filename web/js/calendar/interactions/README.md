@@ -511,7 +511,7 @@ This section documents all functions across the interactions folder to help iden
 
 #### Navigation Functions
 - **navigate(direction)** - Delegates navigation to core calendar system
-- **cycleView(direction)** - Cycles through available views (month, week, agenda) in specified direction and shows notification
+- **cycleView(direction)** - Cycles through available views (month, week) in specified direction and shows notification
 
 #### Visual Feedback Functions
 - **showSwipeFeedback(direction)** - Creates and displays swipe feedback animation with arrow icon positioned on left/right side of screen

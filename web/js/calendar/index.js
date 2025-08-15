@@ -13,7 +13,6 @@ export { ViewManager } from './views/view-manager.js';
 export { ViewBase } from './views/view-base.js';
 export { MonthViewRefactored as MonthView } from './views/month-view.js';
 export { WeekViewRefactored as WeekView } from './views/week-view.js';
-export { AgendaView } from './views/agenda-view.js';
 
 // Component exports
 export { CalendarHeader } from './components/ui/navigation/index.js';

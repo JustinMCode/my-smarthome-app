@@ -30,7 +30,7 @@ Successfully consolidated duplicate `addTouchFeedback` and `createRipple` implem
 - ✅ `web/js/calendar/mixins/ViewMixin.js`
 - ✅ `web/js/calendar/interactions/touch-gestures.js`
 - ✅ `web/js/calendar/views/week-view.js`
-- ✅ `web/js/calendar/views/agenda-view.js`
+
 - ✅ `web/js/calendar/views/month-view.js`
 
 ### 3. Updated Utils Index
@@ -63,14 +63,12 @@ Successfully consolidated duplicate `addTouchFeedback` and `createRipple` implem
 
 ### addTouchFeedback Calls
 - ✅ `week-view.js` (2 calls)
-- ✅ `agenda-view.js` (1 call)
 - ✅ `month-view.js` (1 call)
 - ✅ `event-pill.js` (1 call)
 - ✅ `EventRenderer.js` (1 call)
 - ✅ `day-cell.js` (2 calls)
 
 ### createRipple Calls
-- ✅ `agenda-view.js` (1 call)
 - ✅ `month-view.js` (1 call)
 - ✅ `event-pill.js` (1 call)
 - ✅ `day-cell.js` (1 call)

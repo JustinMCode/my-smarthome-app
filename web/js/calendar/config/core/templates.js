@@ -98,7 +98,7 @@ export const VIEW_SWITCHER = `
     <div class="view-switcher">
         <button class="view-btn" data-calendar-view="month">Month</button>
         <button class="view-btn" data-calendar-view="week">Week</button>
-        <button class="view-btn" data-calendar-view="agenda">Agenda</button>
+        
     </div>
 `;
 

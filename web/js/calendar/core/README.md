@@ -685,7 +685,7 @@ This section documents all functions across the core folder to help identify pot
 #### Navigation Functions
 - **navigate(direction)** - Navigates calendar using state management
 - **switchView(view)** - Switches view using state management
-- **selectDate(date)** - Selects date using state management and auto-switches to agenda view from month view
+- **selectDate(date)** - Selects date using state management
 - **goToToday()** - Goes to today using state navigation
 
 #### Utility Functions
@@ -723,7 +723,7 @@ This section documents all functions across the core folder to help identify pot
 - **getSelectedDate()** - Returns selected date
 
 #### Navigation Functions
-- **navigate(direction)** - Navigates calendar based on direction and current view (month/week/agenda), sets navigation flag with timeout
+- **navigate(direction)** - Navigates calendar based on direction and current view (month/week), sets navigation flag with timeout
 
 #### Event Management Functions
 - **setEvents(events)** - Sets events and updates last updated timestamp
@@ -1136,7 +1136,7 @@ class NavigationService {
         this.state.setSelectedDate(date);
         
         if (this.state.getView() === 'month') {
-            this.state.setView('agenda');
+            
         }
     }
     

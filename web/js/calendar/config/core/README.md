@@ -880,7 +880,7 @@ This section documents all functions across the core config folder to help ident
 ## Configuration Objects Inventory
 
 ### constants.js Configuration Objects (8 total)
-- **VIEWS** - View type constants (month, week, agenda)
+- **VIEWS** - View type constants (month, week)
 - **EVENT_CATEGORIES** - Event category constants (work, family, health, social, personal, other)
 - **NAVIGATION** - Navigation direction constants (prev, next, today)
 - **TOUCH** - Touch gesture configuration (swipe distance, time limits)
@@ -1082,7 +1082,7 @@ class CoreConfigurationManager {
     
     loadConstants() {
         const constants = {
-            VIEWS: { MONTH: 'month', WEEK: 'week', AGENDA: 'agenda' },
+            VIEWS: { MONTH: 'month', WEEK: 'week' },
             EVENT_CATEGORIES: { WORK: 'work', FAMILY: 'family', HEALTH: 'health', SOCIAL: 'social', PERSONAL: 'personal', OTHER: 'other' },
             NAVIGATION: { PREV: 'prev', NEXT: 'next', TODAY: 'today' },
             TOUCH: { MIN_SWIPE_DISTANCE: 50, MAX_SWIPE_TIME: 300, DOUBLE_TAP_TIME: 300 },
@@ -1115,8 +1115,8 @@ class CoreConfigurationManager {
     
     loadCSSClasses() {
         const cssClasses = {
-            VIEW_CONTAINERS: { MONTH_VIEW: 'month-view-container', WEEK_VIEW: 'week-view-container', AGENDA_VIEW: 'agenda-container' },
-            GRID_ELEMENTS: { MONTH_GRID: 'month-grid', WEEK_GRID: 'week-grid', AGENDA_LIST: 'agenda-list' },
+            VIEW_CONTAINERS: { MONTH_VIEW: 'month-view-container', WEEK_VIEW: 'week-view-container' },
+            GRID_ELEMENTS: { MONTH_GRID: 'month-grid', WEEK_GRID: 'week-grid' },
             DAY_CELLS: { DAY_CELL: 'day-cell', DAY_NUMBER: 'day-number', DAY_EVENTS: 'day-events' },
             EVENT_ELEMENTS: { EVENT_PILL: 'event-pill', MORE_EVENTS: 'more-events' },
             NAVIGATION: { VIEW_SWITCHER: 'view-switcher', CALENDAR_HEADER: 'calendar-header' },
@@ -1129,7 +1129,7 @@ class CoreConfigurationManager {
     loadSelectors() {
         const selectors = {
             CONTAINERS: { CALENDAR_CONTAINER: '.calendar-container', MAIN_CONTENT: '#main-content' },
-            VIEW_ELEMENTS: { MONTH_GRID: '#month-grid', WEEK_GRID: '#week-grid', AGENDA_LIST: '#agenda-list' },
+            VIEW_ELEMENTS: { MONTH_GRID: '#month-grid', WEEK_GRID: '#week-grid' },
             NAVIGATION: { PREV_NAV: '.prev-nav, #prev-month, #prev-week', NEXT_NAV: '.next-nav, #next-month, #next-week', TODAY_BTN: '.today-btn, #today-btn' },
             VIEW_SWITCHER: { VIEW_BUTTONS: '.view-switcher button, [data-calendar-view]' },
             HEADER: { CALENDAR_TITLE: '#calendar-title, .calendar-header h2' }
@@ -1146,7 +1146,7 @@ class CoreConfigurationManager {
             EMPTY: '<div class="calendar-empty"><div class="empty-icon">📅</div><div class="empty-title">No events</div><div class="empty-text">No events scheduled for this period</div></div>',
             ERROR: '<div class="calendar-error"><div class="error-icon">⚠️</div><div class="error-title">Error</div><div class="error-text">Failed to load calendar events</div><button class="error-retry">Retry</button></div>',
             NAVIGATION: '<div class="calendar-navigation"><button class="nav-btn prev-nav" title="Previous"><span class="nav-icon">←</span></button><button class="nav-btn today-btn" title="Go to today"><span class="nav-text">Today</span></button><button class="nav-btn next-nav" title="Next"><span class="nav-icon">→</span></button></div>',
-            VIEW_SWITCHER: '<div class="view-switcher"><button class="view-btn" data-calendar-view="month">Month</button><button class="view-btn" data-calendar-view="week">Week</button><button class="view-btn" data-calendar-view="agenda">Agenda</button></div>',
+            VIEW_SWITCHER: '<div class="view-switcher"><button class="view-btn" data-calendar-view="month">Month</button><button class="view-btn" data-calendar-view="week">Week</button></div>',
             CALENDAR_HEADER: '<div class="calendar-header"><h2 class="calendar-title" id="calendar-title"></h2><div class="calendar-controls"><div class="calendar-navigation"></div><div class="view-switcher"></div></div></div>'
         };
         

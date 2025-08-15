@@ -17,9 +17,7 @@ export const VIEW_CONTAINERS = {
     /** Month view container */
     MONTH_VIEW: 'month-view-container',
     /** Week view container */
-    WEEK_VIEW: 'week-view-container',
-    /** Agenda view container */
-    AGENDA_VIEW: 'agenda-container'
+    WEEK_VIEW: 'week-view-container'
 };
 
 /**
@@ -31,9 +29,7 @@ export const GRID_ELEMENTS = {
     /** Month grid */
     MONTH_GRID: 'month-grid',
     /** Week grid */
-    WEEK_GRID: 'week-grid',
-    /** Agenda list */
-    AGENDA_LIST: 'agenda-list'
+    WEEK_GRID: 'week-grid'
 };
 
 /**
@@ -102,12 +98,10 @@ export const CSS_CLASSES = {
     // View containers
     MONTH_VIEW: VIEW_CONTAINERS.MONTH_VIEW,
     WEEK_VIEW: VIEW_CONTAINERS.WEEK_VIEW,
-    AGENDA_VIEW: VIEW_CONTAINERS.AGENDA_VIEW,
     
     // Grid elements
     MONTH_GRID: GRID_ELEMENTS.MONTH_GRID,
     WEEK_GRID: GRID_ELEMENTS.WEEK_GRID,
-    AGENDA_LIST: GRID_ELEMENTS.AGENDA_LIST,
     
     // Day cells
     DAY_CELL: DAY_CELLS.DAY_CELL,
