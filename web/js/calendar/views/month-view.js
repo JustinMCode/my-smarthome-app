@@ -164,7 +164,8 @@ export class MonthViewRefactored extends EnhancedViewBase {
                 showTime: true,
                 showBullet: true,
                 maxWidth: '100%',
-                className: 'event-pill'
+                className: 'event-pill',
+                clickable: false // Disable clicking on individual events in month view
             });
             eventsContainer.appendChild(eventEl);
         }

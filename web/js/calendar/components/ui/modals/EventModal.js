@@ -153,7 +153,7 @@ export class EventModal {
         const content = this.createEventDetailsContent(event);
         return this.showModal(content, {
             ...modalOptions,
-            title: event.title,
+            title: null, // Don't show title in header since it's in content
             className: 'event-details-modal modal-glassmorphism'
         });
     }
@@ -169,7 +169,7 @@ export class EventModal {
             ...modalOptions,
             title: this.formatDateForPopupHeader(date),
             className: 'day-events-modal modal-glassmorphism',
-            width: '480px'
+            width: '600px'
         });
     }
 
@@ -252,14 +252,17 @@ export class EventModal {
                 0 8px 32px rgba(0, 0, 0, 0.08),
                 inset 0 0 20px rgba(255, 255, 255, 0.5);
             z-index: ${options.zIndex + 1};
-            width: ${options.width || '420px'};
-            max-width: 90vw;
+            width: ${options.width || '420px'} !important;
+            min-width: ${options.width || '420px'} !important;
+            max-width: 95vw !important;
             max-height: 85vh;
             display: flex;
             flex-direction: column;
             animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
+            box-sizing: border-box !important;
         `;
+
         
         // Add header if title is provided
         if (options.title) {
@@ -274,6 +277,11 @@ export class EventModal {
             flex: 1;
             overscroll-behavior: contain;
             padding: 0;
+            width: 100%;
+            min-width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         `;
         contentContainer.innerHTML = content;
         modal.appendChild(contentContainer);
@@ -287,11 +295,13 @@ export class EventModal {
     createModalHeader(title) {
         const header = document.createElement('div');
         header.style.cssText = `
-            padding: 24px 28px 20px;
+            padding: 28px 32px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: relative;
+            width: 100%;
+            box-sizing: border-box;
         `;
         
         // Add subtle bottom border
@@ -308,14 +318,15 @@ export class EventModal {
         
         const titleEl = document.createElement('h2');
         titleEl.style.cssText = `
-            font-size: 20px;
-            font-weight: 300;
+            font-size: 24px;
+            font-weight: 400;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-            letter-spacing: -0.3px;
+            letter-spacing: -0.4px;
+            line-height: 1.2;
         `;
         titleEl.textContent = title;
         
@@ -329,14 +340,15 @@ export class EventModal {
         closeBtn.style.cssText = `
             background: transparent;
             border: none;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             color: rgba(100, 116, 139, 0.7);
+            transition: all 0.2s ease;
         `;
         closeBtn.title = 'Close';
         
@@ -354,7 +366,30 @@ export class EventModal {
         const color = event.color || '#8b5cf6';
         
         return `
-            <div style="padding: 28px;">
+            <div style="padding: 28px; position: relative;">
+                <!-- Close button -->
+                <button class="modal-close-btn" style="
+                    position: absolute;
+                    top: 20px;
+                    right: 20px;
+                    background: transparent;
+                    border: none;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: rgba(100, 116, 139, 0.7);
+                    transition: all 0.2s ease;
+                    z-index: 10;
+                " title="Close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+                
                 <div style="
                     font-size: 18px;
                     color: rgba(30, 41, 59, 0.95);
@@ -362,6 +397,7 @@ export class EventModal {
                     font-weight: 400;
                     position: relative;
                     padding-left: 16px;
+                    padding-right: 40px;
                 ">
                     <div style="
                         position: absolute;
@@ -426,90 +462,141 @@ export class EventModal {
      * Create day events content with glassmorphism
      */
     createDayEventsContent(date, events) {
+        console.log('createDayEventsContent called with:', {
+            date: date,
+            eventsCount: events.length,
+            events: events
+        });
+        
         if (events.length === 0) {
             return `
                 <div style="
-                    padding: 60px 32px;
+                    padding: 80px 40px;
                     text-align: center;
                     color: rgba(100, 116, 139, 0.7);
                 ">
                     <div style="
-                        width: 100px;
-                        height: 100px;
-                        margin: 0 auto 24px;
-                        background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(99, 102, 241, 0.05));
+                        width: 120px;
+                        height: 120px;
+                        margin: 0 auto 32px;
+                        background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(99, 102, 241, 0.08));
                         border-radius: 50%;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                     ">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="url(#gradient)">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="url(#gradient)">
                             <defs>
                                 <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:0.3" />
-                                    <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.3" />
+                                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:0.4" />
+                                    <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.4" />
                                 </linearGradient>
                             </defs>
                             <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
                         </svg>
                     </div>
-                    <div style="font-size: 14px; line-height: 20px; opacity: 0.8;">No events scheduled</div>
+                    <div style="
+                        font-size: 16px; 
+                        line-height: 1.4; 
+                        opacity: 0.8;
+                        font-weight: 400;
+                        letter-spacing: -0.1px;
+                    ">No events scheduled</div>
                 </div>
             `;
         }
 
         const eventsHtml = events.map((event, index) => {
+            console.log(`Processing event ${index + 1}/${events.length}:`, event.title);
+            
             const datetime = this.formatEventDateTime(event);
             const recurrence = this.formatRecurrence(event);
             const color = event.color || '#8b5cf6';
+
+            // Debug: Log recurrence information
+            console.log('Event:', event.title, 'Recurrence data:', {
+                hasRecurrence: !!event.recurrence,
+                recurrenceType: typeof event.recurrence,
+                recurrenceValue: event.recurrence,
+                formattedRecurrence: recurrence
+            });
 
             const dateTimeLine = `${datetime.date}${datetime.time ? ', ' + datetime.time : ''}`;
 
             return `
                 <div class="event-item event-item-glass" style="
                     position: relative;
-                    padding: 16px 24px 16px 20px;
+                    padding: 20px 28px 20px 24px;
                     cursor: pointer;
-                    ${index < events.length - 1 ? 'border-bottom: 1px solid rgba(139, 92, 246, 0.06);' : ''}
+                    transition: all 0.2s ease;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                    max-width: 100% !important;
+                    box-sizing: border-box !important;
+                    flex: 1;
+                    background: rgba(255, 255, 255, 0.1);
+                    ${index < events.length - 1 ? 'border-bottom: 1px solid rgba(139, 92, 246, 0.08);' : ''}
                 ">
-                    ${event.allDay ? `
-                        <div style="
-                            position: absolute;
-                            left: 0;
-                            top: 0;
-                            bottom: 0;
-                            width: 3px;
-                            background: linear-gradient(180deg, ${color}, ${color}66);
-                        "></div>
-                    ` : ''}
                     <div style="
-                        font-size: 15px;
-                        color: rgba(30, 41, 59, 0.9);
-                        margin-bottom: 6px;
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        bottom: 0;
+                        width: 4px;
+                        background: linear-gradient(180deg, ${color}, ${color}66);
+                        border-radius: 0 2px 2px 0;
+                    "></div>
+                    <div style="
+                        font-size: 16px;
+                        color: rgba(30, 41, 59, 0.95);
+                        margin-bottom: 8px;
                         font-weight: 500;
                         text-align: left;
+                        line-height: 1.3;
+                        letter-spacing: -0.1px;
                     ">${event.title || 'Event'}</div>
                     <div style="
-                        color: rgba(100, 116, 139, 0.7);
-                        font-size: 13px;
-                        line-height: 20px;
+                        color: rgba(100, 116, 139, 0.75);
+                        font-size: 14px;
+                        line-height: 1.4;
                         text-align: left;
                     ">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" opacity="0.6">
                                 <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
                             </svg>
-                            ${dateTimeLine}
+                            <span style="font-weight: 400;">${dateTimeLine}</span>
                         </div>
                         ${recurrence ? `
-                            <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" opacity="0.6">
                                     <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
                                 </svg>
-                                ${recurrence}
+                                <span style="font-weight: 400;">${recurrence}</span>
+                            </div>
+                        ` : ''}
+                        ${event.location ? `
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" opacity="0.6">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                </svg>
+                                <span style="font-weight: 400;">${event.location}</span>
                             </div>
                         ` : ''}
                     </div>
+                    ${event.description ? `
+                        <div style="
+                            margin-top: 12px;
+                            padding: 12px 16px;
+                            background: rgba(255, 255, 255, 0.08);
+                            border-radius: 8px;
+                            border-left: 3px solid ${color}40;
+                            font-size: 13px;
+                            line-height: 1.4;
+                            color: rgba(51, 65, 85, 0.8);
+                            white-space: pre-wrap;
+                        ">${event.description}</div>
+                    ` : ''}
                 </div>
             `;
         }).join('');
@@ -744,12 +831,92 @@ export class EventModal {
      * Format recurrence information
      */
     formatRecurrence(event) {
+        console.log('formatRecurrence called with event:', event.title, 'recurrence:', event.recurrence);
+        console.log('Full event object for debugging:', event);
+        
+        // Check for different recurrence formats
+        if (event.recurringEventId) {
+            console.log('Found recurringEventId:', event.recurringEventId);
+        }
+        
+        // Check for Google Calendar specific recurrence properties
+        if (event.recurrence) {
+            console.log('Recurrence property exists:', event.recurrence);
+        }
+        
+        // Check for other possible recurrence indicators
+        const recurrenceKeys = Object.keys(event).filter(key => key.toLowerCase().includes('recur'));
+        if (recurrenceKeys.length > 0) {
+            console.log('Found recurrence-related keys:', recurrenceKeys);
+        }
+        
+        // Check for other common recurrence properties
+        const possibleRecurrenceProps = ['recurrenceRule', 'rrule', 'recurrencePattern', 'frequency'];
+        for (const prop of possibleRecurrenceProps) {
+            if (event[prop]) {
+                console.log(`Found ${prop}:`, event[prop]);
+            }
+        }
+        
+        // Check for Google Calendar specific recurrence metadata
+        if (event.extendedProperties && event.extendedProperties.private) {
+            const privateProps = event.extendedProperties.private;
+            console.log('Extended properties (private):', privateProps);
+            
+            // Check for recurrence info in extended properties
+            if (privateProps.recurrenceRule) {
+                console.log('Found recurrenceRule in extended properties:', privateProps.recurrenceRule);
+                return this.parseRRULE(privateProps.recurrenceRule);
+            }
+        }
+        
+        if (event.extendedProperties && event.extendedProperties.shared) {
+            const sharedProps = event.extendedProperties.shared;
+            console.log('Extended properties (shared):', sharedProps);
+            
+            // Check for recurrence info in shared properties
+            if (sharedProps.recurrenceRule) {
+                console.log('Found recurrenceRule in shared properties:', sharedProps.recurrenceRule);
+                return this.parseRRULE(sharedProps.recurrenceRule);
+            }
+        }
+        
+        // Check if this is a recurring event (has recurringEventId)
+        if (event.recurringEventId) {
+            console.log('Event is recurring (has recurringEventId)');
+            
+            // Try to determine recurrence pattern from the event start time
+            const startDate = new Date(event.start);
+            const dayOfWeek = startDate.getDay();
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const dayName = dayNames[dayOfWeek];
+            
+            // Check if this is an all-day event (likely daily or weekly)
+            if (event.allDay) {
+                // For all-day events, check if it's the same day of week
+                // This is often a weekly pattern
+                return `Weekly on ${dayName}`;
+            } else {
+                // For timed events, check the time pattern
+                const startTime = startDate.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                // If it's a specific time, it's likely weekly
+                return `Weekly on ${dayName} at ${startTime}`;
+            }
+        }
+        
+        // Check for RRULE in recurrence array
         if (!event.recurrence || !Array.isArray(event.recurrence) || event.recurrence.length === 0) {
+            console.log('No recurrence data found');
             return null;
         }
 
         const rrule = event.recurrence.find(rule => rule.startsWith('RRULE:'));
         if (!rrule) {
+            console.log('No RRULE found in recurrence data');
             return null;
         }
 
@@ -763,6 +930,8 @@ export class EventModal {
                 params[key] = value;
             }
         });
+
+        console.log('Parsed recurrence params:', params);
 
         if (params.FREQ === 'WEEKLY') {
             if (params.BYDAY) {
@@ -797,6 +966,62 @@ export class EventModal {
         }
 
         return null;
+    }
+
+    /**
+     * Parse RRULE and return human-readable recurrence pattern
+     */
+    parseRRULE(rrule) {
+        if (!rrule || !rrule.startsWith('RRULE:')) {
+            return null;
+        }
+
+        const rruleStr = rrule.substring(6);
+        const parts = rruleStr.split(';');
+        const params = {};
+        
+        parts.forEach(part => {
+            const [key, value] = part.split('=');
+            if (key && value) {
+                params[key] = value;
+            }
+        });
+
+        console.log('Parsed RRULE params:', params);
+
+        if (params.FREQ === 'WEEKLY') {
+            if (params.BYDAY) {
+                const days = params.BYDAY.split(',');
+                const dayNames = days.map(day => {
+                    const dayMap = {
+                        'SU': 'Sun',
+                        'MO': 'Mon', 
+                        'TU': 'Tue',
+                        'WE': 'Wed',
+                        'TH': 'Thu',
+                        'FR': 'Fri',
+                        'SA': 'Sat'
+                    };
+                    return dayMap[day] || day;
+                });
+                
+                if (dayNames.length === 1) {
+                    return `Weekly on ${dayNames[0]}`;
+                } else {
+                    return `Weekly on ${dayNames.join(', ')}`;
+                }
+            } else {
+                return 'Weekly';
+            }
+        } else if (params.FREQ === 'DAILY') {
+            return 'Daily';
+        } else if (params.FREQ === 'MONTHLY') {
+            return 'Monthly';
+        } else if (params.FREQ === 'YEARLY') {
+            return 'Yearly';
+        }
+
+        return 'Recurring Event';
     }
 
     /**

@@ -29,11 +29,17 @@ export class EventRenderer {
             showTime = true,
             showBullet = true,
             maxWidth = '100%',
-            className = 'event-pill'
+            className = 'event-pill',
+            clickable = true
         } = options;
 
         const eventEl = document.createElement('div');
         eventEl.className = className;
+        
+        // Add non-clickable class if disabled
+        if (!clickable) {
+            eventEl.classList.add('non-clickable');
+        }
         
         // Get event color
         const color = this.getEventColor(event);
@@ -46,8 +52,10 @@ export class EventRenderer {
         // Apply styling
         this.applyEventStyling(eventEl, event, { color, isTimedEvent, maxWidth });
         
-        // Add interaction handlers
-        this.addEventInteraction(eventEl, event);
+        // Add interaction handlers only if clickable
+        if (clickable) {
+            this.addEventInteraction(eventEl, event);
+        }
         
         return eventEl;
     }

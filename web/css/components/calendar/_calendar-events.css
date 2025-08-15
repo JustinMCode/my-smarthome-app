@@ -21,6 +21,17 @@
     box-shadow: var(--shadow-sm);
 }
 
+/* Non-clickable event pills */
+.event-pill.non-clickable {
+    cursor: default !important;
+    pointer-events: none;
+}
+
+.event-pill.non-clickable:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
 /* Event Category Colors - Work */
 .event-pill.work,
 .event-work {

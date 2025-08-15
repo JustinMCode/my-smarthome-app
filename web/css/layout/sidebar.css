@@ -39,8 +39,7 @@
     padding: 28px 24px;
     gap: 32px;
     z-index: 10;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
     position: relative;
     box-shadow: 
         inset 0 0 20px rgba(255, 255, 255, 0.5),
@@ -443,22 +442,14 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Minimal scrollbar */
+/* Scrollbar disabled - no scrolling allowed */
 .sidebar::-webkit-scrollbar {
-    width: 3px;
+    display: none;
 }
 
-.sidebar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-    background: rgba(139, 92, 246, 0.2);
-    border-radius: 2px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover {
-    background: rgba(139, 92, 246, 0.3);
+.sidebar {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
 }
 
 /* Subtle entrance animations */

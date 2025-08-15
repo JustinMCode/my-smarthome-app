@@ -16,6 +16,7 @@ export class EventPill {
             showTime: true,
             showLocation: false,
             compact: false,
+            clickable: true, // New option to control clickability
             ...options
         };
         
@@ -31,6 +32,11 @@ export class EventPill {
     create() {
         this.element = document.createElement('div');
         this.element.className = `event-pill ${this.event.category || 'default'}`;
+        
+        // Add non-clickable class if disabled
+        if (!this.options.clickable) {
+            this.element.classList.add('non-clickable');
+        }
         
         // Set color
         this.setColor();
@@ -109,24 +115,23 @@ export class EventPill {
      * Add interactions to the pill
      */
     addInteractions() {
-        // Click handler
-        this.element.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.onClick();
-        });
-        
-        // Touch feedback
-        addTouchFeedback(this.element);
-        
-        // Touch events for ripple effect
-        this.element.addEventListener('touchstart', (e) => {
-            createRipple(e, this.element);
-        });
+        // Only add click interactions if clickable is enabled
+        if (this.options.clickable) {
+            // Click handler
+            this.element.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.onClick();
+            });
+            
+            // Touch feedback
+            addTouchFeedback(this.element);
+            
+            // Touch events for ripple effect
+            this.element.addEventListener('touchstart', (e) => {
+                createRipple(e, this.element);
+            });
+        }
     }
-    
-
-    
-
     
     /**
      * Handle click
