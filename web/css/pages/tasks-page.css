@@ -243,9 +243,9 @@
 }
 
 #tasks-view .health-tracker-horizontal .med-item {
-    padding: 12px 24px;
+    padding: 8px 16px;
     text-align: center;
-    min-width: 120px;
+    min-width: 100px;
 }
 
 #tasks-view .health-tracker-horizontal .water-glasses-horizontal {
@@ -397,11 +397,11 @@
 #tasks-view .med-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
+    gap: 8px;
+    padding: 6px 8px;
     background: rgba(255, 255, 255, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -413,9 +413,9 @@
 }
 
 #tasks-view .med-checkbox {
-    width: 18px;
-    height: 18px;
-    border-radius: 5px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     border: 2px solid rgba(139, 92, 246, 0.3);
     background: transparent;
     cursor: pointer;
@@ -438,12 +438,12 @@
     left: 50%;
     transform: translate(-50%, -50%);
     color: white;
-    font-size: 11px;
+    font-size: 16px;
 }
 
 #tasks-view .med-time {
     flex: 1;
-    font-size: 13px;
+    font-size: 12px;
     color: rgba(30, 41, 59, 0.95);
     letter-spacing: 0.3px;
 }
@@ -452,15 +452,7 @@
     color: rgba(139, 92, 246, 0.8);
 }
 
-#tasks-view .med-icon {
-    font-size: 16px;
-    opacity: 0.7;
-    transition: all 0.15s ease;
-}
 
-#tasks-view .med-checkbox:checked ~ .med-icon {
-    opacity: 1;
-}
 
 #tasks-view .health-divider {
     height: 1px;
@@ -778,6 +770,14 @@
     #tasks-view .health-tracker-horizontal .mini-glass {
         width: 28px;
         height: 28px;
+        font-size: 14px;
+    }
+    #tasks-view .med-checkbox {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+    }
+    #tasks-view .med-checkbox:checked::after {
         font-size: 14px;
     }
 }

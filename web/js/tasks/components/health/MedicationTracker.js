@@ -55,7 +55,6 @@ export class MedicationTracker extends BaseComponent {
                                id="morningMedHorizontal"
                                ${this.medicationStatus.morning ? 'checked' : ''}>
                         <span class="med-time">Morning</span>
-                        <span class="med-icon">🌅</span>
                     </label>
                 </div>
             </div>
@@ -82,7 +81,6 @@ export class MedicationTracker extends BaseComponent {
                                id="morningMed"
                                ${this.medicationStatus.morning ? 'checked' : ''}>
                         <span class="med-time">Morning</span>
-                        <span class="med-icon">🌅</span>
                     </label>
                 </div>
             </div>
@@ -217,10 +215,7 @@ export class MedicationTracker extends BaseComponent {
             }, 200); // Reduced from 500ms to 200ms
         }
         
-        // Show completion celebration if all medications are taken
-        if (this.isAllMedicationComplete()) {
-            this.showCompletionCelebration();
-        }
+        // Removed completion celebration text display
     }
     
     /**
@@ -244,28 +239,7 @@ export class MedicationTracker extends BaseComponent {
         return this.medicationStatus.morning;
     }
     
-    /**
-     * Show completion celebration
-     */
-    showCompletionCelebration() {
-        this.addClass('all-complete');
-        
-        // Create celebration effect
-        const celebration = document.createElement('div');
-        celebration.className = 'medication-celebration';
-        celebration.innerHTML = '✅ All medications taken!';
-        
-        if (this.element) {
-            this.element.appendChild(celebration);
-            
-            setTimeout(() => {
-                celebration.remove();
-                this.removeClass('all-complete');
-            }, 1500); // Reduced from 3000ms to 1500ms for better responsiveness
-        }
-        
-        this.emit('medication:all:complete', this.medicationStatus);
-    }
+
     
     /**
      * Set medication status from external source

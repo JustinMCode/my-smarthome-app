@@ -148,10 +148,6 @@ export class HealthTracker extends BaseComponent {
         
         // Listen for medication events
         if (this.medicationTracker) {
-            this.medicationTracker.addEventListener('medication:all:complete', () => {
-                this.showHealthMilestone('medication');
-            });
-            
             this.medicationTracker.addEventListener('medication:updated', (data) => {
                 this.emit('health:medication:updated', data);
                 this.checkOverallProgress();

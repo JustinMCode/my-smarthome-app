@@ -159,16 +159,21 @@ export class WaterTracker extends BaseComponent {
     toggleGlass(index) {
         console.log('WaterTracker: toggleGlass called with index:', index);
         
-        // Determine new water count based on clicked glass
-        const newCount = index < this.currentGlasses ? index : index + 1;
-        
         if (this.services.health) {
             console.log('WaterTracker: Calling health service setWaterToGlass');
             this.services.health.setWaterToGlass(index);
         } else {
             console.warn('WaterTracker: Health service not available, updating locally');
-            // Update locally if service is not available
-            this.updateWaterCount(newCount);
+            // Use the same logic as the health service for local updates
+            let targetWater;
+            if (index < this.currentGlasses) {
+                // Clicking on a filled glass - remove it and all glasses after it
+                targetWater = index;
+            } else {
+                // Clicking on an empty glass - fill up to that glass
+                targetWater = index + 1;
+            }
+            this.updateWaterCount(targetWater);
         }
         
         this.emit('water:glass:toggled', { index, currentGlasses: this.currentGlasses });
