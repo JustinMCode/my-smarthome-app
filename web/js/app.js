@@ -463,6 +463,26 @@ export class FridgeDashboard {
         if (this.managers.calendar && this.managers.calendar.core && this.managers.calendar.core.calendarFilter) {
             this.managers.calendar.core.calendarFilter.resetToDefault();
         }
+        
+        // Reset calendar to current date after idle
+        if (this.managers.calendar && this.managers.calendar.core) {
+            console.log('🔄 Resetting calendar to current date after idle...');
+            
+            // Set current date and selected date directly
+            const currentDate = new Date();
+            this.managers.calendar.core.state.setCurrentDate(currentDate);
+            this.managers.calendar.core.state.setSelectedDate(currentDate);
+            
+            // Force a re-render to ensure the UI updates
+            if (this.managers.calendar.core.viewManager) {
+                const currentView = this.managers.calendar.core.viewManager.getCurrentView();
+                if (currentView && currentView.render) {
+                    setTimeout(() => {
+                        currentView.render();
+                    }, 100);
+                }
+            }
+        }
     }
     
     /**
