@@ -2,6 +2,16 @@
  * Tasks Page Manager - Production Task Management Interface
  * Implements a comprehensive task management system with user switching,
  * health tracking, and modern glassmorphism design
+ * 
+ * ⚠️  NOTICE: This file has been modularized!
+ * New location: /web/js/tasks/
+ * 
+ * This file will be removed after migration is complete.
+ * The new modular system provides:
+ * - Better separation of concerns
+ * - Improved testability
+ * - Easier maintenance and extension
+ * - Following enterprise architectural standards
  */
 
 import { CONFIG, debug } from '../constants/config.js';
@@ -34,8 +44,8 @@ export class TasksPageManager {
     init() {
         debug('Initializing Tasks Page Manager...');
         this.loadData();
-        this.setupEventListeners();
         this.initializeInterface();
+        this.setupEventListeners();
         this.renderTasks();
         this.updateStats();
     }
@@ -331,16 +341,27 @@ export class TasksPageManager {
      * Setup event listeners
      */
     setupEventListeners() {
-        // User switching
-        document.addEventListener('click', (e) => {
+        // Remove existing listeners if they exist
+        if (this.clickHandler) {
+            document.removeEventListener('click', this.clickHandler);
+        }
+        if (this.keypressHandler) {
+            document.removeEventListener('keypress', this.keypressHandler);
+        }
+
+        // Create click handler
+        this.clickHandler = (e) => {
+            // Check for user button clicks
             const userBtn = e.target.closest('.user-btn');
             if (userBtn) {
                 const user = userBtn.dataset.user;
+                debug('User button clicked:', user);
                 this.switchUser(user);
             }
 
             // Add task button
             if (e.target.closest('#addTaskBtn')) {
+                debug('Add task button clicked');
                 this.addTask();
             }
 
@@ -366,7 +387,8 @@ export class TasksPageManager {
 
             // Medication checkboxes (both vertical and horizontal, morning only)
             if (e.target.id === 'morningMed' || e.target.id === 'morningMedHorizontal') {
-                this.updateMedicationStatus();
+                debug('Medication checkbox clicked:', e.target.id);
+                this.updateMedicationStatus(e.target);
             }
 
             // Water actions (vertical only, no buttons in horizontal)
@@ -384,14 +406,18 @@ export class TasksPageManager {
                 const index = Array.from(miniGlass.parentNode.children).indexOf(miniGlass);
                 this.toggleGlass(index);
             }
-        });
+        };
 
-        // Enter key support for task input
-        document.addEventListener('keypress', (e) => {
+        // Create keypress handler
+        this.keypressHandler = (e) => {
             if (e.target.id === 'taskInput' && e.key === 'Enter') {
                 this.addTask();
             }
-        });
+        };
+
+        // Add event listeners
+        document.addEventListener('click', this.clickHandler);
+        document.addEventListener('keypress', this.keypressHandler);
     }
 
     /**
@@ -453,11 +479,19 @@ export class TasksPageManager {
      * Add new task
      */
     addTask() {
+        debug('addTask() called');
         const input = document.getElementById('taskInput');
-        if (!input) return;
+        if (!input) {
+            debug('Task input not found!');
+            return;
+        }
 
         const text = input.value.trim();
-        if (text === '') return;
+        debug('Input text:', text);
+        if (text === '') {
+            debug('Empty input, returning');
+            return;
+        }
 
         const task = {
             id: this.taskIdCounter++,
@@ -468,6 +502,7 @@ export class TasksPageManager {
         };
 
         this.tasks.push(task);
+        debug('Task added:', task);
         input.value = '';
         this.renderTasks();
         this.updateStats();
@@ -501,19 +536,28 @@ export class TasksPageManager {
      * Render tasks
      */
     renderTasks() {
+        debug('renderTasks() called');
         const activeTasks = document.getElementById('activeTasks');
         const completedTasks = document.getElementById('completedTasks');
         
-        if (!activeTasks || !completedTasks) return;
+        if (!activeTasks || !completedTasks) {
+            debug('Task elements not found!', 'activeTasks:', !!activeTasks, 'completedTasks:', !!completedTasks);
+            return;
+        }
+        debug('Task elements found successfully');
 
         const userTasks = this.tasks.filter(t => t.owner === this.currentUser);
         const active = userTasks.filter(t => !t.completed);
         const completed = userTasks.filter(t => t.completed);
+        
+        debug('Task counts - total:', this.tasks.length, 'userTasks:', userTasks.length, 'active:', active.length, 'completed:', completed.length, 'currentUser:', this.currentUser);
 
         // Render active tasks
         if (active.length === 0) {
+            debug('No active tasks, showing empty state');
             activeTasks.innerHTML = '<div class="empty-state">No active tasks. Time to relax!</div>';
         } else {
+            debug('Rendering', active.length, 'active tasks');
             activeTasks.innerHTML = active.map((task, index) => `
                 <div class="task-item" data-task-id="${task.id}" style="animation-delay: ${index * 50}ms">
                     <input type="checkbox" class="task-checkbox" 
@@ -523,6 +567,7 @@ export class TasksPageManager {
                     <button class="delete-btn">Delete</button>
                 </div>
             `).join('');
+            debug('HTML set on activeTasks element');
         }
 
         // Render completed tasks
@@ -660,25 +705,38 @@ export class TasksPageManager {
     /**
      * Update medication status
      */
-    updateMedicationStatus() {
+    updateMedicationStatus(clickedElement = null) {
+        debug('updateMedicationStatus() called');
         // Get elements from both vertical and horizontal layouts (morning only)
         const morningMed = document.getElementById('morningMed');
         const morningMedHorizontal = document.getElementById('morningMedHorizontal');
+        debug('Found elements:', { morningMed: !!morningMed, morningMedHorizontal: !!morningMedHorizontal });
         const statusElement = document.getElementById('medStatus');
         const statusElementHorizontal = document.getElementById('medStatusHorizontal');
 
-        // Update checkboxes from state
+        // If a specific checkbox was clicked, use only that checkbox's state
+        if (clickedElement) {
+            debug('Using clicked element state:', { id: clickedElement.id, checked: clickedElement.checked });
+            this.medicationStatus.morning = clickedElement.checked;
+            debug('Updated medication state from clicked element:', this.medicationStatus.morning);
+        } else {
+            // Fallback: read from existing checkboxes (for initial load)
+            debug('Checkbox states before update:', {
+                morningMed: morningMed ? morningMed.checked : 'not found',
+                morningMedHorizontal: morningMedHorizontal ? morningMedHorizontal.checked : 'not found'
+            });
+            this.medicationStatus.morning = (morningMed && morningMed.checked) || (morningMedHorizontal && morningMedHorizontal.checked);
+            debug('Updated medication state from existing checkboxes:', this.medicationStatus.morning);
+        }
+
+        // Then sync both checkboxes to match the state
         if (morningMed) morningMed.checked = this.medicationStatus.morning;
         if (morningMedHorizontal) morningMedHorizontal.checked = this.medicationStatus.morning;
-
-        // Update state from checkboxes (check both layouts)
-        if (morningMed || morningMedHorizontal) {
-            this.medicationStatus.morning = (morningMed && morningMed.checked) || (morningMedHorizontal && morningMedHorizontal.checked);
-        }
 
         // Update status displays - only morning medication now
         const statusText = this.medicationStatus.morning ? 'Complete' : 'Pending';
         const statusClass = statusText === 'Complete' ? 'medication-status complete' : 'medication-status pending';
+        debug('Status text:', statusText);
 
         if (statusElement) {
             statusElement.textContent = statusText;
@@ -689,11 +747,7 @@ export class TasksPageManager {
             statusElementHorizontal.className = statusClass;
         }
 
-        // Sync checkboxes between layouts
-        if (morningMed && morningMedHorizontal) {
-            morningMed.checked = morningMedHorizontal.checked = this.medicationStatus.morning;
-        }
-
+        debug('Saving medication data...');
         this.saveData();
     }
 
@@ -720,8 +774,9 @@ export class TasksPageManager {
             // Show tasks view
             tasksView.classList.add('active');
             
-            // Refresh the interface
+            // Refresh the interface and re-setup event listeners
             this.initializeInterface();
+            this.setupEventListeners();
             this.renderTasks();
             this.updateStats();
         }
@@ -742,6 +797,13 @@ export class TasksPageManager {
      */
     destroy() {
         debug('Destroying Tasks Page Manager');
-        // Clean up any intervals or listeners if needed
+        
+        // Remove event listeners
+        if (this.clickHandler) {
+            document.removeEventListener('click', this.clickHandler);
+        }
+        if (this.keypressHandler) {
+            document.removeEventListener('keypress', this.keypressHandler);
+        }
     }
 }

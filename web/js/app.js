@@ -5,7 +5,7 @@
 
 import { CONFIG } from './constants/config.js';
 import { TouchCalendarManager } from './calendar/index.js';
-import { TasksPageManager } from './pages/tasks.js';
+import { TasksPageManager } from './tasks/index.js';
 import { loadFromStorage, saveToStorage } from './utils/utils.js';
 import { formatTime, formatDate } from './calendar/utils/basic/calendar-date-utils.js';
 import { logger } from './utils/logger.js';
