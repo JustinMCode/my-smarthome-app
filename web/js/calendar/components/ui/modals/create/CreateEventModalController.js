@@ -128,7 +128,7 @@ export class CreateEventModalController {
       return btn;
     };
     header.appendChild(mk('event', 'Add Event'));
-    header.appendChild(mk('calendar', 'Add Calendar'));
+    header.appendChild(mk('calendar', 'Create Calendar'));
     header.appendChild(mk('import', 'Import Calendar'));
     return header;
   }

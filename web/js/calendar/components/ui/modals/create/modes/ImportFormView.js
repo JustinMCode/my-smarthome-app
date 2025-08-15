@@ -1,6 +1,6 @@
 /**
- * ImportFormView - Light Glassmorphism Design System
- * Elegant glass panels floating over animated gradient background
+ * ImportFormView - Optimized for 15" touchscreen
+ * Minimal design focused on the essential import functionality
  */
 export class ImportFormView {
   constructor({ calendars }) {
@@ -9,7 +9,7 @@ export class ImportFormView {
 
   render() {
     const wrapper = document.createElement('div');
-    wrapper.className = 'import-form-glass';
+    wrapper.className = 'import-form-touch';
     
     this._injectStyles();
     wrapper.innerHTML = this._template();
@@ -48,7 +48,7 @@ export class ImportFormView {
     });
 
     // Cancel button
-    wrapper.querySelector('.btn-cancel')?.addEventListener('click', () => {
+    wrapper.querySelector('.cancel-btn')?.addEventListener('click', () => {
       wrapper.dispatchEvent(new CustomEvent('cancel', { bubbles: true }));
     });
 
@@ -60,38 +60,34 @@ export class ImportFormView {
       helpToggle.classList.toggle('expanded');
     });
 
+    this._attachTouchFeedback(wrapper);
+
     return wrapper;
   }
 
   _template() {
     return `
-      <form class="glass-import-form">
+      <form class="touch-import-form">
         <!-- Toast Container -->
         <div class="toast-container"></div>
-
-        <!-- Glass Header -->
-        <div class="form-header">
-          <h1 class="gradient-text">Import Calendar</h1>
-          <p class="header-subtitle">Connect your Google Calendar to sync events</p>
-        </div>
 
         <!-- Main Content -->
         <div class="form-content">
           <!-- Calendar ID Input -->
-          <div class="glass-panel input-section">
+          <div class="input-section">
             <label class="section-label" for="google-calendar-id">
               Google Calendar ID
               <span class="required">*</span>
             </label>
             <div class="input-wrapper">
-              <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="url(#purple-gradient)">
+              <svg class="input-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
               </svg>
               <input 
                 id="google-calendar-id" 
                 type="text" 
                 placeholder="example@group.calendar.google.com"
-                class="glass-input"
+                class="input-large"
                 autocomplete="off"
                 spellcheck="false"
                 required
@@ -103,18 +99,17 @@ export class ImportFormView {
           </div>
 
           <!-- Help Section -->
-          <div class="glass-panel help-section">
+          <div class="help-section">
             <button type="button" class="help-toggle">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
               </svg>
               <span>How to find your Calendar ID</span>
-              <svg class="toggle-arrow" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <svg class="toggle-arrow" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M7 10l5 5 5-5z"/>
               </svg>
             </button>
             <div class="help-content">
-              <div class="gradient-line"></div>
               <ol class="help-steps">
                 <li>
                   <div class="step-number">1</div>
@@ -149,20 +144,10 @@ export class ImportFormView {
           </div>
         </div>
 
-        <!-- SVG Gradient Definition -->
-        <svg width="0" height="0">
-          <defs>
-            <linearGradient id="purple-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
-            </linearGradient>
-          </defs>
-        </svg>
-
         <!-- Action Buttons -->
-        <div class="form-actions">
-          <button type="button" class="btn-glass btn-cancel">Cancel</button>
-          <button type="submit" class="btn-glass btn-import">
+        <div class="form-footer">
+          <button type="button" class="btn cancel-btn">Cancel</button>
+          <button type="submit" class="btn primary-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
             </svg>
@@ -174,74 +159,39 @@ export class ImportFormView {
   }
 
   _injectStyles() {
-    if (document.getElementById('import-form-glass-styles')) return;
+    if (document.getElementById('import-form-touch-styles')) return;
     
     const style = document.createElement('style');
-    style.id = 'import-form-glass-styles';
+    style.id = 'import-form-touch-styles';
     style.textContent = `
       * {
         box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
       }
 
-      /* Animated Gradient Background */
-      .import-form-glass {
-        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      .import-form-touch {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         width: 100%;
-        background: linear-gradient(135deg, #e3e8ff 0%, #f0e6ff 25%, #e6f2ff 50%, #e3e8ff 100%);
-        background-size: 400% 400%;
-        animation: gradientFlow 25s ease infinite;
+        background: #f5f7fa;
         display: flex;
         align-items: flex-start;
         justify-content: center;
-        padding: 20px;
       }
 
-      @keyframes gradientFlow {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-      }
-
-      /* Main Form Container */
-      .glass-import-form {
+      .touch-import-form {
         width: 100%;
-        max-width: 800px;
+        max-width: 1024px;
         margin: 0 auto;
+        background: #ffffff;
         display: flex;
         flex-direction: column;
-        gap: 28px;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
         position: relative;
-        animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(10px) scale(0.95);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-      }
-
-      /* Glass Panel Base */
-      .glass-panel {
-        background: rgba(255, 255, 255, 0.25);
-        backdrop-filter: blur(20px) saturate(150%);
-        -webkit-backdrop-filter: blur(20px) saturate(150%);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 20px;
-        box-shadow: 
-          0 8px 32px rgba(0, 0, 0, 0.08),
-          inset 0 0 20px rgba(255, 255, 255, 0.5);
-        padding: 28px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      /* Toast Notifications */
+      /* Toast */
       .toast-container {
-        position: fixed;
+        position: absolute;
         top: 30px;
         left: 50%;
         transform: translateX(-50%);
@@ -249,17 +199,15 @@ export class ImportFormView {
       }
 
       .toast {
-        padding: 16px 24px;
+        padding: 20px 30px;
         border-radius: 12px;
-        font-size: 14px;
-        font-weight: 400;
-        letter-spacing: 0.2px;
+        font-size: 18px;
+        font-weight: 500;
         color: white;
-        min-width: 250px;
+        min-width: 300px;
         text-align: center;
-        animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        animation: slideDown 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
       @keyframes slideDown {
@@ -274,66 +222,47 @@ export class ImportFormView {
       }
 
       .toast.error {
-        background: linear-gradient(135deg, rgba(234, 67, 53, 0.9), rgba(219, 68, 55, 0.9));
-        box-shadow: 0 4px 12px rgba(234, 67, 53, 0.25);
+        background: #ea4335;
       }
 
       .toast.success {
-        background: linear-gradient(135deg, rgba(52, 168, 83, 0.9), rgba(46, 160, 67, 0.9));
-        box-shadow: 0 4px 12px rgba(52, 168, 83, 0.25);
+        background: #34a853;
       }
 
-      /* Header Section */
-      .form-header {
-        text-align: left;
-        margin-bottom: 8px;
-        margin-top: 0px;
-      }
-
-      .gradient-text {
-        font-size: 42px;
-        font-weight: 200;
-        letter-spacing: 1.2px;
-        margin: 0 0 8px 0;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .header-subtitle {
-        font-size: 16px;
-        font-weight: 300;
-        color: rgba(51, 65, 85, 0.8);
-        letter-spacing: 0.4px;
-        margin: 0;
-      }
-
-      /* Content Container */
+      /* Content */
       .form-content {
+        padding: 30px 40px;
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        background: #fafbfc;
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+        padding-top: 60px;
       }
 
       /* Input Section */
       .input-section {
-        animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        border: 1px solid #e1e4e8;
       }
 
       .section-label {
         display: block;
-        font-size: 14px;
-        font-weight: 500;
-        color: rgba(30, 41, 59, 0.95);
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
         margin-bottom: 16px;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
       }
 
       .required {
-        color: #8b5cf6;
-        font-weight: 300;
+        color: #ea4335;
       }
 
       .input-wrapper {
@@ -344,258 +273,248 @@ export class ImportFormView {
 
       .input-icon {
         position: absolute;
-        left: 20px;
+        left: 24px;
+        color: #4285f4;
         pointer-events: none;
-        opacity: 0.6;
+        width: 28px;
+        height: 28px;
       }
 
-      .glass-input {
+      .input-large {
         width: 100%;
-        height: 56px;
-        font-size: 16px;
-        font-weight: 300;
-        padding: 0 20px 0 52px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        height: 70px;
+        font-size: 20px;
+        padding: 0 24px 0 68px;
+        border: 3px solid #e1e4e8;
         border-radius: 12px;
-        background: rgba(255, 255, 255, 0.1);
-        color: rgba(30, 41, 59, 0.95);
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        letter-spacing: 0.2px;
-        font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+        background: #ffffff;
+        color: #2c3e50;
+        transition: all 0.2s;
+        font-family: 'Courier New', monospace;
       }
 
-      .glass-input:focus {
+      .input-large:focus {
         outline: none;
-        border-color: rgba(139, 92, 246, 0.3);
-        background: rgba(139, 92, 246, 0.04);
-        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.08);
+        border-color: #4285f4;
+        background: #f8f9ff;
       }
 
-      .glass-input::placeholder {
-        color: rgba(100, 116, 139, 0.5);
-        font-weight: 300;
+      .input-large::placeholder {
+        color: #adb5bd;
+        font-family: 'Courier New', monospace;
+        font-size: 18px;
       }
 
       .input-helper {
         margin-top: 12px;
-        font-size: 13px;
-        font-weight: 300;
-        color: rgba(100, 116, 139, 0.7);
-        letter-spacing: 0.2px;
-        line-height: 1.5;
+        font-size: 16px;
+        color: #6c757d;
+        font-style: italic;
       }
 
       /* Help Section */
       .help-section {
+        background: white;
+        border-radius: 16px;
         overflow: hidden;
-        padding: 0;
-        animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        border: 1px solid #e1e4e8;
       }
 
       .help-toggle {
         width: 100%;
-        padding: 24px 28px;
-        background: transparent;
+        padding: 20px 24px;
+        background: #f8f9fa;
         border: none;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 16px;
         cursor: pointer;
-        font-size: 14px;
-        font-weight: 400;
-        color: rgba(30, 41, 59, 0.9);
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        letter-spacing: 0.4px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
+        transition: all 0.2s;
+        min-height: 60px;
       }
 
       .help-toggle:hover {
-        background: rgba(139, 92, 246, 0.04);
-        transform: translateX(2px);
+        background: #e9ecef;
       }
 
-      .help-toggle svg {
-        color: #8b5cf6;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      .help-toggle:active {
+        transform: scale(0.99);
       }
 
       .toggle-arrow {
         margin-left: auto;
-        color: rgba(100, 116, 139, 0.5) !important;
+        transition: transform 0.3s;
       }
 
       .help-toggle.expanded .toggle-arrow {
         transform: rotate(180deg);
       }
 
-      .gradient-line {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(100, 116, 139, 0.1), transparent);
-        margin: 0 0 24px 0;
-      }
-
       .help-content {
         max-height: 0;
         overflow: hidden;
-        transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: max-height 0.3s ease;
+        background: white;
       }
 
       .help-content.expanded {
-        max-height: 500px;
+        max-height: 600px;
       }
 
       .help-steps {
         list-style: none;
         margin: 0;
-        padding: 0 28px 28px 28px;
+        padding: 24px;
       }
 
       .help-steps li {
         display: flex;
         gap: 16px;
         margin-bottom: 20px;
-        opacity: 0;
-        animation: fadeInLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
       }
 
-      .help-content.expanded .help-steps li:nth-child(1) { animation-delay: 0.05s; }
-      .help-content.expanded .help-steps li:nth-child(2) { animation-delay: 0.1s; }
-      .help-content.expanded .help-steps li:nth-child(3) { animation-delay: 0.15s; }
-      .help-content.expanded .help-steps li:nth-child(4) { animation-delay: 0.2s; }
-
-      @keyframes fadeInLeft {
-        from {
-          opacity: 0;
-          transform: translateX(-10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
+      .help-steps li:last-child {
+        margin-bottom: 0;
       }
 
       .step-number {
         flex-shrink: 0;
-        width: 36px;
-        height: 36px;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        width: 48px;
+        height: 48px;
+        background: #4285f4;
         color: white;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 400;
-        font-size: 14px;
-        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+        font-weight: 600;
+        font-size: 20px;
       }
 
       .step-content strong {
         display: block;
-        font-size: 14px;
-        font-weight: 500;
-        color: rgba(30, 41, 59, 0.95);
-        margin-bottom: 4px;
-        letter-spacing: 0.2px;
+        font-size: 18px;
+        color: #2c3e50;
+        margin-bottom: 6px;
       }
 
       .step-content p {
         margin: 0;
-        font-size: 13px;
-        font-weight: 300;
-        color: rgba(100, 116, 139, 0.7);
+        font-size: 16px;
+        color: #6c757d;
         line-height: 1.5;
-        letter-spacing: 0.2px;
       }
 
       /* Action Buttons */
-      .form-actions {
+      .form-footer {
         display: flex;
         gap: 16px;
-        animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+        padding: 24px 28px;
+        background: white;
+        border-top: 1px solid #e0e0e0;
       }
 
-      .btn-glass {
+      .btn {
         flex: 1;
-        height: 56px;
-        font-size: 14px;
-        font-weight: 400;
-        letter-spacing: 0.8px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 16px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
         border-radius: 12px;
         cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        text-transform: uppercase;
+        transition: all 0.3s ease;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 10px;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        gap: 8px;
+        min-height: 56px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
 
-      .btn-cancel {
-        background: rgba(255, 255, 255, 0.25);
-        color: rgba(51, 65, 85, 0.8);
-        border: 1px solid rgba(139, 92, 246, 0.2);
+      .cancel-btn {
+        background: #f5f5f5;
+        color: #666;
       }
 
-      .btn-cancel:hover {
-        background: rgba(139, 92, 246, 0.04);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      .cancel-btn:hover {
+        background: #e0e0e0;
       }
 
-      .btn-cancel:active {
-        transform: translateY(0);
+      .cancel-btn:active {
+        transform: scale(0.98);
       }
 
-      .btn-import {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      .primary-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        border: none;
-        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
       }
 
-      .btn-import:hover {
+      .primary-btn:hover {
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(139, 92, 246, 0.35);
       }
 
-      .btn-import:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+      .primary-btn:active {
+        transform: scale(0.98);
       }
 
-      /* Responsive Design */
-      @media (max-width: 768px) {
-        .glass-import-form {
-          max-width: 100%;
+      /* Touch Feedback */
+      .touch-active {
+        transform: scale(0.98);
+        opacity: 0.9;
+      }
+
+      /* Responsive */
+      @media (max-width: 1366px) and (max-height: 768px) {
+        .form-content {
+          padding: 30px;
         }
 
-        .gradient-text {
-          font-size: 32px;
+        .input-section {
+          padding: 24px;
         }
 
-        .glass-panel {
-          padding: 20px;
+        .input-large {
+          height: 70px;
+          font-size: 20px;
         }
 
-        .form-actions {
-          flex-direction: column;
+        .btn-touch {
+          height: 70px;
+          font-size: 18px;
         }
 
-        .btn-glass {
-          width: 100%;
+        .help-toggle {
+          min-height: 60px;
+          font-size: 16px;
+          padding: 20px 24px;
+        }
+
+        .help-steps {
+          padding: 24px;
+        }
+
+        .step-number {
+          width: 40px;
+          height: 40px;
+          font-size: 18px;
         }
       }
 
-      /* High Contrast Mode */
+      /* High Contrast */
       @media (prefers-contrast: high) {
-        .glass-panel {
-          border-width: 2px;
+        .input-large {
+          border-width: 3px;
         }
 
-        .glass-input {
-          border-width: 2px;
+        .btn-import {
+          background: #2c3e50;
         }
       }
 
@@ -635,6 +554,33 @@ export class ImportFormView {
       toast.style.opacity = '0';
       setTimeout(() => toast.remove(), 300);
     }, 3000);
+  }
+
+  _attachTouchFeedback(wrapper) {
+    const touchElements = wrapper.querySelectorAll('button, input');
+    
+    touchElements.forEach(element => {
+      element.addEventListener('touchstart', () => {
+        element.classList.add('touch-active');
+      });
+      
+      element.addEventListener('touchend', () => {
+        setTimeout(() => {
+          element.classList.remove('touch-active');
+        }, 150);
+      });
+      
+      // Mouse events for testing
+      element.addEventListener('mousedown', () => {
+        element.classList.add('touch-active');
+      });
+      
+      element.addEventListener('mouseup', () => {
+        setTimeout(() => {
+          element.classList.remove('touch-active');
+        }, 150);
+      });
+    });
   }
 }
 

@@ -124,15 +124,20 @@ export class HealthService {
             
             const currentWater = this.state.get('waterGlasses');
             
-            // Fix the off-by-one issue: if clicking on a filled glass, remove it
-            // If clicking on an empty glass, fill up to that glass
+            debug(DEBUG_PREFIXES.HEALTH, 'Current state:', { glassIndex, currentWater, maxWater });
+            
+            // Fix the indexing issue: glassIndex is 0-based, but we want to fill up to that glass
+            // If clicking on a filled glass, remove it and all glasses after it
+            // If clicking on an empty glass, fill up to that glass (inclusive)
             let targetWater;
             if (glassIndex < currentWater) {
                 // Clicking on a filled glass - remove it and all glasses after it
                 targetWater = glassIndex;
+                debug(DEBUG_PREFIXES.HEALTH, 'Removing glasses - targetWater:', targetWater);
             } else {
-                // Clicking on an empty glass - fill up to that glass
+                // Clicking on an empty glass - fill up to that glass (inclusive)
                 targetWater = glassIndex + 1;
+                debug(DEBUG_PREFIXES.HEALTH, 'Adding glasses - targetWater:', targetWater);
             }
             
             if (currentWater === targetWater) {
@@ -141,6 +146,8 @@ export class HealthService {
             }
             
             this.state.set('waterGlasses', targetWater);
+            
+            debug(DEBUG_PREFIXES.HEALTH, 'State updated, waterGlasses now:', targetWater);
             
             // Emit events
             this.events.emit(EVENTS.WATER_GLASS_TOGGLED, {

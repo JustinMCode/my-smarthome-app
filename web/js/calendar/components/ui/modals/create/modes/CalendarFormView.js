@@ -1,16 +1,17 @@
 /**
- * CalendarFormView - Light Glassmorphism Design System
- * Elegant glass panels floating over animated gradient background
+ * CalendarFormView - Optimized for 15" touchscreen
+ * Large touch targets, clear visual hierarchy, accessible design
+ * Improved custom color picker for better touch interaction
  */
 export class CalendarFormView {
   constructor() {
-    this.selectedColor = '#6366f1';
-    this.customColor = '#8b5cf6'; // Default custom color (purple gradient end)
+    this.selectedColor = '#1a73e8';
+    this.customColor = '#ff6b6b'; // Default custom color
   }
 
   render() {
     const wrapper = document.createElement('div');
-    wrapper.className = 'calendar-form-glass';
+    wrapper.className = 'calendar-form-touch';
     
     this._injectStyles();
     wrapper.innerHTML = this._template();
@@ -43,6 +44,7 @@ export class CalendarFormView {
 
     // Initialize color selection
     this._attachColorSelection(wrapper);
+    this._attachTouchFeedback(wrapper);
     this._setupCustomColorPicker(wrapper);
 
     return wrapper;
@@ -50,13 +52,13 @@ export class CalendarFormView {
 
   _template() {
     const colors = [
-      { value: '#6366f1', name: 'Indigo', label: 'Primary Indigo' },
-      { value: '#8b5cf6', name: 'Purple', label: 'Accent Purple' },
-      { value: '#ec4899', name: 'Pink', label: 'Rose Pink' },
-      { value: '#06b6d4', name: 'Cyan', label: 'Ocean Cyan' },
-      { value: '#10b981', name: 'Emerald', label: 'Forest Emerald' },
-      { value: '#f59e0b', name: 'Amber', label: 'Warm Amber' },
-      { value: '#64748b', name: 'Slate', label: 'Neutral Slate' }
+      { value: '#1a73e8', name: 'Blue', label: 'Primary Blue' },
+      { value: '#0b8043', name: 'Green', label: 'Forest Green' },
+      { value: '#d50000', name: 'Red', label: 'Vibrant Red' },
+      { value: '#8e24aa', name: 'Purple', label: 'Royal Purple' },
+      { value: '#616161', name: 'Gray', label: 'Neutral Gray' },
+      { value: '#e91e63', name: 'Pink', label: 'Rose Pink' },
+      { value: '#009688', name: 'Teal', label: 'Ocean Teal' }
     ];
 
     const timezones = [
@@ -73,56 +75,42 @@ export class CalendarFormView {
     ];
 
     return `
-      <form class="glass-calendar-form">
+      <form class="touch-calendar-form">
         <!-- Toast Container -->
         <div class="toast-container"></div>
 
-        <!-- Glass Header -->
-        <div class="form-header">
-          <h1 class="gradient-text">Create Calendar</h1>
-          <p class="header-subtitle">Design your personal calendar with custom colors and settings</p>
-        </div>
-
         <!-- Main Content -->
-        <div class="form-content">
+        <div class="form-body">
           <!-- Calendar Name -->
-          <div class="glass-panel input-section">
-            <label class="section-label" for="calendar-name">
-              Calendar Name
-              <span class="required">*</span>
-            </label>
-            <div class="input-wrapper">
-              <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="url(#purple-gradient)">
-                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-              </svg>
-              <input 
-                id="calendar-name" 
-                type="text" 
-                required 
-                placeholder="Enter calendar name"
-                class="glass-input"
-                autocomplete="off"
-                maxlength="50"
-              />
-            </div>
+          <div class="input-section">
+            <label class="section-label" for="calendar-name">Calendar Name *</label>
+            <input 
+              id="calendar-name" 
+              type="text" 
+              required 
+              placeholder="Enter calendar name"
+              class="input-primary"
+              autocomplete="off"
+              maxlength="50"
+            />
             <div class="input-helper">Give your calendar a descriptive name</div>
           </div>
 
           <!-- Description -->
-          <div class="glass-panel input-section">
+          <div class="input-section">
             <label class="section-label" for="calendar-description">Description</label>
             <textarea 
               id="calendar-description" 
               rows="3"
               placeholder="Add a description for this calendar (optional)"
-              class="glass-textarea"
+              class="textarea-touch"
               maxlength="200"
             ></textarea>
             <div class="input-helper">Optional: Add notes about this calendar</div>
           </div>
 
           <!-- Color Selection -->
-          <div class="glass-panel input-section">
+          <div class="input-section">
             <label class="section-label">Calendar Color</label>
             <div class="color-grid">
               ${colors.map((color, index) => `
@@ -168,7 +156,6 @@ export class CalendarFormView {
 
             <!-- Custom Color Picker Panel -->
             <div class="custom-color-panel" style="display: none;">
-              <div class="gradient-line"></div>
               <div class="color-picker-header">
                 <span class="picker-title">Choose Custom Color</span>
                 <span class="current-color-value">${this.customColor}</span>
@@ -195,30 +182,30 @@ export class CalendarFormView {
                 </div>
               </div>
               <div class="quick-colors">
-                <span class="quick-colors-label">Quick Colors</span>
+                <span class="quick-colors-label">Quick Colors:</span>
                 <div class="quick-color-grid">
-                  <button type="button" class="quick-color" data-color="#6366f1" style="background: linear-gradient(135deg, #6366f1, #8b5cf6)"></button>
-                  <button type="button" class="quick-color" data-color="#ec4899" style="background: #ec4899"></button>
-                  <button type="button" class="quick-color" data-color="#06b6d4" style="background: #06b6d4"></button>
-                  <button type="button" class="quick-color" data-color="#10b981" style="background: #10b981"></button>
-                  <button type="button" class="quick-color" data-color="#f59e0b" style="background: #f59e0b"></button>
-                  <button type="button" class="quick-color" data-color="#8b5cf6" style="background: #8b5cf6"></button>
-                  <button type="button" class="quick-color" data-color="#64748b" style="background: #64748b"></button>
-                  <button type="button" class="quick-color" data-color="#ef4444" style="background: #ef4444"></button>
+                  <button type="button" class="quick-color" data-color="#ff6b6b" style="background: #ff6b6b"></button>
+                  <button type="button" class="quick-color" data-color="#4ecdc4" style="background: #4ecdc4"></button>
+                  <button type="button" class="quick-color" data-color="#45b7d1" style="background: #45b7d1"></button>
+                  <button type="button" class="quick-color" data-color="#96ceb4" style="background: #96ceb4"></button>
+                  <button type="button" class="quick-color" data-color="#feca57" style="background: #feca57"></button>
+                  <button type="button" class="quick-color" data-color="#ff9ff3" style="background: #ff9ff3"></button>
+                  <button type="button" class="quick-color" data-color="#dfe4ea" style="background: #dfe4ea"></button>
+                  <button type="button" class="quick-color" data-color="#5f27cd" style="background: #5f27cd"></button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Time Zone -->
-          <div class="glass-panel input-section">
+          <div class="input-section">
             <label class="section-label" for="calendar-timezone">Time Zone</label>
             <div class="select-wrapper">
-              <svg class="select-icon" width="20" height="20" viewBox="0 0 24 24" fill="url(#purple-gradient)">
+              <svg class="select-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
                 <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
               </svg>
-              <select id="calendar-timezone" class="glass-select">
+              <select id="calendar-timezone" class="select-touch">
                 ${timezones.map(tz => `
                   <option value="${tz.value}">${tz.label}</option>
                 `).join('')}
@@ -228,21 +215,11 @@ export class CalendarFormView {
           </div>
         </div>
 
-        <!-- SVG Gradient Definition -->
-        <svg width="0" height="0">
-          <defs>
-            <linearGradient id="purple-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
-            </linearGradient>
-          </defs>
-        </svg>
-
         <!-- Action Buttons -->
-        <div class="form-actions">
-          <button type="button" class="btn-glass btn-cancel">Cancel</button>
-          <button type="submit" class="btn-glass btn-create">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <div class="form-footer">
+          <button type="button" class="btn-touch btn-cancel">Cancel</button>
+          <button type="submit" class="btn-touch btn-create">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
             </svg>
             Create Calendar
@@ -253,99 +230,52 @@ export class CalendarFormView {
   }
 
   _injectStyles() {
-    if (document.getElementById('calendar-form-glass-styles')) return;
+    if (document.getElementById('calendar-form-touch-styles')) return;
     
     const style = document.createElement('style');
-    style.id = 'calendar-form-glass-styles';
+    style.id = 'calendar-form-touch-styles';
     style.textContent = `
       * {
         box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
       }
 
-      /* Animated Gradient Background */
-      .calendar-form-glass {
-        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-        min-height: 100vh;
-        background: linear-gradient(135deg, #e3e8ff 0%, #f0e6ff 25%, #e6f2ff 50%, #e3e8ff 100%);
-        background-size: 400% 400%;
-        animation: gradientFlow 25s ease infinite;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-      }
-
-      @keyframes gradientFlow {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-      }
-
-      /* Main Form Container */
-      .glass-calendar-form {
-        width: 100%;
-        max-width: 900px;
+      .calendar-form-touch {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        color: #1a1a1a;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        max-width: 800px;
         margin: 0 auto;
+      }
+
+      .touch-calendar-form {
         display: flex;
         flex-direction: column;
-        gap: 28px;
-        position: relative;
-        animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
       }
 
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(10px) scale(0.95);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-      }
-
-      /* Glass Panel Base */
-      .glass-panel {
-        background: rgba(255, 255, 255, 0.25);
-        backdrop-filter: blur(20px) saturate(150%);
-        -webkit-backdrop-filter: blur(20px) saturate(150%);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 20px;
-        box-shadow: 
-          0 8px 32px rgba(0, 0, 0, 0.08),
-          inset 0 0 20px rgba(255, 255, 255, 0.5);
-        padding: 28px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .glass-panel:hover {
-        transform: translateY(-2px);
-        box-shadow: 
-          0 12px 40px rgba(0, 0, 0, 0.1),
-          inset 0 0 20px rgba(255, 255, 255, 0.6);
-      }
-
-      /* Toast Notifications */
+      /* Toast */
       .toast-container {
-        position: fixed;
-        top: 30px;
+        position: absolute;
+        top: 100px;
         left: 50%;
         transform: translateX(-50%);
         z-index: 1000;
       }
 
       .toast {
-        padding: 16px 24px;
+        padding: 20px 30px;
         border-radius: 12px;
-        font-size: 14px;
-        font-weight: 400;
-        letter-spacing: 0.2px;
+        font-size: 18px;
+        font-weight: 500;
         color: white;
-        min-width: 250px;
+        min-width: 300px;
         text-align: center;
-        animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        animation: slideDown 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
       @keyframes slideDown {
@@ -359,157 +289,125 @@ export class CalendarFormView {
         }
       }
 
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        50% {
+          transform: scale(1.05);
+          box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+      }
+
       .toast.error {
-        background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9));
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        background: #e74c3c;
       }
 
       .toast.success {
-        background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(22, 163, 74, 0.9));
-        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+        background: #27ae60;
       }
 
-      /* Header Section */
-      .form-header {
-        text-align: left;
-        margin-bottom: 8px;
+      /* Content Area */
+      .form-body {
+        flex: 1;
+        padding: 28px;
+        background: #fafafa;
       }
 
-      .gradient-text {
-        font-size: 42px;
-        font-weight: 200;
-        letter-spacing: 1.2px;
-        margin: 0 0 8px 0;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+      .form-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
       }
 
-      .header-subtitle {
-        font-size: 16px;
-        font-weight: 300;
-        color: rgba(51, 65, 85, 0.8);
-        letter-spacing: 0.4px;
-        margin: 0;
-      }
-
-      /* Content Container */
-      .form-content {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-      }
-
-      /* Input Sections */
+      /* Input Sections (Calendar Name style) */
       .input-section {
-        animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        border: 1px solid #e1e4e8;
       }
-
-      .input-section:nth-child(2) { animation-delay: 0.15s; }
-      .input-section:nth-child(3) { animation-delay: 0.2s; }
-      .input-section:nth-child(4) { animation-delay: 0.25s; }
 
       .section-label {
         display: block;
-        font-size: 14px;
-        font-weight: 500;
-        color: rgba(30, 41, 59, 0.95);
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
         margin-bottom: 16px;
         text-transform: uppercase;
-        letter-spacing: 1px;
-      }
-
-      .required {
-        color: #8b5cf6;
-        font-weight: 300;
+        letter-spacing: 0.5px;
       }
 
       .input-helper {
-        margin-top: 12px;
-        font-size: 13px;
-        font-weight: 300;
-        color: rgba(100, 116, 139, 0.7);
-        letter-spacing: 0.2px;
-        line-height: 1.5;
+        margin-top: 8px;
+        font-size: 14px;
+        color: #6c757d;
+        font-style: italic;
       }
 
-      /* Input Wrapper */
-      .input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-      }
-
-      .input-icon {
-        position: absolute;
-        left: 20px;
-        pointer-events: none;
-        opacity: 0.6;
-      }
-
-      /* Glass Input */
-      .glass-input {
+      /* Primary Input */
+      .input-primary {
         width: 100%;
-        height: 56px;
-        font-size: 16px;
-        font-weight: 300;
-        padding: 0 20px 0 52px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        height: 70px;
+        font-size: 22px;
+        padding: 0 20px;
+        border: 3px solid #e1e4e8;
         border-radius: 12px;
-        background: rgba(255, 255, 255, 0.1);
-        color: rgba(30, 41, 59, 0.95);
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        letter-spacing: 0.2px;
+        background: #ffffff;
+        color: #2c3e50;
+        transition: all 0.2s;
+        font-weight: 500;
       }
 
-      .glass-input:focus {
+      .input-primary:focus {
         outline: none;
-        border-color: rgba(139, 92, 246, 0.3);
-        background: rgba(139, 92, 246, 0.04);
-        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.08);
+        border-color: #667eea;
+        background: #f8f9ff;
       }
 
-      .glass-input::placeholder {
-        color: rgba(100, 116, 139, 0.5);
-        font-weight: 300;
+      .input-primary::placeholder {
+        color: #adb5bd;
+        font-weight: 400;
       }
 
-      /* Glass Textarea */
-      .glass-textarea {
+      /* Textarea */
+      .textarea-touch {
         width: 100%;
-        min-height: 100px;
-        font-size: 15px;
-        font-weight: 300;
+        min-height: 120px;
+        font-size: 18px;
         padding: 16px 20px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 2px solid #e1e4e8;
         border-radius: 12px;
-        background: rgba(255, 255, 255, 0.1);
-        color: rgba(30, 41, 59, 0.95);
+        background: #ffffff;
+        color: #2c3e50;
         resize: vertical;
         font-family: inherit;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        letter-spacing: 0.2px;
-        line-height: 1.6;
+        transition: all 0.2s;
       }
 
-      .glass-textarea:focus {
+      .textarea-touch:focus {
         outline: none;
-        border-color: rgba(139, 92, 246, 0.3);
-        background: rgba(139, 92, 246, 0.04);
-        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.08);
+        border-color: #667eea;
+        background: #f8f9ff;
       }
 
-      .glass-textarea::placeholder {
-        color: rgba(100, 116, 139, 0.5);
-        font-weight: 300;
+      .textarea-touch::placeholder {
+        color: #adb5bd;
       }
 
       /* Color Grid */
       .color-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
       }
 
       .color-option input {
@@ -521,30 +419,24 @@ export class CalendarFormView {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: 90px;
+        height: 100px;
         padding: 12px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 12px;
+        background: white;
+        border: 3px solid #e1e4e8;
+        border-radius: 16px;
         cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.2s;
         position: relative;
       }
 
-      .color-button:hover {
-        background: rgba(139, 92, 246, 0.04);
-        transform: translateY(-2px);
-        border-color: rgba(139, 92, 246, 0.2);
-      }
-
       .color-swatch {
-        width: 40px;
-        height: 40px;
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
         background: var(--color);
         margin-bottom: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.2s;
       }
 
       .custom-swatch {
@@ -559,43 +451,39 @@ export class CalendarFormView {
         left: 50%;
         transform: translate(-50%, -50%);
         color: white;
-        font-size: 16px;
+        font-size: 20px;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
       }
 
       .color-name {
-        font-size: 12px;
-        font-weight: 400;
-        color: rgba(51, 65, 85, 0.8);
+        font-size: 14px;
+        font-weight: 600;
+        color: #495057;
         text-align: center;
-        letter-spacing: 0.4px;
       }
 
       .color-option input:checked + .color-button {
-        background: rgba(139, 92, 246, 0.06);
-        border-color: rgba(139, 92, 246, 0.3);
+        border-color: var(--color);
+        background: #f8f9ff;
         transform: scale(0.95);
       }
 
       .color-option input:checked + .color-button .color-swatch {
-        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2), 0 2px 8px rgba(0, 0, 0, 0.15);
-        transform: scale(1.1);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .color-button:active {
+        transform: scale(0.92);
       }
 
       /* Custom Color Panel */
       .custom-color-panel {
         margin-top: 20px;
-        padding: 24px;
-        background: rgba(139, 92, 246, 0.04);
+        padding: 20px;
+        background: #f8f9ff;
         border-radius: 12px;
-        border: 1px solid rgba(139, 92, 246, 0.2);
-        animation: fadeInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .gradient-line {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(100, 116, 139, 0.1), transparent);
-        margin: 0 0 20px 0;
+        border: 2px solid #667eea;
+        animation: slideDown 0.3s ease;
       }
 
       .color-picker-header {
@@ -606,21 +494,19 @@ export class CalendarFormView {
       }
 
       .picker-title {
-        font-size: 14px;
-        font-weight: 500;
-        color: rgba(30, 41, 59, 0.9);
-        letter-spacing: 0.4px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
       }
 
       .current-color-value {
-        font-size: 13px;
-        font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
-        color: #8b5cf6;
-        background: rgba(255, 255, 255, 0.5);
+        font-size: 14px;
+        font-family: 'Courier New', monospace;
+        color: #667eea;
+        background: white;
         padding: 4px 12px;
         border-radius: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        letter-spacing: 0.5px;
+        border: 1px solid #e1e4e8;
       }
 
       .color-picker-container {
@@ -631,8 +517,8 @@ export class CalendarFormView {
       }
 
       .large-color-picker {
-        width: 100px;
-        height: 100px;
+        width: 120px;
+        height: 120px;
         border: none;
         border-radius: 12px;
         cursor: pointer;
@@ -644,13 +530,13 @@ export class CalendarFormView {
       }
 
       .large-color-picker::-webkit-color-swatch {
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 3px solid #e1e4e8;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
 
       .large-color-picker::-moz-color-swatch {
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 3px solid #e1e4e8;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
@@ -663,12 +549,11 @@ export class CalendarFormView {
       }
 
       .preview-swatch {
-        width: 70px;
-        height: 70px;
+        width: 80px;
+        height: 80px;
         border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 3px solid #e1e4e8;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .preview-info {
@@ -678,66 +563,60 @@ export class CalendarFormView {
       }
 
       .preview-label {
-        font-size: 12px;
-        color: rgba(100, 116, 139, 0.7);
-        font-weight: 400;
-        letter-spacing: 0.4px;
+        font-size: 14px;
+        color: #6c757d;
+        font-weight: 500;
       }
 
       .color-hex-input {
-        width: 120px;
-        height: 40px;
-        font-size: 15px;
-        font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+        width: 140px;
+        height: 50px;
+        font-size: 18px;
+        font-family: 'Courier New', monospace;
         padding: 0 12px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 2px solid #e1e4e8;
         border-radius: 8px;
-        background: rgba(255, 255, 255, 0.1);
-        color: rgba(30, 41, 59, 0.95);
         text-transform: uppercase;
-        font-weight: 400;
-        letter-spacing: 0.5px;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 600;
       }
 
       .color-hex-input:focus {
         outline: none;
-        border-color: rgba(139, 92, 246, 0.3);
-        background: rgba(139, 92, 246, 0.04);
+        border-color: #667eea;
+        background: white;
       }
 
       .quick-colors {
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid #e1e4e8;
         padding-top: 16px;
       }
 
       .quick-colors-label {
         display: block;
-        font-size: 12px;
-        color: rgba(100, 116, 139, 0.7);
+        font-size: 14px;
+        color: #6c757d;
         margin-bottom: 12px;
-        font-weight: 400;
-        letter-spacing: 0.4px;
+        font-weight: 500;
       }
 
       .quick-color-grid {
         display: flex;
-        gap: 10px;
+        gap: 12px;
       }
 
       .quick-color {
-        width: 40px;
-        height: 40px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        width: 50px;
+        height: 50px;
+        border: 2px solid #e1e4e8;
         border-radius: 8px;
         cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.2s;
       }
 
       .quick-color:hover {
-        transform: translateY(-2px) scale(1.1);
-        border-color: rgba(139, 92, 246, 0.3);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: scale(1.1);
+        border-color: #667eea;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       }
 
       .quick-color:active {
@@ -755,131 +634,146 @@ export class CalendarFormView {
         position: absolute;
         left: 20px;
         pointer-events: none;
-        opacity: 0.6;
+        color: #667eea;
       }
 
-      .glass-select {
+      .select-touch {
         width: 100%;
-        height: 56px;
-        font-size: 15px;
-        font-weight: 300;
-        padding: 0 40px 0 52px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        height: 70px;
+        font-size: 18px;
+        padding: 0 20px 0 60px;
+        border: 2px solid #e1e4e8;
         border-radius: 12px;
-        background: rgba(255, 255, 255, 0.1);
-        color: rgba(30, 41, 59, 0.95);
+        background: white;
+        color: #2c3e50;
         cursor: pointer;
         appearance: none;
-        background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%238b5cf6" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+        background-image: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23667eea" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>');
         background-repeat: no-repeat;
-        background-position: right 16px center;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        letter-spacing: 0.2px;
+        background-position: right 20px center;
+        transition: all 0.2s;
       }
 
-      .glass-select:focus {
+      .select-touch:focus {
         outline: none;
-        border-color: rgba(139, 92, 246, 0.3);
-        background-color: rgba(139, 92, 246, 0.04);
-        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.08);
+        border-color: #667eea;
+        background-color: #f8f9ff;
       }
 
-      /* Action Buttons */
-      .form-actions {
+      .form-footer {
         display: flex;
         gap: 16px;
-        animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+        padding: 24px 28px;
+        background: white;
+        border-top: 1px solid #e0e0e0;
       }
 
-      .btn-glass {
+      .btn-touch {
         flex: 1;
-        height: 56px;
-        font-size: 14px;
-        font-weight: 400;
-        letter-spacing: 0.8px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 12px;
+        height: 80px;
+        font-size: 20px;
+        font-weight: 600;
+        border: none;
+        border-radius: 16px;
         cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.2s;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 10px;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        gap: 12px;
       }
 
       .btn-cancel {
-        background: rgba(255, 255, 255, 0.25);
-        color: rgba(51, 65, 85, 0.8);
-        border: 1px solid rgba(139, 92, 246, 0.2);
-      }
-
-      .btn-cancel:hover {
-        background: rgba(139, 92, 246, 0.04);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        background: #e9ecef;
+        color: #495057;
       }
 
       .btn-cancel:active {
-        transform: translateY(0);
+        background: #dee2e6;
+        transform: scale(0.98);
       }
 
       .btn-create {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        border: none;
-        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
-      }
-
-      .btn-create:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(139, 92, 246, 0.35);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
       }
 
       .btn-create:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+        transform: scale(0.98);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
       }
 
-      /* Responsive Design */
-      @media (max-width: 768px) {
-        .glass-calendar-form {
+      /* Touch Feedback */
+      .touch-active {
+        transform: scale(0.98);
+        opacity: 0.9;
+      }
+
+      /* Responsive adjustments for 15" touch screen */
+      @media (max-width: 1366px) {
+        .calendar-form-touch {
           max-width: 100%;
+          border-radius: 0;
         }
 
-        .gradient-text {
-          font-size: 32px;
-        }
-
-        .glass-panel {
+        .form-body {
           padding: 20px;
         }
 
-        .color-grid {
-          grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        .input-section {
+          padding: 20px;
+          margin-bottom: 20px;
         }
 
-        .form-actions {
-          flex-direction: column;
+        .input-primary {
+          height: 60px;
+          font-size: 20px;
         }
 
-        .btn-glass {
-          width: 100%;
+        .color-button {
+          height: 90px;
+        }
+
+        .color-swatch {
+          width: 40px;
+          height: 40px;
+        }
+
+        .select-touch {
+          height: 60px;
+          font-size: 16px;
+        }
+
+        .btn-touch {
+          height: 70px;
+          font-size: 18px;
+        }
+
+        .large-color-picker {
+          width: 100px;
+          height: 100px;
+        }
+
+        .preview-swatch {
+          width: 70px;
+          height: 70px;
         }
       }
 
-      /* High Contrast Mode */
+      /* High Contrast Support */
       @media (prefers-contrast: high) {
-        .glass-panel {
-          border-width: 2px;
+        .input-primary,
+        .textarea-touch,
+        .select-touch,
+        .color-button {
+          border-width: 3px;
         }
 
-        .glass-input,
-        .glass-textarea,
-        .glass-select {
-          border-width: 2px;
+        .btn-create {
+          background: #2c3e50;
         }
       }
 
@@ -914,7 +808,22 @@ export class CalendarFormView {
     
     colorInputs.forEach(input => {
       input.addEventListener('change', () => {
-        this.selectedColor = input.value;
+        // Update visual selection
+        wrapper.querySelectorAll('.color-button').forEach(btn => {
+          btn.classList.remove('selected');
+        });
+        
+        const selectedButton = wrapper.querySelector(`label[for="${input.id}"]`);
+        if (selectedButton) {
+          selectedButton.classList.add('selected');
+          this.selectedColor = input.value;
+          
+          // Provide haptic-style feedback (visual pulse)
+          selectedButton.style.animation = 'pulse 0.3s ease';
+          setTimeout(() => {
+            selectedButton.style.animation = '';
+          }, 300);
+        }
       });
     });
   }
@@ -934,6 +843,7 @@ export class CalendarFormView {
     customRadio.addEventListener('change', () => {
       if (customRadio.checked) {
         customPanel.style.display = 'block';
+        // Scroll to make panel visible
         customPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     });
@@ -1029,6 +939,12 @@ export class CalendarFormView {
           customRadio.checked = true;
           customRadio.dispatchEvent(new Event('change'));
         }
+        
+        // Visual feedback
+        button.style.animation = 'pulse 0.3s ease';
+        setTimeout(() => {
+          button.style.animation = '';
+        }, 300);
       });
     });
 
@@ -1038,6 +954,33 @@ export class CalendarFormView {
         customRadio.checked = true;
         customRadio.dispatchEvent(new Event('change'));
       }
+    });
+  }
+
+  _attachTouchFeedback(wrapper) {
+    const touchElements = wrapper.querySelectorAll('button, input, select, textarea, .color-button, .quick-color');
+    
+    touchElements.forEach(element => {
+      element.addEventListener('touchstart', () => {
+        element.classList.add('touch-active');
+      });
+      
+      element.addEventListener('touchend', () => {
+        setTimeout(() => {
+          element.classList.remove('touch-active');
+        }, 150);
+      });
+      
+      // Also handle mouse events for testing
+      element.addEventListener('mousedown', () => {
+        element.classList.add('touch-active');
+      });
+      
+      element.addEventListener('mouseup', () => {
+        setTimeout(() => {
+          element.classList.remove('touch-active');
+        }, 150);
+      });
     });
   }
 }
