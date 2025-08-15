@@ -45,6 +45,7 @@ export class TasksState {
         
         // Don't update if value hasn't changed
         if (oldValue === value) {
+            debug(DEBUG_PREFIXES.STATE, `State unchanged: ${key}`, value);
             return;
         }
         
@@ -62,6 +63,8 @@ export class TasksState {
             
             // Notify global state change subscribers
             this.notifySubscribers(EVENTS.STATE_CHANGED, { key, value, oldValue });
+        } else {
+            debug(DEBUG_PREFIXES.STATE, `State updated silently: ${key}`, { oldValue, newValue: value });
         }
     }
     
@@ -71,6 +74,8 @@ export class TasksState {
      * @param {boolean} silent - Skip notifications if true
      */
     update(updates, silent = false) {
+        debug(DEBUG_PREFIXES.STATE, 'Batch state update:', updates);
+        
         const changes = [];
         
         for (const [key, value] of Object.entries(updates)) {
@@ -83,7 +88,7 @@ export class TasksState {
         }
         
         if (!silent && changes.length > 0) {
-            debug(DEBUG_PREFIXES.STATE, 'Batch state update:', changes);
+            debug(DEBUG_PREFIXES.STATE, 'Batch state changes:', changes);
             
             // Notify subscribers for each change
             changes.forEach(({ key, value, oldValue }) => {
@@ -92,6 +97,8 @@ export class TasksState {
             
             // Notify global batch change
             this.notifySubscribers(EVENTS.STATE_CHANGED, { changes });
+        } else if (changes.length === 0) {
+            debug(DEBUG_PREFIXES.STATE, 'No state changes in batch update');
         }
     }
     
@@ -137,6 +144,8 @@ export class TasksState {
     notifySubscribers(key, value, oldValue) {
         const subscribers = this.subscribers.get(key);
         if (subscribers) {
+            debug(DEBUG_PREFIXES.STATE, `Notifying ${subscribers.size} subscribers for: ${key}`);
+            
             subscribers.forEach(callback => {
                 try {
                     callback(value, oldValue);
@@ -144,6 +153,8 @@ export class TasksState {
                     debug(DEBUG_PREFIXES.STATE, `Error in subscriber callback for ${key}:`, error);
                 }
             });
+        } else {
+            debug(DEBUG_PREFIXES.STATE, `No subscribers for: ${key}`);
         }
     }
     
@@ -172,6 +183,7 @@ export class TasksState {
         
         // Clear history
         this.history = [];
+        debug(DEBUG_PREFIXES.STATE, 'State reset complete');
     }
     
     /**
@@ -268,40 +280,37 @@ export class TasksState {
     }
     
     /**
-     * Validate state integrity
-     * @returns {Object} Validation results
+     * Get all subscribers for debugging
+     * @returns {Object} Subscriber information
      */
-    validate() {
-        const errors = [];
-        const warnings = [];
+    getSubscriberInfo() {
+        const info = {};
+        for (const [key, subscribers] of this.subscribers.entries()) {
+            info[key] = subscribers.size;
+        }
+        return info;
+    }
+    
+    /**
+     * Validate state structure
+     * @returns {boolean} Whether state is valid
+     */
+    validateState() {
+        const requiredKeys = ['tasks', 'currentUser', 'waterGlasses', 'maxWaterGlasses', 'medicationStatus'];
+        const missingKeys = requiredKeys.filter(key => !(key in this.state));
         
-        // Validate required fields
+        if (missingKeys.length > 0) {
+            debug(DEBUG_PREFIXES.STATE, 'State validation failed - missing keys:', missingKeys);
+            return false;
+        }
+        
         if (!Array.isArray(this.state.tasks)) {
-            errors.push('Tasks must be an array');
+            debug(DEBUG_PREFIXES.STATE, 'State validation failed - tasks is not an array');
+            return false;
         }
         
-        if (typeof this.state.currentUser !== 'string') {
-            errors.push('Current user must be a string');
-        }
-        
-        if (typeof this.state.waterGlasses !== 'number' || this.state.waterGlasses < 0) {
-            errors.push('Water glasses must be a non-negative number');
-        }
-        
-        // Validate task structure
-        if (Array.isArray(this.state.tasks)) {
-            this.state.tasks.forEach((task, index) => {
-                if (!task.id || !task.text || !task.owner) {
-                    errors.push(`Task at index ${index} is missing required fields`);
-                }
-            });
-        }
-        
-        return {
-            isValid: errors.length === 0,
-            errors,
-            warnings
-        };
+        debug(DEBUG_PREFIXES.STATE, 'State validation passed');
+        return true;
     }
     
     /**

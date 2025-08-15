@@ -54,10 +54,16 @@ export class TasksContainer extends BaseComponent {
      * Render component and task lists
      */
     render(container = null) {
+        console.log('TasksContainer: Starting render...');
+        console.log('TasksContainer: Current user:', this.currentUser);
+        console.log('TasksContainer: Total tasks:', this.tasks.length);
+        
         const element = super.render(container);
         
+        console.log('TasksContainer: Base component rendered, rendering task lists...');
         this.renderTaskLists();
         
+        console.log('TasksContainer: Render complete');
         return element;
     }
     
@@ -65,11 +71,17 @@ export class TasksContainer extends BaseComponent {
      * Render task lists
      */
     renderTaskLists() {
+        console.log('TasksContainer: Rendering task lists...');
+        
         const activeContainer = this.$('#activeTasksContainer');
         const completedContainer = this.$('#completedTasksContainer');
         
+        console.log('TasksContainer: Active container found:', !!activeContainer);
+        console.log('TasksContainer: Completed container found:', !!completedContainer);
+        
         if (activeContainer) {
             const activeTasks = this.getActiveTasks();
+            console.log('TasksContainer: Active tasks for user:', activeTasks);
             
             this.activeTasksList = new TaskList({
                 tasks: activeTasks,
@@ -92,10 +104,13 @@ export class TasksContainer extends BaseComponent {
                 this.emit('task:deleted');
                 this.updateTaskLists();
             });
+            
+            console.log('TasksContainer: Active tasks list rendered successfully');
         }
         
         if (completedContainer) {
             const completedTasks = this.getCompletedTasks();
+            console.log('TasksContainer: Completed tasks for user:', completedTasks);
             
             this.completedTasksList = new TaskList({
                 tasks: completedTasks,
@@ -118,6 +133,8 @@ export class TasksContainer extends BaseComponent {
                 this.emit('task:deleted');
                 this.updateTaskLists();
             });
+            
+            console.log('TasksContainer: Completed tasks list rendered successfully');
         }
     }
     
@@ -126,9 +143,19 @@ export class TasksContainer extends BaseComponent {
      * @returns {Array} Active tasks
      */
     getActiveTasks() {
-        return this.tasks.filter(task => 
-            task.owner === this.currentUser && !task.completed
-        );
+        if (!this.tasks || !Array.isArray(this.tasks)) {
+            console.warn('TasksContainer: Tasks is not an array:', this.tasks);
+            return [];
+        }
+        
+        const activeTasks = this.tasks.filter(task => {
+            const isOwnerMatch = task.owner === this.currentUser;
+            const isNotCompleted = !task.completed;
+            return isOwnerMatch && isNotCompleted;
+        });
+        
+        console.log('TasksContainer: Filtered active tasks:', activeTasks);
+        return activeTasks;
     }
     
     /**
@@ -136,9 +163,19 @@ export class TasksContainer extends BaseComponent {
      * @returns {Array} Completed tasks
      */
     getCompletedTasks() {
-        return this.tasks.filter(task => 
-            task.owner === this.currentUser && task.completed
-        );
+        if (!this.tasks || !Array.isArray(this.tasks)) {
+            console.warn('TasksContainer: Tasks is not an array:', this.tasks);
+            return [];
+        }
+        
+        const completedTasks = this.tasks.filter(task => {
+            const isOwnerMatch = task.owner === this.currentUser;
+            const isCompleted = task.completed;
+            return isOwnerMatch && isCompleted;
+        });
+        
+        console.log('TasksContainer: Filtered completed tasks:', completedTasks);
+        return completedTasks;
     }
     
     /**
@@ -146,6 +183,7 @@ export class TasksContainer extends BaseComponent {
      * @param {Array} newTasks - Updated tasks array
      */
     updateTasks(newTasks) {
+        console.log('TasksContainer: Updating tasks:', newTasks);
         this.tasks = newTasks || [];
         this.updateTaskLists();
     }
@@ -154,14 +192,22 @@ export class TasksContainer extends BaseComponent {
      * Update task lists with current data
      */
     updateTaskLists() {
+        console.log('TasksContainer: Updating task lists...');
+        
         if (this.activeTasksList) {
             const activeTasks = this.getActiveTasks();
+            console.log('TasksContainer: Updating active tasks list with:', activeTasks);
             this.activeTasksList.updateTasks(activeTasks);
+        } else {
+            console.warn('TasksContainer: Active tasks list not available');
         }
         
         if (this.completedTasksList) {
             const completedTasks = this.getCompletedTasks();
+            console.log('TasksContainer: Updating completed tasks list with:', completedTasks);
             this.completedTasksList.updateTasks(completedTasks);
+        } else {
+            console.warn('TasksContainer: Completed tasks list not available');
         }
     }
     
@@ -170,6 +216,7 @@ export class TasksContainer extends BaseComponent {
      * @param {string} newUser - New current user
      */
     updateCurrentUser(newUser) {
+        console.log('TasksContainer: Updating current user from', this.currentUser, 'to', newUser);
         this.currentUser = newUser;
         
         // Update user indicator

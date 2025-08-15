@@ -69,6 +69,9 @@ export class TasksCore {
             // Initial render
             this.render();
             
+            // Validate state after initialization
+            this.validateInitialization();
+            
             this.isInitialized = true;
             this.events.emit(EVENTS.STATE_LOADED);
             
@@ -78,6 +81,42 @@ export class TasksCore {
             debug(DEBUG_PREFIXES.CORE, 'Initialization failed:', error);
             throw error;
         }
+    }
+    
+    /**
+     * Validate initialization was successful
+     */
+    validateInitialization() {
+        debug(DEBUG_PREFIXES.CORE, 'Validating initialization...');
+        
+        // Validate state
+        if (!this.state.validateState()) {
+            debug(DEBUG_PREFIXES.CORE, 'WARNING: State validation failed');
+        }
+        
+        // Validate components
+        if (!this.components.layout) {
+            debug(DEBUG_PREFIXES.CORE, 'ERROR: Layout component not initialized');
+        }
+        
+        // Validate services
+        const requiredServices = ['storage', 'task', 'user', 'health', 'stats'];
+        const missingServices = requiredServices.filter(service => !this.services[service]);
+        
+        if (missingServices.length > 0) {
+            debug(DEBUG_PREFIXES.CORE, 'ERROR: Missing services:', missingServices);
+        }
+        
+        // Log current state
+        const currentState = this.state.get();
+        debug(DEBUG_PREFIXES.CORE, 'Current state after initialization:', {
+            tasksCount: currentState.tasks?.length || 0,
+            currentUser: currentState.currentUser,
+            waterGlasses: currentState.waterGlasses,
+            isInitialized: this.isInitialized
+        });
+        
+        debug(DEBUG_PREFIXES.CORE, 'Initialization validation complete');
     }
     
     /**
@@ -129,12 +168,15 @@ export class TasksCore {
         
         try {
             const data = await this.services.storage.loadAll();
+            debug(DEBUG_PREFIXES.CORE, 'Loaded data from storage:', data);
             this.state.update(data, true); // Silent update during init
             
         } catch (error) {
             debug(DEBUG_PREFIXES.CORE, 'Error loading data, using defaults:', error);
             // State is already initialized with defaults
         }
+        
+        debug(DEBUG_PREFIXES.CORE, 'Current state after loading:', this.state.get());
     }
     
     /**
@@ -145,16 +187,22 @@ export class TasksCore {
         
         const tasksView = document.getElementById('tasks-view');
         if (!tasksView) {
-            debug(DEBUG_PREFIXES.CORE, 'Tasks view container not found');
+            debug(DEBUG_PREFIXES.CORE, 'ERROR: Tasks view container not found');
             return;
         }
+        
+        debug(DEBUG_PREFIXES.CORE, 'Found tasks-view container, clearing content...');
         
         // Clear existing content
         tasksView.innerHTML = '';
         
         // Render main layout component
         if (this.components.layout) {
+            debug(DEBUG_PREFIXES.CORE, 'Rendering layout component...');
             this.components.layout.render(tasksView);
+            debug(DEBUG_PREFIXES.CORE, 'Layout component rendered successfully');
+        } else {
+            debug(DEBUG_PREFIXES.CORE, 'ERROR: Layout component not available');
         }
         
         debug(DEBUG_PREFIXES.CORE, 'Interface initialized with components');
@@ -205,39 +253,63 @@ export class TasksCore {
      * Setup core event handlers for state synchronization
      */
     setupCoreEventHandlers() {
+        debug(DEBUG_PREFIXES.CORE, 'Setting up core event handlers...');
+        
         // Auto-save when state changes
         this.state.subscribe(EVENTS.STATE_CHANGED, () => {
             if (this.isInitialized) {
+                debug(DEBUG_PREFIXES.CORE, 'State changed, auto-saving...');
                 this.saveData();
             }
         });
         
         // Update UI when tasks change
-        this.state.subscribe('tasks', () => {
+        this.state.subscribe('tasks', (newTasks, oldTasks) => {
+            debug(DEBUG_PREFIXES.CORE, 'Tasks state changed:', { newTasks, oldTasks });
             this.render();
             this.updateStats();
+            
+            // Update components if they exist
+            if (this.components.layout && this.components.layout.tasksContainer) {
+                debug(DEBUG_PREFIXES.CORE, 'Updating tasks container with new tasks');
+                this.components.layout.tasksContainer.updateTasks(newTasks);
+            }
         });
         
         // Update UI when user changes
-        this.state.subscribe('currentUser', (newUser) => {
+        this.state.subscribe('currentUser', (newUser, oldUser) => {
+            debug(DEBUG_PREFIXES.CORE, 'Current user changed:', { newUser, oldUser });
             this.updateUserInterface(newUser);
+            
+            // Update components if they exist
+            if (this.components.layout && this.components.layout.tasksContainer) {
+                debug(DEBUG_PREFIXES.CORE, 'Updating tasks container with new user');
+                this.components.layout.tasksContainer.updateCurrentUser(newUser);
+            }
         });
         
         // Update health UI when water/medication changes
-        this.state.subscribe('waterGlasses', () => {
+        this.state.subscribe('waterGlasses', (newGlasses, oldGlasses) => {
+            debug(DEBUG_PREFIXES.CORE, 'Water glasses changed:', { newGlasses, oldGlasses });
             this.updateWaterTracker();
         });
         
-        this.state.subscribe('medicationStatus', () => {
+        this.state.subscribe('medicationStatus', (newStatus, oldStatus) => {
+            debug(DEBUG_PREFIXES.CORE, 'Medication status changed:', { newStatus, oldStatus });
             this.updateMedicationTracker();
         });
+        
+        debug(DEBUG_PREFIXES.CORE, 'Core event handlers set up successfully');
     }
     
     /**
      * Render the tasks interface (now handled by components)
      */
     render() {
-        if (!this.isInitialized) return;
+        if (!this.isInitialized) {
+            debug(DEBUG_PREFIXES.CORE, 'Cannot render: not initialized');
+            return;
+        }
         
         debug(DEBUG_PREFIXES.CORE, 'Refreshing component rendering...');
         
@@ -248,6 +320,8 @@ export class TasksCore {
         if (this.components.layout && this.components.layout.isRendered) {
             // Components will auto-update through state subscriptions
             debug(DEBUG_PREFIXES.CORE, 'Components auto-updating via state');
+        } else {
+            debug(DEBUG_PREFIXES.CORE, 'WARNING: Layout component not rendered');
         }
     }
     
@@ -255,8 +329,12 @@ export class TasksCore {
      * Show the tasks view
      */
     show() {
+        debug(DEBUG_PREFIXES.CORE, 'Showing tasks view...');
+        
         const tasksView = document.getElementById('tasks-view');
         if (tasksView) {
+            debug(DEBUG_PREFIXES.CORE, 'Found tasks-view, showing...');
+            
             // Hide all other views
             document.querySelectorAll('.view-container').forEach(view => {
                 view.classList.remove('active');
@@ -267,12 +345,16 @@ export class TasksCore {
             
             // Refresh if already initialized
             if (this.isInitialized) {
+                debug(DEBUG_PREFIXES.CORE, 'Tasks already initialized, refreshing...');
                 this.render();
                 this.updateStats();
             } else {
                 // Initialize if not yet done
+                debug(DEBUG_PREFIXES.CORE, 'Tasks not initialized, initializing...');
                 this.init();
             }
+        } else {
+            debug(DEBUG_PREFIXES.CORE, 'ERROR: tasks-view container not found');
         }
     }
     
@@ -615,44 +697,75 @@ export class TasksCore {
         };
     }
     
+    /**
+     * Update user interface when user changes
+     * @param {string} newUser - New current user
+     */
     updateUserInterface(newUser) {
-        // Update UI elements
-        document.querySelectorAll('.user-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.user === newUser);
-        });
-
-        const activeUserIndicator = document.getElementById('activeUserIndicator');
-        if (activeUserIndicator) {
-            activeUserIndicator.textContent = newUser === 'justin' ? "Justin's" : "Brooke's";
-        }
-
-        // Show/hide health trackers
-        const waterTracker = document.getElementById('waterTracker');
-        const healthTrackerHorizontal = document.getElementById('healthTrackerHorizontal');
+        debug(DEBUG_PREFIXES.CORE, 'Updating user interface for:', newUser);
         
-        if (newUser === 'justin') {
-            if (healthTrackerHorizontal) {
-                healthTrackerHorizontal.classList.add('visible');
-            }
-            if (waterTracker) {
-                waterTracker.classList.remove('visible');
-            }
-        } else {
-            if (healthTrackerHorizontal) {
-                healthTrackerHorizontal.classList.remove('visible');
-            }
-            if (waterTracker) {
-                waterTracker.classList.remove('visible');
-            }
+        // Update user switcher if it exists
+        if (this.components.layout && this.components.layout.userSwitcher) {
+            this.components.layout.userSwitcher.updateCurrentUser(newUser);
         }
-
-        this.render();
-        this.updateStats();
+        
+        // Update health tracker if it exists
+        if (this.components.layout && this.components.layout.healthTracker) {
+            this.components.layout.healthTracker.updateCurrentUser(newUser);
+        }
     }
     
+    /**
+     * Update water tracker UI
+     */
+    updateWaterTracker() {
+        debug(DEBUG_PREFIXES.CORE, 'Updating water tracker...');
+        
+        if (this.components.layout && this.components.layout.healthTracker) {
+            this.components.layout.healthTracker.updateWaterGlasses(this.state.get('waterGlasses'));
+        }
+    }
+    
+    /**
+     * Update medication tracker UI
+     */
+    updateMedicationTracker() {
+        debug(DEBUG_PREFIXES.CORE, 'Updating medication tracker...');
+        
+        if (this.components.layout && this.components.layout.healthTracker) {
+            this.components.layout.healthTracker.updateMedicationStatus(this.state.get('medicationStatus'));
+        }
+    }
+    
+    /**
+     * Update stats display
+     */
     updateStats() {
-        // Stats are now automatically updated by components through state subscriptions
-        debug(DEBUG_PREFIXES.CORE, 'Stats update requested - handled by components');
+        debug(DEBUG_PREFIXES.CORE, 'Updating stats...');
+        
+        if (this.components.layout && this.components.layout.statsHeader) {
+            const stats = this.calculateCurrentStats();
+            this.components.layout.statsHeader.updateStats(stats);
+        }
+    }
+    
+    /**
+     * Calculate current stats
+     * @returns {Object} Current statistics
+     */
+    calculateCurrentStats() {
+        const tasks = this.state.get('tasks') || [];
+        const currentUser = this.state.get('currentUser');
+        
+        const userTasks = tasks.filter(task => task.owner === currentUser);
+        const activeTasks = userTasks.filter(task => !task.completed);
+        const completedTasks = userTasks.filter(task => task.completed);
+        
+        return {
+            total: userTasks.length,
+            active: activeTasks.length,
+            completed: completedTasks.length
+        };
     }
     
     initializeHealthTrackers() {
@@ -680,51 +793,6 @@ export class TasksCore {
         }
     }
     
-    updateWaterTracker() {
-        const waterGlasses = this.state.get('waterGlasses');
-        const maxWaterGlasses = this.state.get('maxWaterGlasses');
-        const percentage = (waterGlasses / maxWaterGlasses) * 100;
-        
-        const progressBar = document.getElementById('waterProgress');
-        const waterCount = document.getElementById('waterCount');
-        
-        if (progressBar) {
-            progressBar.style.width = `${percentage}%`;
-        }
-        if (waterCount) {
-            waterCount.textContent = waterGlasses;
-        }
-        
-        // Update glasses display
-        this.initWaterGlasses('waterGlasses');
-        this.initWaterGlasses('waterGlassesHorizontal');
-    }
-    
-    updateMedicationTracker() {
-        const medicationStatus = this.state.get('medicationStatus');
-        
-        const morningMed = document.getElementById('morningMed');
-        const morningMedHorizontal = document.getElementById('morningMedHorizontal');
-        
-        if (morningMed) morningMed.checked = medicationStatus.morning;
-        if (morningMedHorizontal) morningMedHorizontal.checked = medicationStatus.morning;
-        
-        const statusText = medicationStatus.morning ? 'Complete' : 'Pending';
-        const statusClass = `medication-status ${medicationStatus.morning ? 'complete' : 'pending'}`;
-        
-        const statusElement = document.getElementById('medStatus');
-        const statusElementHorizontal = document.getElementById('medStatusHorizontal');
-        
-        if (statusElement) {
-            statusElement.textContent = statusText;
-            statusElement.className = statusClass;
-        }
-        if (statusElementHorizontal) {
-            statusElementHorizontal.textContent = statusText;
-            statusElementHorizontal.className = statusClass;
-        }
-    }
-    
     toggleGlass(index) {
         return this.services.health.setWaterToGlass(index);
     }
@@ -733,5 +801,52 @@ export class TasksCore {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    /**
+     * Force refresh the tasks display
+     */
+    forceRefresh() {
+        debug(DEBUG_PREFIXES.CORE, 'Forcing refresh of tasks display...');
+        
+        if (!this.isInitialized) {
+            debug(DEBUG_PREFIXES.CORE, 'Cannot refresh: not initialized');
+            return;
+        }
+        
+        // Re-render the entire interface
+        this.initializeInterface();
+        
+        // Update task lists
+        if (this.components.layout && this.components.layout.tasksContainer) {
+            const currentTasks = this.state.get('tasks');
+            this.components.layout.tasksContainer.updateTasks(currentTasks);
+        }
+        
+        debug(DEBUG_PREFIXES.CORE, 'Tasks display refresh complete');
+    }
+    
+    /**
+     * Get debug information
+     * @returns {Object} Debug information
+     */
+    getDebugInfo() {
+        return {
+            isInitialized: this.isInitialized,
+            isDestroyed: this.isDestroyed,
+            state: this.state.get(),
+            stateValidation: this.state.validateState(),
+            subscriberInfo: this.state.getSubscriberInfo(),
+            components: {
+                layout: !!this.components.layout,
+                tasksContainer: !!(this.components.layout && this.components.layout.tasksContainer),
+                activeTasksList: !!(this.components.layout && this.components.layout.tasksContainer && this.components.layout.tasksContainer.activeTasksList),
+                completedTasksList: !!(this.components.layout && this.components.layout.tasksContainer && this.components.layout.tasksContainer.completedTasksList)
+            },
+            services: Object.keys(this.services).reduce((acc, key) => {
+                acc[key] = !!this.services[key];
+                return acc;
+            }, {})
+        };
     }
 }

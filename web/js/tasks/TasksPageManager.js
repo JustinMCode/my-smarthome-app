@@ -290,23 +290,38 @@ export class TasksPageManager {
      * @returns {Object} Debug information
      */
     getDebugInfo() {
+        if (!this.isInitialized) {
+            return { error: 'TasksPageManager not initialized' };
+        }
+        
+        return this.core.getDebugInfo();
+    }
+    
+    /**
+     * Force refresh the tasks display
+     */
+    forceRefresh() {
+        if (!this.isInitialized) {
+            debug('TasksPageManager', 'Cannot force refresh: not initialized');
+            return;
+        }
+        
+        this.core.forceRefresh();
+    }
+    
+    /**
+     * Validate the current state
+     * @returns {Object} Validation results
+     */
+    validateState() {
+        if (!this.isInitialized) {
+            return { error: 'TasksPageManager not initialized' };
+        }
+        
         return {
-            type: 'TasksPageManager (Compatibility Wrapper)',
-            isInitialized: this.isInitialized,
-            coreType: this.core.constructor.name,
-            coreInitialized: this.core.isInitialized,
-            coreDebugInfo: this.core.getDebugInfo ? this.core.getDebugInfo() : null,
-            migrationRecommendation: {
-                message: 'Consider migrating to the modern modular system',
-                newImport: "import { TasksCore } from './core/TasksCore.js';",
-                benefits: [
-                    'Better performance',
-                    'More flexible component system', 
-                    'Enhanced error handling',
-                    'Modern event system',
-                    'Better testability'
-                ]
-            }
+            stateValidation: this.core.state.validateState(),
+            currentState: this.core.state.get(),
+            subscriberInfo: this.core.state.getSubscriberInfo()
         };
     }
     

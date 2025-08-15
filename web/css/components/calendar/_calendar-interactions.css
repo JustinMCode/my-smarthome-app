@@ -68,10 +68,6 @@
     border-bottom-color: #1a73e8;
 }
 
-.create-modal-content {
-    padding: 20px;
-}
-
 /* Forms */
 .event-form, .calendar-form, .import-form {
     display: flex;

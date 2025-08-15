@@ -65,10 +65,14 @@ export class TasksLayout extends BaseComponent {
      * Render component and all child components
      */
     render(container = null) {
+        console.log('TasksLayout: Starting render...');
+        
         const element = super.render(container);
         
+        console.log('TasksLayout: Base component rendered, rendering child components...');
         this.renderChildComponents();
         
+        console.log('TasksLayout: Render complete');
         return element;
     }
     
@@ -76,30 +80,44 @@ export class TasksLayout extends BaseComponent {
      * Render all child components
      */
     renderChildComponents() {
+        console.log('TasksLayout: Rendering child components...');
+        
         this.renderUserSwitcher();
         this.renderStatsHeader();
         this.renderAddTaskForm();
         this.renderHealthTracker();
         this.renderTasksContainer();
         
+        console.log('TasksLayout: Setting up component event handlers...');
         this.setupComponentEventHandlers();
+        
+        console.log('TasksLayout: All child components rendered');
     }
     
     /**
      * Render user switcher component
      */
     renderUserSwitcher() {
+        console.log('TasksLayout: Rendering user switcher...');
         const container = this.$('#userSwitcherContainer');
         if (container) {
-            this.userSwitcher = new UserSwitcher({
-                currentUser: this.currentUser,
-                services: this.services,
-                events: this.events,
-                state: this.state
-            });
-            
-            this.userSwitcher.render(container);
-            this.addChild('userSwitcher', this.userSwitcher);
+            try {
+                this.userSwitcher = new UserSwitcher({
+                    currentUser: this.currentUser,
+                    services: this.services,
+                    events: this.events,
+                    state: this.state
+                });
+                
+                this.userSwitcher.render(container);
+                this.addChild('userSwitcher', this.userSwitcher);
+                console.log('TasksLayout: User switcher rendered successfully');
+            } catch (error) {
+                console.error('TasksLayout: Error rendering user switcher:', error);
+                container.innerHTML = '<div class="error">User switcher unavailable</div>';
+            }
+        } else {
+            console.error('TasksLayout: ERROR - userSwitcherContainer not found');
         }
     }
     
@@ -107,19 +125,28 @@ export class TasksLayout extends BaseComponent {
      * Render stats header component
      */
     renderStatsHeader() {
+        console.log('TasksLayout: Rendering stats header...');
         const container = this.$('#statsHeaderContainer');
         if (container) {
-            const stats = this.calculateCurrentStats();
-            
-            this.statsHeader = new StatsHeader({
-                stats,
-                services: this.services,
-                events: this.events,
-                state: this.state
-            });
-            
-            this.statsHeader.render(container);
-            this.addChild('statsHeader', this.statsHeader);
+            try {
+                const stats = this.calculateCurrentStats();
+                
+                this.statsHeader = new StatsHeader({
+                    stats,
+                    services: this.services,
+                    events: this.events,
+                    state: this.state
+                });
+                
+                this.statsHeader.render(container);
+                this.addChild('statsHeader', this.statsHeader);
+                console.log('TasksLayout: Stats header rendered successfully');
+            } catch (error) {
+                console.error('TasksLayout: Error rendering stats header:', error);
+                container.innerHTML = '<div class="error">Stats unavailable</div>';
+            }
+        } else {
+            console.error('TasksLayout: ERROR - statsHeaderContainer not found');
         }
     }
     
@@ -127,16 +154,25 @@ export class TasksLayout extends BaseComponent {
      * Render add task form component
      */
     renderAddTaskForm() {
+        console.log('TasksLayout: Rendering add task form...');
         const container = this.$('#addTaskFormContainer');
         if (container) {
-            this.addTaskForm = new AddTaskForm({
-                services: this.services,
-                events: this.events,
-                state: this.state
-            });
-            
-            this.addTaskForm.render(container);
-            this.addChild('addTaskForm', this.addTaskForm);
+            try {
+                this.addTaskForm = new AddTaskForm({
+                    services: this.services,
+                    events: this.events,
+                    state: this.state
+                });
+                
+                this.addTaskForm.render(container);
+                this.addChild('addTaskForm', this.addTaskForm);
+                console.log('TasksLayout: Add task form rendered successfully');
+            } catch (error) {
+                console.error('TasksLayout: Error rendering add task form:', error);
+                container.innerHTML = '<div class="error">Add task form unavailable</div>';
+            }
+        } else {
+            console.error('TasksLayout: ERROR - addTaskFormContainer not found');
         }
     }
     
@@ -144,25 +180,34 @@ export class TasksLayout extends BaseComponent {
      * Render health tracker component
      */
     renderHealthTracker() {
+        console.log('TasksLayout: Rendering health tracker...');
         const container = this.$('#healthTrackerContainer');
         if (container) {
-            this.healthTracker = new HealthTracker({
-                currentUser: this.currentUser,
-                layout: 'horizontal',
-                services: this.services,
-                events: this.events,
-                state: this.state,
-                waterConfig: {
-                    currentGlasses: this.waterGlasses,
-                    maxGlasses: this.maxWaterGlasses
-                },
-                medicationConfig: {
-                    medicationStatus: this.medicationStatus
-                }
-            });
-            
-            this.healthTracker.render(container);
-            this.addChild('healthTracker', this.healthTracker);
+            try {
+                this.healthTracker = new HealthTracker({
+                    currentUser: this.currentUser,
+                    layout: 'horizontal',
+                    services: this.services,
+                    events: this.events,
+                    state: this.state,
+                    waterConfig: {
+                        currentGlasses: this.waterGlasses,
+                        maxGlasses: this.maxWaterGlasses
+                    },
+                    medicationConfig: {
+                        medicationStatus: this.medicationStatus
+                    }
+                });
+                
+                this.healthTracker.render(container);
+                this.addChild('healthTracker', this.healthTracker);
+                console.log('TasksLayout: Health tracker rendered successfully');
+            } catch (error) {
+                console.error('TasksLayout: Error rendering health tracker:', error);
+                container.innerHTML = '<div class="error">Health tracker unavailable</div>';
+            }
+        } else {
+            console.error('TasksLayout: ERROR - healthTrackerContainer not found');
         }
     }
     
@@ -170,18 +215,29 @@ export class TasksLayout extends BaseComponent {
      * Render tasks container component
      */
     renderTasksContainer() {
+        console.log('TasksLayout: Rendering tasks container...');
         const container = this.$('#tasksContainerWrapper');
         if (container) {
-            this.tasksContainer = new TasksContainer({
-                currentUser: this.currentUser,
-                tasks: this.tasks,
-                services: this.services,
-                events: this.events,
-                state: this.state
-            });
-            
-            this.tasksContainer.render(container);
-            this.addChild('tasksContainer', this.tasksContainer);
+            try {
+                console.log('TasksLayout: Tasks data:', this.tasks);
+                
+                this.tasksContainer = new TasksContainer({
+                    currentUser: this.currentUser,
+                    tasks: this.tasks,
+                    services: this.services,
+                    events: this.events,
+                    state: this.state
+                });
+                
+                this.tasksContainer.render(container);
+                this.addChild('tasksContainer', this.tasksContainer);
+                console.log('TasksLayout: Tasks container rendered successfully');
+            } catch (error) {
+                console.error('TasksLayout: Error rendering tasks container:', error);
+                container.innerHTML = '<div class="error">Tasks container unavailable</div>';
+            }
+        } else {
+            console.error('TasksLayout: ERROR - tasksContainerWrapper not found');
         }
     }
     

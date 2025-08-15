@@ -72,6 +72,266 @@ export class FridgeDashboard {
         // Initialize tasks page manager
         this.managers.tasks = new TasksPageManager(this);
         this.managers.tasks.init();
+        
+        // Add global debug functions for troubleshooting
+        window.debugTasks = () => {
+            if (this.managers.tasks) {
+                console.log('=== TASKS DEBUG INFO ===');
+                console.log(this.managers.tasks.getDebugInfo());
+                console.log('=== TASKS STATE VALIDATION ===');
+                console.log(this.managers.tasks.validateState());
+                console.log('=== END DEBUG INFO ===');
+            } else {
+                console.log('Tasks manager not available');
+            }
+        };
+        
+        window.refreshTasks = () => {
+            if (this.managers.tasks) {
+                console.log('Forcing tasks refresh...');
+                this.managers.tasks.forceRefresh();
+            } else {
+                console.log('Tasks manager not available');
+            }
+        };
+        
+        window.showTasks = () => {
+            this.switchView('tasks');
+        };
+        
+        window.testTasksFix = () => {
+            console.log('=== TESTING TASKS FIX ===');
+            if (this.managers.tasks) {
+                const debugInfo = this.managers.tasks.getDebugInfo();
+                console.log('Debug info:', debugInfo);
+                
+                // Test user switching
+                console.log('Testing user switch to Brooke...');
+                this.managers.tasks.switchUser('brooke');
+                
+                setTimeout(() => {
+                    console.log('Testing user switch back to Justin...');
+                    this.managers.tasks.switchUser('justin');
+                }, 1000);
+            } else {
+                console.log('Tasks manager not available');
+            }
+        };
+        
+        window.forceTaskVisibility = () => {
+            console.log('=== FORCING TASK VISIBILITY ===');
+            
+            // Force all task items to be visible
+            const taskItems = document.querySelectorAll('.task-item');
+            console.log('Found task items:', taskItems.length);
+            
+            taskItems.forEach((item, index) => {
+                console.log(`Task item ${index + 1}:`, item);
+                console.log('Current styles:', {
+                    display: window.getComputedStyle(item).display,
+                    opacity: window.getComputedStyle(item).opacity,
+                    visibility: window.getComputedStyle(item).visibility
+                });
+                
+                // Force visibility
+                item.style.opacity = '1';
+                item.style.visibility = 'visible';
+                item.style.display = 'flex';
+                item.style.transform = 'translateX(0)';
+                
+                console.log('Updated styles:', {
+                    display: window.getComputedStyle(item).display,
+                    opacity: window.getComputedStyle(item).opacity,
+                    visibility: window.getComputedStyle(item).visibility
+                });
+            });
+            
+            // Also check task list containers
+            const taskListContainers = document.querySelectorAll('.task-list-container');
+            console.log('Task list containers:', taskListContainers.length);
+            
+            taskListContainers.forEach((container, index) => {
+                console.log(`Container ${index + 1}:`, container);
+                console.log('Container children:', container.children.length);
+                console.log('Container HTML:', container.innerHTML);
+            });
+        };
+        
+        window.debugTaskVisibility = () => {
+            console.log('=== DEBUGGING TASK VISIBILITY ===');
+            
+            // Check if we're on the tasks view
+            const tasksView = document.getElementById('tasks-view');
+            if (tasksView) {
+                console.log('Tasks view found:', tasksView);
+                console.log('Tasks view display:', window.getComputedStyle(tasksView).display);
+                console.log('Tasks view visibility:', window.getComputedStyle(tasksView).visibility);
+            } else {
+                console.log('Tasks view not found');
+            }
+            
+            // Check task panels
+            const taskPanels = document.querySelectorAll('.task-panel');
+            console.log('Task panels found:', taskPanels.length);
+            
+            taskPanels.forEach((panel, index) => {
+                console.log(`Panel ${index + 1}:`, panel);
+                console.log('Panel styles:', {
+                    display: window.getComputedStyle(panel).display,
+                    opacity: window.getComputedStyle(panel).opacity,
+                    visibility: window.getComputedStyle(panel).visibility
+                });
+            });
+            
+            // Check task lists
+            const taskLists = document.querySelectorAll('.task-list');
+            console.log('Task lists found:', taskLists.length);
+            
+            taskLists.forEach((list, index) => {
+                console.log(`Task list ${index + 1}:`, list);
+                console.log('Task list styles:', {
+                    display: window.getComputedStyle(list).display,
+                    opacity: window.getComputedStyle(list).opacity,
+                    visibility: window.getComputedStyle(list).visibility
+                });
+            });
+            
+            // Check task items
+            const taskItems = document.querySelectorAll('.task-item');
+            console.log('Task items found:', taskItems.length);
+            
+            taskItems.forEach((item, index) => {
+                console.log(`Task item ${index + 1}:`, item);
+                console.log('Task item text:', item.textContent);
+                console.log('Task item styles:', {
+                    display: window.getComputedStyle(item).display,
+                    opacity: window.getComputedStyle(item).opacity,
+                    visibility: window.getComputedStyle(item).visibility,
+                    position: window.getComputedStyle(item).position,
+                    zIndex: window.getComputedStyle(item).zIndex
+                });
+            });
+        };
+        
+        window.debugHealthTracker = () => {
+            console.log('=== DEBUGGING HEALTH TRACKER ===');
+            
+            // Check health tracker horizontal
+            const healthTrackerHorizontal = document.querySelector('.health-tracker-horizontal');
+            if (healthTrackerHorizontal) {
+                console.log('Health tracker horizontal found:', healthTrackerHorizontal);
+                console.log('Health tracker styles:', {
+                    display: window.getComputedStyle(healthTrackerHorizontal).display,
+                    opacity: window.getComputedStyle(healthTrackerHorizontal).opacity,
+                    visibility: window.getComputedStyle(healthTrackerHorizontal).visibility
+                });
+                console.log('Health tracker classes:', healthTrackerHorizontal.className);
+            } else {
+                console.log('Health tracker horizontal not found');
+            }
+            
+            // Check water tracker compact
+            const waterTrackerCompact = document.querySelector('.water-tracker-compact');
+            if (waterTrackerCompact) {
+                console.log('Water tracker compact found:', waterTrackerCompact);
+                console.log('Water tracker styles:', {
+                    display: window.getComputedStyle(waterTrackerCompact).display,
+                    opacity: window.getComputedStyle(waterTrackerCompact).opacity,
+                    visibility: window.getComputedStyle(waterTrackerCompact).visibility
+                });
+                console.log('Water tracker classes:', waterTrackerCompact.className);
+            } else {
+                console.log('Water tracker compact not found');
+            }
+            
+            // Check all health-related elements
+            const healthElements = document.querySelectorAll('[class*="health"], [class*="water"], [class*="medication"]');
+            console.log('Health-related elements found:', healthElements.length);
+            
+            healthElements.forEach((element, index) => {
+                console.log(`Health element ${index + 1}:`, element);
+                console.log('Element classes:', element.className);
+                console.log('Element styles:', {
+                    display: window.getComputedStyle(element).display,
+                    opacity: window.getComputedStyle(element).opacity,
+                    visibility: window.getComputedStyle(element).visibility
+                });
+            });
+        };
+        
+        window.forceHealthTrackerVisibility = () => {
+            console.log('=== FORCING HEALTH TRACKER VISIBILITY ===');
+            
+            // Force health tracker horizontal to be visible
+            const healthTrackerHorizontal = document.querySelector('.health-tracker-horizontal');
+            if (healthTrackerHorizontal) {
+                healthTrackerHorizontal.style.display = 'block';
+                healthTrackerHorizontal.style.opacity = '1';
+                healthTrackerHorizontal.style.visibility = 'visible';
+                healthTrackerHorizontal.style.transform = 'translateY(0)';
+                healthTrackerHorizontal.classList.add('visible');
+                console.log('Health tracker horizontal forced visible');
+            }
+            
+            // Force water tracker compact to be visible
+            const waterTrackerCompact = document.querySelector('.water-tracker-compact');
+            if (waterTrackerCompact) {
+                waterTrackerCompact.style.display = 'block';
+                waterTrackerCompact.style.opacity = '1';
+                waterTrackerCompact.style.visibility = 'visible';
+                waterTrackerCompact.style.transform = 'translateY(0)';
+                waterTrackerCompact.classList.add('visible');
+                console.log('Water tracker compact forced visible');
+            }
+            
+            // Force all health-related elements to be visible
+            const healthElements = document.querySelectorAll('[class*="health"], [class*="water"], [class*="medication"]');
+            healthElements.forEach(element => {
+                element.style.display = element.style.display || 'block';
+                element.style.opacity = '1';
+                element.style.visibility = 'visible';
+            });
+            
+            console.log('All health tracker elements forced visible');
+        };
+        
+        window.testHealthInteractions = () => {
+            console.log('=== TESTING HEALTH INTERACTIONS ===');
+            
+            // Test medication checkbox
+            const medicationCheckboxes = document.querySelectorAll('.med-checkbox');
+            console.log('Medication checkboxes found:', medicationCheckboxes.length);
+            
+            medicationCheckboxes.forEach((checkbox, index) => {
+                console.log(`Checkbox ${index + 1}:`, {
+                    id: checkbox.id,
+                    checked: checkbox.checked,
+                    disabled: checkbox.disabled
+                });
+                
+                // Test clicking the checkbox
+                console.log(`Testing checkbox ${index + 1} click...`);
+                checkbox.click();
+            });
+            
+            // Test water glasses
+            const waterGlasses = document.querySelectorAll('.mini-glass');
+            console.log('Water glasses found:', waterGlasses.length);
+            
+            waterGlasses.forEach((glass, index) => {
+                console.log(`Glass ${index + 1}:`, {
+                    index: glass.dataset.glassIndex,
+                    filled: glass.classList.contains('filled'),
+                    content: glass.textContent
+                });
+            });
+            
+            // Test clicking the first few glasses
+            for (let i = 0; i < Math.min(3, waterGlasses.length); i++) {
+                console.log(`Testing glass ${i + 1} click...`);
+                waterGlasses[i].click();
+            }
+        };
     }
     
     /**

@@ -29,10 +29,14 @@ export class TaskList extends BaseComponent {
      * Generate HTML for task list
      */
     generateHTML() {
+        console.log('TaskList: Generating HTML for', this.tasks.length, 'tasks');
+        
         if (this.tasks.length === 0) {
+            console.log('TaskList: No tasks, showing empty state');
             return this.generateEmptyState();
         }
         
+        console.log('TaskList: Generating container for task items');
         // Container for task items (will be populated by child components)
         return `<div class="task-list-container"></div>`;
     }
@@ -41,6 +45,7 @@ export class TaskList extends BaseComponent {
      * Generate empty state HTML
      */
     generateEmptyState() {
+        console.log('TaskList: Generating empty state with message:', this.emptyMessage);
         return `
             <div class="empty-state">
                 <div class="empty-state-icon">📋</div>
@@ -53,58 +58,110 @@ export class TaskList extends BaseComponent {
      * Render component and task items
      */
     render(container = null) {
+        console.log('TaskList: Starting render...');
+        
         const element = super.render(container);
         
         if (this.tasks.length > 0) {
+            console.log('TaskList: Rendering task items...');
             this.renderTaskItems();
+        } else {
+            console.log('TaskList: No tasks to render, showing empty state');
         }
         
+        console.log('TaskList: Render complete');
         return element;
+    }
+    
+    /**
+     * Ensure task list container exists
+     * @returns {HTMLElement|null} The container element or null if not found
+     */
+    ensureTaskListContainer() {
+        let listContainer = this.$('.task-list-container');
+        
+        if (!listContainer) {
+            console.log('TaskList: task-list-container not found, checking if we need to re-render...');
+            
+            // Check if we have the main element but not the container
+            if (this.element) {
+                // Try to create the container
+                this.element.innerHTML = '<div class="task-list-container"></div>';
+                listContainer = this.$('.task-list-container');
+                
+                if (listContainer) {
+                    console.log('TaskList: Created task-list-container successfully');
+                } else {
+                    console.error('TaskList: Failed to create task-list-container');
+                }
+            } else {
+                console.error('TaskList: Main element not found, cannot create container');
+            }
+        }
+        
+        return listContainer;
     }
     
     /**
      * Render individual task items
      */
     renderTaskItems() {
-        const listContainer = this.$('.task-list-container');
-        if (!listContainer) return;
+        console.log('TaskList: Rendering', this.tasks.length, 'task items...');
+        
+        const listContainer = this.ensureTaskListContainer();
+        if (!listContainer) {
+            console.error('TaskList: ERROR - Cannot ensure task-list-container exists');
+            return;
+        }
+        
+        console.log('TaskList: Found task-list-container, clearing existing items...');
         
         // Clear existing task components
         this.clearTaskItems();
         
         // Create and render task items
         this.tasks.forEach((task, index) => {
+            console.log('TaskList: Rendering task', index + 1, ':', task);
+            
             const animationDelay = this.showAnimations 
                 ? index * UI_CONFIG.ANIMATION_DELAY_INCREMENT 
                 : 0;
             
-            const taskItem = new TaskItem({
-                task,
-                animationDelay,
-                services: this.services,
-                events: this.events
-            });
-            
-            // Render task item
-            taskItem.render(listContainer);
-            
-            // Store reference
-            this.taskComponents.set(task.id, taskItem);
-            
-            // Listen for task events
-            taskItem.addEventListener('task:toggled', () => {
-                this.emit('task:toggled', task);
-            });
-            
-            taskItem.addEventListener('task:deleted', () => {
-                this.emit('task:deleted', task);
-                this.removeTaskItem(task.id);
-            });
-            
-            taskItem.addEventListener('task:selected', () => {
-                this.emit('task:selected', task);
-            });
+            try {
+                const taskItem = new TaskItem({
+                    task,
+                    animationDelay,
+                    services: this.services,
+                    events: this.events
+                });
+                
+                // Render task item
+                taskItem.render(listContainer);
+                
+                // Store reference
+                this.taskComponents.set(task.id, taskItem);
+                
+                // Listen for task events
+                taskItem.addEventListener('task:toggled', () => {
+                    this.emit('task:toggled', task);
+                });
+                
+                taskItem.addEventListener('task:deleted', () => {
+                    this.emit('task:deleted', task);
+                    this.removeTaskItem(task.id);
+                });
+                
+                taskItem.addEventListener('task:selected', () => {
+                    this.emit('task:selected', task);
+                });
+                
+                console.log('TaskList: Task item', index + 1, 'rendered successfully');
+            } catch (error) {
+                console.error('TaskList: Error rendering task item', index + 1, ':', error);
+            }
         });
+        
+        console.log('TaskList: All task items rendered');
     }
     
     /**
@@ -127,10 +184,38 @@ export class TaskList extends BaseComponent {
      * @param {Array} newTasks - Updated tasks array
      */
     updateTasks(newTasks) {
+        console.log('TaskList: Updating tasks from', this.tasks.length, 'to', (newTasks || []).length);
         this.tasks = newTasks || [];
         
         if (this.isRendered) {
-            this.render();
+            console.log('TaskList: Re-rendering with updated tasks...');
+            // Don't call render() again as it regenerates HTML and loses the container
+            // Instead, just update the task items
+            this.updateTaskItems();
+        } else {
+            console.log('TaskList: Component not rendered, skipping re-render');
+        }
+    }
+    
+    /**
+     * Update task items without regenerating HTML
+     */
+    updateTaskItems() {
+        console.log('TaskList: Updating task items without regenerating HTML...');
+        
+        if (this.tasks.length === 0) {
+            // Show empty state
+            const listContainer = this.ensureTaskListContainer();
+            if (listContainer) {
+                listContainer.innerHTML = this.generateEmptyState();
+            } else {
+                // If no container exists, we need to re-render
+                console.log('TaskList: No container found, re-rendering...');
+                this.render();
+            }
+        } else {
+            // Render task items in existing container
+            this.renderTaskItems();
         }
     }
     
@@ -139,16 +224,21 @@ export class TaskList extends BaseComponent {
      * @param {Object} task - Task to add
      */
     addTask(task) {
+        console.log('TaskList: Adding task:', task);
         this.tasks.push(task);
         
         if (this.isRendered) {
             // If we're showing empty state, re-render completely
             if (this.tasks.length === 1) {
+                console.log('TaskList: First task added, re-rendering completely');
                 this.render();
             } else {
                 // Otherwise just add the new task item
+                console.log('TaskList: Adding task to existing list');
                 this.addTaskItem(task);
             }
+        } else {
+            console.log('TaskList: Component not rendered, task will be added on next render');
         }
     }
     
@@ -157,32 +247,43 @@ export class TaskList extends BaseComponent {
      * @param {Object} task - Task to add
      */
     addTaskItem(task) {
-        const listContainer = this.$('.task-list-container');
-        if (!listContainer) return;
+        console.log('TaskList: Adding task item:', task);
+        
+        const listContainer = this.ensureTaskListContainer();
+        if (!listContainer) {
+            console.error('TaskList: ERROR - Cannot ensure task-list-container exists for adding task');
+            return;
+        }
         
         const animationDelay = this.showAnimations 
             ? this.taskComponents.size * UI_CONFIG.ANIMATION_DELAY_INCREMENT 
             : 0;
         
-        const taskItem = new TaskItem({
-            task,
-            animationDelay,
-            services: this.services,
-            events: this.events
-        });
-        
-        taskItem.render(listContainer);
-        this.taskComponents.set(task.id, taskItem);
-        
-        // Setup event listeners
-        taskItem.addEventListener('task:toggled', () => {
-            this.emit('task:toggled', task);
-        });
-        
-        taskItem.addEventListener('task:deleted', () => {
-            this.emit('task:deleted', task);
-            this.removeTaskItem(task.id);
-        });
+        try {
+            const taskItem = new TaskItem({
+                task,
+                animationDelay,
+                services: this.services,
+                events: this.events
+            });
+            
+            taskItem.render(listContainer);
+            this.taskComponents.set(task.id, taskItem);
+            
+            // Setup event listeners
+            taskItem.addEventListener('task:toggled', () => {
+                this.emit('task:toggled', task);
+            });
+            
+            taskItem.addEventListener('task:deleted', () => {
+                this.emit('task:deleted', task);
+                this.removeTaskItem(task.id);
+            });
+            
+            console.log('TaskList: Task item added successfully');
+        } catch (error) {
+            console.error('TaskList: Error adding task item:', error);
+        }
     }
     
     /**
@@ -190,11 +291,13 @@ export class TaskList extends BaseComponent {
      * @param {string} taskId - Task ID to remove
      */
     removeTask(taskId) {
+        console.log('TaskList: Removing task:', taskId);
         this.tasks = this.tasks.filter(t => t.id !== taskId);
         this.removeTaskItem(taskId);
         
         // If no tasks left, show empty state
         if (this.tasks.length === 0 && this.isRendered) {
+            console.log('TaskList: No tasks left, showing empty state');
             this.render();
         }
     }

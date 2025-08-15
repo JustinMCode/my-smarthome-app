@@ -123,13 +123,20 @@ export class HealthService {
             }
             
             const currentWater = this.state.get('waterGlasses');
-            const targetWater = glassIndex + 1;
+            
+            // Fix the off-by-one issue: if clicking on a filled glass, remove it
+            // If clicking on an empty glass, fill up to that glass
+            let targetWater;
+            if (glassIndex < currentWater) {
+                // Clicking on a filled glass - remove it and all glasses after it
+                targetWater = glassIndex;
+            } else {
+                // Clicking on an empty glass - fill up to that glass
+                targetWater = glassIndex + 1;
+            }
             
             if (currentWater === targetWater) {
-                // If clicking on the last filled glass, remove it
-                if (glassIndex === currentWater - 1) {
-                    return this.removeWater();
-                }
+                debug(DEBUG_PREFIXES.HEALTH, 'No change needed');
                 return true; // No change needed
             }
             

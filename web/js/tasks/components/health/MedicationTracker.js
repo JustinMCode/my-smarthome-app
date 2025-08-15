@@ -93,25 +93,16 @@ export class MedicationTracker extends BaseComponent {
      * Setup event listeners
      */
     setupEventListeners() {
-        // Medication checkbox changes
-        this.addEventListener('change', (e) => {
-            const checkbox = e.target.closest('.med-checkbox');
-            if (checkbox) {
-                this.updateMedicationStatus(checkbox);
-            }
-        });
+        console.log('MedicationTracker: Setting up event listeners, health service available:', !!this.services?.health);
         
-        // Prevent label clicks from triggering twice
-        this.addEventListener('click', (e) => {
-            const medItem = e.target.closest('.med-item');
-            if (medItem && !e.target.matches('.med-checkbox')) {
-                e.preventDefault();
-                const checkbox = medItem.querySelector('.med-checkbox');
-                if (checkbox) {
-                    checkbox.checked = !checkbox.checked;
-                    this.updateMedicationStatus(checkbox);
-                }
-            }
+        // Medication checkbox changes
+        const checkboxes = this.element.querySelectorAll('.med-checkbox');
+        checkboxes.forEach(checkbox => {
+            console.log('MedicationTracker: Adding listener to checkbox:', checkbox.id);
+            checkbox.addEventListener('change', (e) => {
+                console.log('MedicationTracker: Checkbox changed:', e.target.id, e.target.checked);
+                this.updateMedicationStatus(e.target);
+            });
         });
     }
     
@@ -120,21 +111,28 @@ export class MedicationTracker extends BaseComponent {
      * @param {HTMLElement} checkbox - Checkbox element
      */
     updateMedicationStatus(checkbox) {
+        console.log('MedicationTracker: updateMedicationStatus called with:', checkbox);
+        
         const medicationType = this.getMedicationTypeFromCheckbox(checkbox);
         const isChecked = checkbox.checked;
         
-        // Update local state
+        console.log('MedicationTracker: Updating medication:', { medicationType, isChecked });
+        
+        // Update local state immediately
         this.medicationStatus[medicationType] = isChecked;
         
-        // Update through service
-        if (this.services.health) {
-            this.services.health.updateMedicationFromElement(checkbox);
-        }
-        
-        // Update status display
+        // Update status display immediately for instant feedback
         this.updateStatusDisplay();
         
-        // Show feedback
+        // Update through service (async, doesn't block UI)
+        if (this.services.health) {
+            console.log('MedicationTracker: Calling health service');
+            this.services.health.updateMedicationFromElement(checkbox);
+        } else {
+            console.warn('MedicationTracker: Health service not available');
+        }
+        
+        // Show feedback with minimal delay
         this.showMedicationFeedback(medicationType, isChecked);
         
         this.emit('medication:updated', { 
@@ -142,6 +140,8 @@ export class MedicationTracker extends BaseComponent {
             taken: isChecked,
             status: this.medicationStatus
         });
+        
+        console.log('MedicationTracker: Update complete');
     }
     
     /**
@@ -170,8 +170,15 @@ export class MedicationTracker extends BaseComponent {
         ].filter(Boolean);
         
         statusElements.forEach(element => {
+            // Temporarily disable transitions for immediate update
+            element.classList.add('updating');
             element.textContent = statusText;
-            element.className = `medication-status ${statusClass}`;
+            element.className = `medication-status ${statusClass} updating`;
+            
+            // Re-enable transitions after a brief moment
+            requestAnimationFrame(() => {
+                element.classList.remove('updating');
+            });
         });
     }
     
@@ -201,13 +208,13 @@ export class MedicationTracker extends BaseComponent {
     showMedicationFeedback(medicationType, taken) {
         const checkbox = this.getMedicationCheckbox(medicationType);
         if (checkbox) {
-            // Add visual feedback
+            // Add visual feedback with shorter duration for better responsiveness
             const feedbackClass = taken ? 'med-taken' : 'med-skipped';
             checkbox.classList.add(feedbackClass);
             
             setTimeout(() => {
                 checkbox.classList.remove(feedbackClass);
-            }, 500);
+            }, 200); // Reduced from 500ms to 200ms
         }
         
         // Show completion celebration if all medications are taken
@@ -254,17 +261,17 @@ export class MedicationTracker extends BaseComponent {
             setTimeout(() => {
                 celebration.remove();
                 this.removeClass('all-complete');
-            }, 3000);
+            }, 1500); // Reduced from 3000ms to 1500ms for better responsiveness
         }
         
         this.emit('medication:all:complete', this.medicationStatus);
     }
     
     /**
-     * Update medication status
+     * Set medication status from external source
      * @param {Object} newStatus - New medication status
      */
-    updateMedicationStatus(newStatus) {
+    setMedicationStatus(newStatus) {
         this.medicationStatus = { ...this.medicationStatus, ...newStatus };
         
         // Update checkboxes
@@ -286,7 +293,7 @@ export class MedicationTracker extends BaseComponent {
      */
     resetMedicationStatus() {
         const resetStatus = { morning: false };
-        this.updateMedicationStatus(resetStatus);
+        this.setMedicationStatus(resetStatus);
         
         this.emit('medication:reset');
     }
@@ -341,7 +348,7 @@ export class MedicationTracker extends BaseComponent {
         // Subscribe to medication status changes
         if (this.state) {
             this.subscribeToState('medicationStatus', (status) => {
-                this.updateMedicationStatus(status);
+                this.setMedicationStatus(status);
             });
         }
     }

@@ -119,11 +119,14 @@ export class WaterTracker extends BaseComponent {
      * Setup event listeners
      */
     setupEventListeners() {
+        console.log('WaterTracker: Setting up event listeners, health service available:', !!this.services?.health);
+        
         // Individual glass clicks
         this.addEventListener('click', (e) => {
             const glassBtn = e.target.closest('.mini-glass');
             if (glassBtn) {
                 const index = parseInt(glassBtn.dataset.glassIndex);
+                console.log('WaterTracker: Glass clicked:', { index, currentGlasses: this.currentGlasses });
                 this.toggleGlass(index);
             }
         });
@@ -135,12 +138,14 @@ export class WaterTracker extends BaseComponent {
             
             if (addBtn) {
                 addBtn.addEventListener('click', () => {
+                    console.log('WaterTracker: Add water button clicked');
                     this.addWater();
                 });
             }
             
             if (resetBtn) {
                 resetBtn.addEventListener('click', () => {
+                    console.log('WaterTracker: Reset water button clicked');
                     this.resetWater();
                 });
             }
@@ -152,8 +157,18 @@ export class WaterTracker extends BaseComponent {
      * @param {number} index - Glass index (0-based)
      */
     toggleGlass(index) {
+        console.log('WaterTracker: toggleGlass called with index:', index);
+        
+        // Determine new water count based on clicked glass
+        const newCount = index < this.currentGlasses ? index : index + 1;
+        
         if (this.services.health) {
+            console.log('WaterTracker: Calling health service setWaterToGlass');
             this.services.health.setWaterToGlass(index);
+        } else {
+            console.warn('WaterTracker: Health service not available, updating locally');
+            // Update locally if service is not available
+            this.updateWaterCount(newCount);
         }
         
         this.emit('water:glass:toggled', { index, currentGlasses: this.currentGlasses });
@@ -165,6 +180,9 @@ export class WaterTracker extends BaseComponent {
     addWater() {
         if (this.services.health) {
             this.services.health.addWater();
+        } else {
+            // Fallback to local update
+            this.updateWaterCount(Math.min(this.currentGlasses + 1, this.maxGlasses));
         }
         
         this.emit('water:added', { currentGlasses: this.currentGlasses });
@@ -177,6 +195,9 @@ export class WaterTracker extends BaseComponent {
         if (confirm('Reset water tracking for today?')) {
             if (this.services.health) {
                 this.services.health.resetWater();
+            } else {
+                // Fallback to local reset
+                this.updateWaterCount(0);
             }
             
             this.emit('water:reset');
