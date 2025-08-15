@@ -41,31 +41,113 @@
 .modal.create-event-modal {
     width: 720px;
     max-width: 95vw;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .create-modal-header {
     display: flex;
     gap: 0;
     border-bottom: 1px solid #e5e7eb;
+    background: #f8f9fa;
+    padding: 0;
+    position: relative;
+}
+
+.create-modal-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
 }
 
 .create-modal-header .mode-btn {
     flex: 1;
-    padding: 14px 16px;
-    background: white;
+    padding: 20px 16px;
+    background: transparent;
     border: none;
     border-bottom: 3px solid transparent;
     color: #5f6368;
-    font-weight: 600;
-    font-size: 15px;
+    font-weight: 500;
+    font-size: 14px;
     cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.create-modal-header .mode-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 115, 232, 0.05);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.create-modal-header .mode-btn:hover::before {
+    opacity: 1;
+}
+
+.create-modal-header .mode-btn:hover,
+.create-modal-header .mode-btn:focus {
+    color: #1a73e8;
+    background: rgba(26, 115, 232, 0.02);
+    outline: none;
+}
+
+.create-modal-header .mode-btn:focus-visible {
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3);
+    border-radius: 4px;
 }
 
 .create-modal-header .mode-btn.active {
     color: #1a73e8;
     border-bottom-color: #1a73e8;
+    background: white;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.create-modal-header .mode-btn.active::before {
+    opacity: 0;
+}
+
+.mode-btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.create-modal-header .mode-btn:hover .mode-btn-icon {
+    transform: scale(1.1);
+}
+
+.create-modal-header .mode-btn.active .mode-btn-icon {
+    transform: scale(1.05);
+}
+
+.mode-btn-label {
+    font-size: 13px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
 }
 
 /* Forms */
@@ -516,6 +598,43 @@
 #occurrences-text {
     color: #6b7280;
     font-size: 14px;
+}
+
+/* Enhanced Header Responsive Design */
+@media (max-width: 768px) {
+    .create-modal-header {
+        padding: 0;
+    }
+    
+    .create-modal-header .mode-btn {
+        padding: 16px 12px;
+        gap: 6px;
+    }
+    
+    .mode-btn-icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .mode-btn-label {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .create-modal-header .mode-btn {
+        padding: 14px 8px;
+        gap: 4px;
+    }
+    
+    .mode-btn-icon {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .mode-btn-label {
+        font-size: 11px;
+    }
 }
 
 /* Touch optimizations for new recurring UI */

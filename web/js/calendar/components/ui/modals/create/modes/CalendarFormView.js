@@ -369,7 +369,7 @@ export class CalendarFormView {
 
       .input-primary:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: #5B21B6;
         background: #f8f9ff;
       }
 
@@ -395,7 +395,7 @@ export class CalendarFormView {
 
       .textarea-touch:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: #5B21B6;
         background: #f8f9ff;
       }
 
@@ -482,7 +482,7 @@ export class CalendarFormView {
         padding: 20px;
         background: #f8f9ff;
         border-radius: 12px;
-        border: 2px solid #667eea;
+        border: 2px solid #5B21B6;
         animation: slideDown 0.3s ease;
       }
 
@@ -502,7 +502,7 @@ export class CalendarFormView {
       .current-color-value {
         font-size: 14px;
         font-family: 'Courier New', monospace;
-        color: #667eea;
+        color: #5B21B6;
         background: white;
         padding: 4px 12px;
         border-radius: 6px;
@@ -582,7 +582,7 @@ export class CalendarFormView {
 
       .color-hex-input:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: #5B21B6;
         background: white;
       }
 
@@ -615,7 +615,7 @@ export class CalendarFormView {
 
       .quick-color:hover {
         transform: scale(1.1);
-        border-color: #667eea;
+        border-color: #5B21B6;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       }
 
@@ -634,7 +634,7 @@ export class CalendarFormView {
         position: absolute;
         left: 20px;
         pointer-events: none;
-        color: #667eea;
+        color: #5B21B6;
       }
 
       .select-touch {
@@ -648,7 +648,7 @@ export class CalendarFormView {
         color: #2c3e50;
         cursor: pointer;
         appearance: none;
-        background-image: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23667eea" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+        background-image: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235B21B6" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>');
         background-repeat: no-repeat;
         background-position: right 20px center;
         transition: all 0.2s;
@@ -656,7 +656,7 @@ export class CalendarFormView {
 
       .select-touch:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: #5B21B6;
         background-color: #f8f9ff;
       }
 
@@ -696,14 +696,14 @@ export class CalendarFormView {
       }
 
       .btn-create {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #5B21B6 0%, #EC4899 100%);
         color: white;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 12px rgba(91, 33, 182, 0.3);
       }
 
       .btn-create:active {
         transform: scale(0.98);
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 2px 8px rgba(91, 33, 182, 0.3);
       }
 
       /* Touch Feedback */

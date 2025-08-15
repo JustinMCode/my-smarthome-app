@@ -544,13 +544,13 @@ export class EventFormView {
       }
 
       .primary-btn {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #5B21B6 0%, #EC4899 100%);
         color: white;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 15px rgba(91, 33, 182, 0.3);
       }
 
       .primary-btn:hover {
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 6px 20px rgba(91, 33, 182, 0.4);
         transform: translateY(-2px);
       }
 

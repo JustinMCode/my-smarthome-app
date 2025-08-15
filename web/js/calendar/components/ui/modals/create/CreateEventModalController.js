@@ -117,19 +117,57 @@ export class CreateEventModalController {
   _renderHeader() {
     const header = document.createElement('div');
     header.className = 'create-modal-header';
-    const mk = (mode, label) => {
+    
+    const mk = (mode, label, icon) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'mode-btn';
-      btn.textContent = label;
       btn.dataset.mode = mode;
+      btn.setAttribute('aria-label', label);
+      
+      // Create icon element
+      const iconEl = document.createElement('span');
+      iconEl.className = 'mode-btn-icon';
+      iconEl.innerHTML = icon;
+      
+      // Create label element
+      const labelEl = document.createElement('span');
+      labelEl.className = 'mode-btn-label';
+      labelEl.textContent = label;
+      
+      // Assemble button
+      btn.appendChild(iconEl);
+      btn.appendChild(labelEl);
+      
       if (this.mode === mode) btn.classList.add('active');
       btn.addEventListener('click', () => this._switchTo(mode));
+      
       return btn;
     };
-    header.appendChild(mk('event', 'Add Event'));
-    header.appendChild(mk('calendar', 'Create Calendar'));
-    header.appendChild(mk('import', 'Import Calendar'));
+    
+    // Define mode configurations with icons
+    const modes = [
+      {
+        mode: 'event',
+        label: 'Add Event',
+        icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>'
+      },
+      {
+        mode: 'calendar',
+        label: 'Create Calendar',
+        icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>'
+      },
+      {
+        mode: 'import',
+        label: 'Import Calendar',
+        icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>'
+      }
+    ];
+    
+    modes.forEach(({ mode, label, icon }) => {
+      header.appendChild(mk(mode, label, icon));
+    });
+    
     return header;
   }
 
