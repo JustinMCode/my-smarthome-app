@@ -462,12 +462,6 @@ export class EventModal {
      * Create day events content with glassmorphism
      */
     createDayEventsContent(date, events) {
-        console.log('createDayEventsContent called with:', {
-            date: date,
-            eventsCount: events.length,
-            events: events
-        });
-        
         if (events.length === 0) {
             return `
                 <div style="
@@ -507,19 +501,9 @@ export class EventModal {
         }
 
         const eventsHtml = events.map((event, index) => {
-            console.log(`Processing event ${index + 1}/${events.length}:`, event.title);
-            
             const datetime = this.formatEventDateTime(event);
             const recurrence = this.formatRecurrence(event);
             const color = event.color || '#8b5cf6';
-
-            // Debug: Log recurrence information
-            console.log('Event:', event.title, 'Recurrence data:', {
-                hasRecurrence: !!event.recurrence,
-                recurrenceType: typeof event.recurrence,
-                recurrenceValue: event.recurrence,
-                formattedRecurrence: recurrence
-            });
 
             const dateTimeLine = `${datetime.date}${datetime.time ? ', ' + datetime.time : ''}`;
 
@@ -831,60 +815,42 @@ export class EventModal {
      * Format recurrence information
      */
     formatRecurrence(event) {
-        console.log('formatRecurrence called with event:', event.title, 'recurrence:', event.recurrence);
-        console.log('Full event object for debugging:', event);
-        
         // Check for different recurrence formats
         if (event.recurringEventId) {
-            console.log('Found recurringEventId:', event.recurringEventId);
-        }
-        
-        // Check for Google Calendar specific recurrence properties
-        if (event.recurrence) {
-            console.log('Recurrence property exists:', event.recurrence);
-        }
-        
-        // Check for other possible recurrence indicators
-        const recurrenceKeys = Object.keys(event).filter(key => key.toLowerCase().includes('recur'));
-        if (recurrenceKeys.length > 0) {
-            console.log('Found recurrence-related keys:', recurrenceKeys);
-        }
-        
-        // Check for other common recurrence properties
-        const possibleRecurrenceProps = ['recurrenceRule', 'rrule', 'recurrencePattern', 'frequency'];
-        for (const prop of possibleRecurrenceProps) {
-            if (event[prop]) {
-                console.log(`Found ${prop}:`, event[prop]);
-            }
-        }
-        
-        // Check for Google Calendar specific recurrence metadata
-        if (event.extendedProperties && event.extendedProperties.private) {
-            const privateProps = event.extendedProperties.private;
-            console.log('Extended properties (private):', privateProps);
-            
-            // Check for recurrence info in extended properties
-            if (privateProps.recurrenceRule) {
-                console.log('Found recurrenceRule in extended properties:', privateProps.recurrenceRule);
-                return this.parseRRULE(privateProps.recurrenceRule);
-            }
-        }
-        
-        if (event.extendedProperties && event.extendedProperties.shared) {
-            const sharedProps = event.extendedProperties.shared;
-            console.log('Extended properties (shared):', sharedProps);
-            
-            // Check for recurrence info in shared properties
-            if (sharedProps.recurrenceRule) {
-                console.log('Found recurrenceRule in shared properties:', sharedProps.recurrenceRule);
-                return this.parseRRULE(sharedProps.recurrenceRule);
+            // Check for Google Calendar specific recurrence properties
+            if (event.recurrence) {
+                // Check for other possible recurrence indicators
+                const recurrenceKeys = Object.keys(event).filter(key => key.toLowerCase().includes('recur'));
+                
+                // Check for other common recurrence properties
+                const possibleRecurrenceProps = ['recurrenceRule', 'rrule', 'recurrencePattern', 'frequency'];
+                for (const prop of possibleRecurrenceProps) {
+                    if (event[prop]) {
+                        // Check for Google Calendar specific recurrence metadata
+                        if (event.extendedProperties && event.extendedProperties.private) {
+                            const privateProps = event.extendedProperties.private;
+                            
+                            // Check for recurrence info in extended properties
+                            if (privateProps.recurrenceRule) {
+                                return this.parseRRULE(privateProps.recurrenceRule);
+                            }
+                        }
+                        
+                        if (event.extendedProperties && event.extendedProperties.shared) {
+                            const sharedProps = event.extendedProperties.shared;
+                            
+                            // Check for recurrence info in shared properties
+                            if (sharedProps.recurrenceRule) {
+                                return this.parseRRULE(sharedProps.recurrenceRule);
+                            }
+                        }
+                    }
+                }
             }
         }
         
         // Check if this is a recurring event (has recurringEventId)
         if (event.recurringEventId) {
-            console.log('Event is recurring (has recurringEventId)');
-            
             // Try to determine recurrence pattern from the event start time
             const startDate = new Date(event.start);
             const dayOfWeek = startDate.getDay();
@@ -910,13 +876,11 @@ export class EventModal {
         
         // Check for RRULE in recurrence array
         if (!event.recurrence || !Array.isArray(event.recurrence) || event.recurrence.length === 0) {
-            console.log('No recurrence data found');
             return null;
         }
 
         const rrule = event.recurrence.find(rule => rule.startsWith('RRULE:'));
         if (!rrule) {
-            console.log('No RRULE found in recurrence data');
             return null;
         }
 
@@ -930,8 +894,6 @@ export class EventModal {
                 params[key] = value;
             }
         });
-
-        console.log('Parsed recurrence params:', params);
 
         if (params.FREQ === 'WEEKLY') {
             if (params.BYDAY) {
@@ -986,8 +948,6 @@ export class EventModal {
                 params[key] = value;
             }
         });
-
-        console.log('Parsed RRULE params:', params);
 
         if (params.FREQ === 'WEEKLY') {
             if (params.BYDAY) {

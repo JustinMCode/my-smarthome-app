@@ -493,6 +493,19 @@ export class SidebarManager {
     }
     
     /**
+     * Update task count from main tasks manager
+     */
+    updateTaskCountFromMainManager() {
+        if (this.dashboard && this.dashboard.managers && this.dashboard.managers.tasks) {
+            const tasksManager = this.dashboard.managers.tasks;
+            if (tasksManager.tasks) {
+                const activeTasks = tasksManager.tasks.filter(t => !t.completed);
+                this.addNotificationBadge('tasks', activeTasks.length);
+            }
+        }
+    }
+
+    /**
      * Update active navigation - minimal style
      */
     updateActiveNav(viewName) {

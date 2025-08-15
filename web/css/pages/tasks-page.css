@@ -1,0 +1,765 @@
+/* Tasks Page Styles - Scoped to #tasks-view */
+
+#tasks-view {
+    background: linear-gradient(135deg, #f3f0ff 0%, #f8f4ff 25%, #f0f0ff 50%, #f3f0ff 100%);
+    background-size: 400% 400%;
+    animation: gradientFlow 25s ease infinite;
+    min-height: 100vh;
+    overflow: auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    color: rgba(30, 41, 59, 0.95);
+}
+
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+#tasks-view .tasks-page-container {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+}
+
+#tasks-view .container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header with User Switcher and Stats */
+#tasks-view .header {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 0 20px rgba(255, 255, 255, 0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#tasks-view .header-left {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+#tasks-view .header-stats {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+#tasks-view .stat-item-header {
+    text-align: center;
+    min-width: 60px;
+}
+
+#tasks-view .stat-value-header {
+    font-size: 24px;
+    font-weight: 200;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+}
+
+#tasks-view .stat-label-header {
+    font-size: 11px;
+    color: rgba(100, 116, 139, 0.7);
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+#tasks-view .page-title {
+    font-size: 32px;
+    font-weight: 200;
+    letter-spacing: 1.2px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+#tasks-view .user-switcher {
+    display: flex;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 4px;
+}
+
+#tasks-view .user-btn {
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    color: rgba(51, 65, 85, 0.8);
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+#tasks-view .user-btn.active {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+#tasks-view .user-btn:hover:not(.active) {
+    background: rgba(139, 92, 246, 0.04);
+    transform: translateX(2px);
+}
+
+/* Main Content */
+#tasks-view .add-task-panel {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 0 20px rgba(255, 255, 255, 0.5);
+    margin-bottom: 32px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 0.4s ease forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#tasks-view .input-group {
+    display: flex;
+    gap: 12px;
+}
+
+#tasks-view .task-input {
+    flex: 1;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    font-size: 15px;
+    color: rgba(30, 41, 59, 0.95);
+    letter-spacing: 0.2px;
+    transition: all 0.3s ease;
+}
+
+#tasks-view .task-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(139, 92, 246, 0.3);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+#tasks-view .task-input::placeholder {
+    color: rgba(100, 116, 139, 0.7);
+}
+
+#tasks-view .add-btn {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+#tasks-view .add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+}
+
+/* Health Tracker Horizontal Layout */
+#tasks-view .health-tracker-horizontal {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 0 20px rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 0.5s ease forwards;
+    animation-delay: 0.15s;
+    display: none;
+}
+
+#tasks-view .health-tracker-horizontal.visible {
+    display: block;
+}
+
+#tasks-view .health-tracker-horizontal .health-horizontal-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+}
+
+#tasks-view .health-tracker-horizontal .health-section {
+    display: flex;
+    flex-direction: column;
+}
+
+#tasks-view .health-tracker-horizontal .health-section-title {
+    font-size: 16px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    color: rgba(30, 41, 59, 0.9);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#tasks-view .health-tracker-horizontal .medication-items {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0;
+}
+
+#tasks-view .health-tracker-horizontal .med-item {
+    padding: 12px 24px;
+    text-align: center;
+    min-width: 120px;
+}
+
+#tasks-view .health-tracker-horizontal .water-glasses-horizontal {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#tasks-view .health-tracker-horizontal .mini-glass {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#tasks-view .health-tracker-horizontal .mini-glass:hover {
+    background: rgba(59, 130, 246, 0.08);
+    transform: translateY(-2px);
+}
+
+#tasks-view .health-tracker-horizontal .mini-glass.filled {
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    border-color: transparent;
+}
+
+/* Task Content Grid */
+#tasks-view .content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+}
+
+#tasks-view .content.with-water {
+    grid-template-columns: 1fr 1fr;
+}
+
+#tasks-view .task-panel {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 0 20px rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 0.5s ease forwards;
+    animation-delay: 0.1s;
+}
+
+/* Compact Water Tracker */
+#tasks-view .water-tracker-compact {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 0 20px rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 0.5s ease forwards;
+    animation-delay: 0.15s;
+    display: none;
+}
+
+#tasks-view .water-tracker-compact.visible {
+    display: block;
+}
+
+#tasks-view .water-compact-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#tasks-view .water-compact-title {
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    color: rgba(30, 41, 59, 0.9);
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Medication Section */
+#tasks-view .medication-section {
+    margin-bottom: 20px;
+}
+
+#tasks-view .medication-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+#tasks-view .medication-label {
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    color: rgba(30, 41, 59, 0.9);
+}
+
+#tasks-view .medication-status {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
+    font-weight: 400;
+    transition: all 0.3s ease;
+}
+
+#tasks-view .medication-status.pending {
+    background: rgba(251, 146, 60, 0.1);
+    color: rgba(251, 146, 60, 0.9);
+}
+
+#tasks-view .medication-status.complete {
+    background: rgba(34, 197, 94, 0.1);
+    color: rgba(34, 197, 94, 0.9);
+}
+
+#tasks-view .medication-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#tasks-view .med-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+#tasks-view .med-item:hover {
+    background: rgba(139, 92, 246, 0.04);
+    transform: translateX(2px);
+}
+
+#tasks-view .med-checkbox {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+#tasks-view .med-checkbox:checked {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-color: transparent;
+}
+
+#tasks-view .med-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 11px;
+}
+
+#tasks-view .med-time {
+    flex: 1;
+    font-size: 13px;
+    color: rgba(30, 41, 59, 0.95);
+    letter-spacing: 0.3px;
+}
+
+#tasks-view .med-checkbox:checked ~ .med-time {
+    color: rgba(139, 92, 246, 0.8);
+}
+
+#tasks-view .med-icon {
+    font-size: 16px;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+#tasks-view .med-checkbox:checked ~ .med-icon {
+    opacity: 1;
+}
+
+#tasks-view .health-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(100, 116, 139, 0.1), transparent);
+    margin: 20px 0;
+}
+
+#tasks-view .water-compact-subtitle {
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    color: rgba(30, 41, 59, 0.9);
+    margin-bottom: 8px;
+}
+
+#tasks-view .water-inner-header {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+#tasks-view .water-compact-count {
+    font-size: 24px;
+    font-weight: 200;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+#tasks-view .water-compact-goal {
+    font-size: 12px;
+    color: rgba(100, 116, 139, 0.7);
+    letter-spacing: 0.3px;
+}
+
+#tasks-view .water-mini-progress {
+    background: rgba(255, 255, 255, 0.4);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+#tasks-view .water-mini-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    border-radius: 4px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#tasks-view .water-compact-glasses {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+#tasks-view .mini-glass {
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+#tasks-view .mini-glass:hover {
+    background: rgba(59, 130, 246, 0.08);
+    transform: translateY(-2px);
+}
+
+#tasks-view .mini-glass.filled {
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    border-color: transparent;
+}
+
+#tasks-view .water-compact-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+#tasks-view .water-compact-btn {
+    padding: 8px;
+    background: transparent;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 8px;
+    color: rgba(59, 130, 246, 0.8);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.2px;
+}
+
+#tasks-view .water-compact-btn:hover {
+    background: rgba(59, 130, 246, 0.06);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+#tasks-view .panel-title {
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: 0.8px;
+    color: rgba(30, 41, 59, 0.9);
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    background: linear-gradient(90deg, transparent, rgba(100, 116, 139, 0.1), transparent);
+    background-position: bottom;
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
+}
+
+#tasks-view .user-indicator {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(139, 92, 246, 0.08);
+    border-radius: 6px;
+    font-size: 12px;
+    color: #8b5cf6;
+    margin-left: 8px;
+    font-weight: 400;
+}
+
+#tasks-view .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+#tasks-view .task-item {
+    padding: 18px 20px;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    border-left: 2px solid transparent;
+    opacity: 0;
+    transform: translateX(-10px);
+    animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+#tasks-view .task-item:hover {
+    background: rgba(139, 92, 246, 0.04);
+    transform: translateX(4px);
+    border-left-color: rgba(139, 92, 246, 0.2);
+}
+
+#tasks-view .task-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+#tasks-view .task-checkbox:checked {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-color: transparent;
+}
+
+#tasks-view .task-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+}
+
+#tasks-view .task-text {
+    flex: 1;
+    font-size: 15px;
+    color: rgba(30, 41, 59, 0.95);
+    letter-spacing: 0.2px;
+    line-height: 1.5;
+}
+
+#tasks-view .task-item.completed .task-text {
+    text-decoration: line-through;
+    color: rgba(100, 116, 139, 0.7);
+}
+
+#tasks-view .task-owner {
+    font-size: 12px;
+    color: rgba(100, 116, 139, 0.7);
+    padding: 4px 10px;
+    background: rgba(139, 92, 246, 0.04);
+    border-radius: 6px;
+}
+
+#tasks-view .delete-btn {
+    opacity: 0;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: rgba(239, 68, 68, 0.8);
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#tasks-view .task-item:hover .delete-btn {
+    opacity: 1;
+}
+
+#tasks-view .delete-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+#tasks-view .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(100, 116, 139, 0.7);
+    font-size: 14px;
+    letter-spacing: 0.3px;
+}
+
+/* Legacy stats styles (kept for backward compatibility) */
+#tasks-view .stats {
+    display: none;
+}
+
+#tasks-view .stat-item {
+    text-align: center;
+}
+
+#tasks-view .stat-value {
+    font-size: 36px;
+    font-weight: 200;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+#tasks-view .stat-label {
+    font-size: 13px;
+    color: rgba(100, 116, 139, 0.7);
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+@media (max-width: 968px) {
+    #tasks-view .content, #tasks-view .content.with-water {
+        grid-template-columns: 1fr;
+    }
+    #tasks-view .water-tracker-compact {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    #tasks-view .health-tracker-horizontal .health-horizontal-content {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    #tasks-view .header {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+    }
+    #tasks-view .header-left {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+        width: 100%;
+    }
+    #tasks-view .header-stats {
+        gap: 16px;
+        justify-content: space-around;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    #tasks-view .water-compact-glasses {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    #tasks-view .health-tracker-horizontal .water-glasses-horizontal {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+    }
+    #tasks-view .health-tracker-horizontal .medication-items {
+        flex-direction: column;
+        gap: 12px;
+    }
+    #tasks-view .health-tracker-horizontal .mini-glass {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+}

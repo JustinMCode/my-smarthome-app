@@ -5,7 +5,7 @@
 
 import { CONFIG } from './constants/config.js';
 import { TouchCalendarManager } from './calendar/index.js';
-import { TasksManager } from './components/tasks.js';
+import { TasksPageManager } from './pages/tasks.js';
 import { loadFromStorage, saveToStorage } from './utils/utils.js';
 import { formatTime, formatDate } from './calendar/utils/basic/calendar-date-utils.js';
 import { logger } from './utils/logger.js';
@@ -69,8 +69,8 @@ export class FridgeDashboard {
         this.managers.calendar = new TouchCalendarManager(this);
         this.managers.calendar.init();
         
-        // Initialize tasks manager
-        this.managers.tasks = new TasksManager(this);
+        // Initialize tasks page manager
+        this.managers.tasks = new TasksPageManager(this);
         this.managers.tasks.init();
     }
     
@@ -621,6 +621,13 @@ export class FridgeDashboard {
     }
     
     /**
+     * Show view (alias for switchView for compatibility)
+     */
+    showView(viewName) {
+        this.switchView(viewName);
+    }
+    
+    /**
      * Switch view
      */
     switchView(viewName) {
@@ -653,7 +660,7 @@ export class FridgeDashboard {
         
         // Special handling for tasks view
         if (viewName === 'tasks' && this.managers.tasks) {
-            this.managers.tasks.renderTasks();
+            this.managers.tasks.show();
         }
         
         // Special handling for performance view - initialize performance dashboard

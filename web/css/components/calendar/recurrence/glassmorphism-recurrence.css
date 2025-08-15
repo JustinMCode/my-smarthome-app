@@ -1,0 +1,526 @@
+/* Glassmorphism Recurrence Picker Styles
+   Based on Light Glassmorphism UI Design System */
+
+/* ============================================
+   Foundation - Animated Gradient Background
+   ============================================ */
+
+   .glass-recurring-wrapper {
+    background: linear-gradient(135deg, #e3e8ff 0%, #f0e6ff 25%, #e6f2ff 50%, #e3e8ff 100%);
+    background-size: 400% 400%;
+    animation: glassGradientFlow 25s ease infinite;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  
+  @keyframes glassGradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* ============================================
+     Glass Panel Container
+     ============================================ */
+  
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.08),
+      inset 0 0 20px rgba(255, 255, 255, 0.5);
+    padding: 28px;
+    animation: glassFadeInSlide 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @keyframes glassFadeInSlide {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  /* ============================================
+     Typography
+     ============================================ */
+  
+  .glass-heading {
+    font-size: 32px;
+    font-weight: 200;
+    letter-spacing: 1.2px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 24px;
+  }
+  
+  .glass-section-label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(100, 116, 139, 0.7);
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+  
+  .glass-option-heading {
+    display: block;
+    color: rgba(51, 65, 85, 0.8);
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    margin-bottom: 12px;
+  }
+  
+  .glass-option-label {
+    color: rgba(30, 41, 59, 0.9);
+    font-weight: 300;
+    letter-spacing: 0.2px;
+    margin: 0;
+    cursor: pointer;
+  }
+  
+  .glass-muted-text {
+    color: rgba(100, 116, 139, 0.7);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.2px;
+  }
+  
+  /* ============================================
+     Recurring Section
+     ============================================ */
+  
+  .glass-recurring-section {
+    margin-top: 20px;
+  }
+  
+  .glass-recurring-header {
+    padding: 16px 0;
+    border-bottom: 1px solid transparent;
+    background: linear-gradient(90deg, transparent, rgba(100, 116, 139, 0.1), transparent);
+    background-size: 100% 1px;
+    background-position: bottom;
+    background-repeat: no-repeat;
+    margin-bottom: 20px;
+  }
+  
+  /* ============================================
+     Checkbox Styling
+     ============================================ */
+  
+  .glass-checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 8px;
+    border-radius: 12px;
+  }
+  
+  .glass-checkbox-container:hover {
+    background: rgba(139, 92, 246, 0.04);
+    transform: translateX(2px);
+  }
+  
+  .glass-checkbox-input {
+    display: none;
+  }
+  
+  .glass-checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: 6px;
+    margin-right: 12px;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass-checkbox-input:checked + .glass-checkmark {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-color: transparent;
+  }
+  
+  .glass-check-pulse {
+    animation: glassCheckPulse 0.3s ease;
+  }
+  
+  @keyframes glassCheckPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  
+  .glass-checkbox-input:checked + .glass-checkmark::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 1;
+  }
+  
+  .glass-checkbox-label {
+    color: rgba(30, 41, 59, 0.9);
+    font-weight: 300;
+    letter-spacing: 0.2px;
+  }
+  
+  /* ============================================
+     Recurring Details
+     ============================================ */
+  
+  .glass-recurring-details {
+    animation: glassExpandIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .glass-expand-in {
+    animation: glassExpandIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .glass-collapse-out {
+    animation: glassCollapseOut 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @keyframes glassExpandIn {
+    from {
+      opacity: 0;
+      max-height: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      max-height: 800px;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes glassCollapseOut {
+    from {
+      opacity: 1;
+      max-height: 800px;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      max-height: 0;
+      transform: translateY(-10px);
+    }
+  }
+  
+  /* ============================================
+     Select Dropdown
+     ============================================ */
+  
+  .glass-recurring-select {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 12px;
+    color: rgba(30, 41, 59, 0.95);
+    font-size: 15px;
+    font-weight: 300;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    margin-bottom: 20px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(139, 92, 246, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 40px;
+  }
+  
+  .glass-recurring-select:hover {
+    background-color: rgba(139, 92, 246, 0.06);
+    border-color: rgba(139, 92, 246, 0.3);
+    transform: translateX(2px);
+  }
+  
+  .glass-recurring-select:focus,
+  .glass-select-focused {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  }
+  
+  .glass-select-changed {
+    animation: glassSelectPulse 0.3s ease;
+  }
+  
+  @keyframes glassSelectPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+  
+  /* ============================================
+     Day Selector
+     ============================================ */
+  
+  .glass-day-selector {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .glass-day-btn {
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 10px;
+    color: rgba(51, 65, 85, 0.8);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex: 1;
+    min-width: 48px;
+    text-align: center;
+    font-family: inherit;
+  }
+  
+  .glass-day-btn:hover,
+  .glass-day-hover {
+    background: rgba(139, 92, 246, 0.04);
+    transform: translateY(-2px);
+    border-color: rgba(139, 92, 246, 0.3);
+  }
+  
+  .glass-day-btn.glass-day-selected {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  }
+  
+  .glass-day-select-pulse {
+    animation: glassSelectPulse 0.3s ease;
+  }
+  
+  .glass-day-deselect {
+    animation: glassDayDeselect 0.3s ease;
+  }
+  
+  .glass-day-init {
+    animation: glassDayInit 0.5s ease;
+  }
+  
+  @keyframes glassDayDeselect {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes glassDayInit {
+    from {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  /* ============================================
+     Radio Options
+     ============================================ */
+  
+  .glass-option-item {
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 10px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .glass-option-item:hover {
+    background: rgba(139, 92, 246, 0.04);
+    transform: translateX(2px);
+  }
+  
+  .glass-option-active {
+    background: rgba(139, 92, 246, 0.06);
+    border-left: 2px solid transparent;
+    border-image: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-image-slice: 1;
+    padding-left: 10px;
+  }
+  
+  .glass-radio {
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+    accent-color: #8b5cf6;
+    cursor: pointer;
+  }
+  
+  /* ============================================
+     Frequency Details Sections
+     ============================================ */
+  
+  .glass-frequency-option-details {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    margin-top: 16px;
+  }
+  
+  .glass-fade-in {
+    animation: glassFadeIn 0.3s ease;
+  }
+  
+  .glass-fade-out {
+    animation: glassFadeOut 0.2s ease;
+  }
+  
+  @keyframes glassFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes glassFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  
+  /* ============================================
+     End Section
+     ============================================ */
+  
+  .glass-recurring-end-section {
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid transparent;
+    background: linear-gradient(90deg, transparent, rgba(100, 116, 139, 0.1), transparent);
+    background-size: 100% 1px;
+    background-position: top;
+    background-repeat: no-repeat;
+  }
+  
+  /* ============================================
+     Number Input
+     ============================================ */
+  
+  .glass-number-input {
+    width: 80px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 8px;
+    color: rgba(30, 41, 59, 0.95);
+    font-size: 14px;
+    font-weight: 300;
+    margin: 0 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    font-family: inherit;
+  }
+  
+  .glass-number-input:hover {
+    background: rgba(139, 92, 246, 0.06);
+    border-color: rgba(139, 92, 246, 0.3);
+  }
+  
+  .glass-number-input:focus,
+  .glass-input-focused {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  }
+  
+  /* ============================================
+     Date Picker Button
+     ============================================ */
+  
+  .glass-datetime-picker-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 10px;
+    color: rgba(30, 41, 59, 0.9);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: 12px;
+    font-family: inherit;
+  }
+  
+  .glass-datetime-picker-btn:hover,
+  .glass-btn-hover {
+    background: rgba(139, 92, 246, 0.06);
+    border-color: rgba(139, 92, 246, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .glass-btn-clicked {
+    animation: glassBtnClick 0.3s ease;
+  }
+  
+  @keyframes glassBtnClick {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+  
+  .glass-icon-calendar {
+    color: #8b5cf6;
+    flex-shrink: 0;
+  }
+  
+  .glass-date-part {
+    font-weight: 400;
+  }
+  
+  .glass-text-update {
+    animation: glassTextUpdate 0.3s ease;
+  }
+  
+  @keyframes glassTextUpdate {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  
+  /* ============================================
+     Utility Classes
+     ============================================ */
+  
+  .glass-mt-4 { margin-top: 16px; }
+  .glass-mt-6 { margin-top: 24px; }
+  .glass-mb-4 { margin-bottom: 16px; }
+  .glass-mb-6 { margin-bottom: 24px; }
+  .glass-p-4 { padding: 16px; }
+  .glass-p-6 { padding: 24px; }
+  .glass-rounded { border-radius: 12px; }
+  .glass-rounded-lg { border-radius: 20px; }
